@@ -145,7 +145,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Advanced hazard detection error:", error);
       
       // Fallback to enhanced regional detection if APIs fail
-      const fallbackData = getEnhancedRegionalHazardData(zipCode);
+      const fallbackData = getEnhancedRegionalHazardData(req.params.zipCode);
       res.json(fallbackData);
     }
   });
@@ -416,7 +416,7 @@ async function getInfrastructureData(lat: number, lon: number) {
 }
 
 function generateLocationRecommendations(hazardData: any) {
-  const recommendations = [];
+  const recommendations: string[] = [];
   
   hazardData.allHazards.forEach((hazard: any) => {
     switch (hazard.type) {
