@@ -71,6 +71,7 @@ export default function AuditWizard() {
   const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
   const [showPaymentGate, setShowPaymentGate] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<'basic' | 'premium'>('basic');
 
   const updateField = (field: keyof AuditData, value: any) => {
     setAuditData(prev => ({
@@ -127,7 +128,8 @@ export default function AuditWizard() {
   };
 
   const continueWithPayment = () => {
-    setLocation(`/payment?auditId=${auditId}`);
+    const amount = selectedPlan === 'basic' ? 29 : 49;
+    setLocation(`/payment?auditId=${auditId}&amount=${amount}&plan=${selectedPlan}`);
   };
 
   const generateReport = async () => {
@@ -208,16 +210,60 @@ export default function AuditWizard() {
                 </p>
               </div>
 
-              <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-600">Disaster Preparedness Audit</span>
-                  <span className="font-bold text-xl">$29.00</span>
+              <div className="space-y-3 mb-6">
+                {/* Basic Plan */}
+                <div 
+                  className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                    selectedPlan === 'basic' 
+                      ? 'border-emergency-red bg-red-50' 
+                      : 'border-gray-200 bg-gray-50 hover:border-gray-300'
+                  }`}
+                  onClick={() => setSelectedPlan('basic')}
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center">
+                      <div className={`w-4 h-4 rounded-full border-2 mr-3 ${
+                        selectedPlan === 'basic' ? 'border-emergency-red bg-emergency-red' : 'border-gray-300'
+                      }`}>
+                        {selectedPlan === 'basic' && <div className="w-2 h-2 bg-white rounded-full m-0.5"></div>}
+                      </div>
+                      <span className="font-medium text-gray-900">Basic Audit</span>
+                    </div>
+                    <span className="font-bold text-xl">$29</span>
+                  </div>
+                  <div className="text-sm text-gray-600 ml-7">
+                    • Instant PDF report with FEMA citations
+                    • Personalized recommendations
+                    • Regional hazard analysis
+                  </div>
                 </div>
-                <div className="text-sm text-gray-500">
-                  • Instant PDF report with FEMA citations
-                  • Personalized recommendations
-                  • Regional hazard analysis
-                  • Insurance savings guidance
+
+                {/* Premium Plan */}
+                <div 
+                  className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                    selectedPlan === 'premium' 
+                      ? 'border-emergency-red bg-red-50' 
+                      : 'border-gray-200 bg-gray-50 hover:border-gray-300'
+                  }`}
+                  onClick={() => setSelectedPlan('premium')}
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center">
+                      <div className={`w-4 h-4 rounded-full border-2 mr-3 ${
+                        selectedPlan === 'premium' ? 'border-emergency-red bg-emergency-red' : 'border-gray-300'
+                      }`}>
+                        {selectedPlan === 'premium' && <div className="w-2 h-2 bg-white rounded-full m-0.5"></div>}
+                      </div>
+                      <span className="font-medium text-gray-900">Premium Audit</span>
+                    </div>
+                    <span className="font-bold text-xl">$49</span>
+                  </div>
+                  <div className="text-sm text-gray-600 ml-7">
+                    • Everything in Basic Plan
+                    • Insurance savings guidance
+                    • Rebate opportunities database
+                    • Priority email support
+                  </div>
                 </div>
               </div>
 

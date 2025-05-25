@@ -14,9 +14,10 @@ if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
-const CheckoutForm = ({ zipCode, hazard, onSuccess }: { 
+const CheckoutForm = ({ zipCode, hazard, amount, onSuccess }: { 
   zipCode: string; 
   hazard: string; 
+  amount: number;
   onSuccess: (auditId: number) => void; 
 }) => {
   const stripe = useStripe();
@@ -84,7 +85,7 @@ const CheckoutForm = ({ zipCode, hazard, onSuccess }: {
         className="w-full bg-emergency-red hover:bg-red-700 text-white py-4 text-lg font-semibold"
       >
         <CreditCard className="mr-2 h-5 w-5" />
-        {isLoading ? "Processing..." : "Pay $29 & Start Audit"}
+        {isLoading ? "Processing..." : `Pay $${amount} & Start Audit`}
       </Button>
     </form>
   );
@@ -95,29 +96,33 @@ export default function Payment() {
   const [clientSecret, setClientSecret] = useState("");
   const [zipCode, setZipCode] = useState("");
   const [hazard, setHazard] = useState("");
+  const [amount, setAmount] = useState(29);
+  const [plan, setPlan] = useState("basic");
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const zip = urlParams.get('zip') || '';
     const detectedHazard = urlParams.get('hazard') || '';
+    const auditId = urlParams.get('auditId') || '';
+    const planAmount = parseInt(urlParams.get('amount') || '29');
+    const selectedPlan = urlParams.get('plan') || 'basic';
     
     setZipCode(zip);
     setHazard(detectedHazard);
+    setAmount(planAmount);
+    setPlan(selectedPlan);
 
-    if (zip && detectedHazard) {
-      // Create payment intent
-      apiRequest("POST", "/api/create-payment-intent", { 
-        zipCode: zip, 
-        primaryHazard: detectedHazard 
+    // Create payment intent with the selected amount
+    apiRequest("POST", "/api/create-payment-intent", { 
+      amount: planAmount
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setClientSecret(data.clientSecret);
       })
-        .then((res) => res.json())
-        .then((data) => {
-          setClientSecret(data.clientSecret);
-        })
-        .catch((error) => {
-          console.error("Failed to create payment intent:", error);
-        });
-    }
+      .catch((error) => {
+        console.error("Failed to create payment intent:", error);
+      });
   }, []);
 
   const goBackToZip = () => {
@@ -166,8 +171,8 @@ export default function Payment() {
                 </div>
                 <div className="border-t pt-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-lg font-semibold">Total:</span>
-                    <span className="text-2xl font-bold text-fema-blue">$29.00</span>
+                    <span className="text-lg font-semibold">Total ({plan} plan):</span>
+                    <span className="text-2xl font-bold text-fema-blue">${amount}.00</span>
                   </div>
                 </div>
               </CardContent>
@@ -177,6 +182,7 @@ export default function Payment() {
               <CheckoutForm 
                 zipCode={zipCode} 
                 hazard={hazard} 
+                amount={amount}
                 onSuccess={onPaymentSuccess} 
               />
             </Elements>
