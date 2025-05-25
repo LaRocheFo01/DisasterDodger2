@@ -1,4 +1,7 @@
 import { audits, type Audit, type InsertAudit } from "@shared/schema";
+import { drizzle } from "drizzle-orm/neon-http";
+import { neon } from "@neondatabase/serverless";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
   createAudit(audit: InsertAudit): Promise<Audit>;
@@ -7,44 +10,37 @@ export interface IStorage {
   getAuditByPaymentId(paymentId: string): Promise<Audit | undefined>;
 }
 
-export class MemStorage implements IStorage {
-  private audits: Map<number, Audit>;
-  private currentId: number;
+// Database setup
+const sql = neon(process.env.DATABASE_URL!);
+const db = drizzle(sql);
 
-  constructor() {
-    this.audits = new Map();
-    this.currentId = 1;
-  }
-
+export class DatabaseStorage implements IStorage {
   async createAudit(insertAudit: InsertAudit): Promise<Audit> {
-    const id = this.currentId++;
-    const audit: Audit = { 
-      ...insertAudit, 
-      id,
-      createdAt: new Date()
-    };
-    this.audits.set(id, audit);
+    const [audit] = await db.insert(audits).values(insertAudit).returning();
     return audit;
   }
 
   async getAudit(id: number): Promise<Audit | undefined> {
-    return this.audits.get(id);
+    const [audit] = await db.select().from(audits).where(eq(audits.id, id));
+    return audit;
   }
 
   async updateAudit(id: number, updates: Partial<Audit>): Promise<Audit | undefined> {
-    const existing = this.audits.get(id);
-    if (!existing) return undefined;
-    
-    const updated = { ...existing, ...updates };
-    this.audits.set(id, updated);
-    return updated;
+    const [audit] = await db
+      .update(audits)
+      .set(updates)
+      .where(eq(audits.id, id))
+      .returning();
+    return audit;
   }
 
   async getAuditByPaymentId(paymentId: string): Promise<Audit | undefined> {
-    return Array.from(this.audits.values()).find(
-      (audit) => audit.stripePaymentId === paymentId
-    );
+    const [audit] = await db
+      .select()
+      .from(audits)
+      .where(eq(audits.stripePaymentId, paymentId));
+    return audit;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
