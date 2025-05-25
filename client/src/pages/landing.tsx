@@ -48,14 +48,40 @@ export default function Landing() {
                 Get a personalized disaster preparedness audit with instant PDF report, 
                 FEMA citations, rebate opportunities, and insurance savings guidance.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
+              
+              {/* Primary CTA - Moved up and styled as requested */}
+              <div className="mb-6">
                 <Button 
                   onClick={startAudit}
-                  className="bg-emergency-red hover:bg-red-700 text-white px-8 py-4 text-lg font-heading font-bold transition-all transform hover:scale-105 shadow-xl rounded-lg"
+                  className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white py-4 px-8 rounded-lg font-semibold text-lg transition-all transform hover:scale-105 shadow-xl"
+                  aria-label="Start your disaster preparedness audit for $29"
                 >
                   <Play className="mr-2 h-5 w-5" />
                   Start Your $29 Audit
                 </Button>
+              </div>
+
+              {/* Rating snippet and sample PDF link */}
+              <div className="mb-4 text-center sm:text-left">
+                <div className="flex items-center justify-center sm:justify-start mb-2">
+                  <span className="text-yellow-400 text-lg mr-2">★★★★★</span>
+                  <span className="text-white text-sm font-medium">4.8 / 5 from our first 20 homeowners</span>
+                </div>
+                <a 
+                  href="/sample-report.pdf" 
+                  target="_blank" 
+                  className="text-teal-300 hover:text-teal-200 text-sm underline font-medium"
+                  aria-label="View a sample PDF report in a new window"
+                >
+                  View Sample PDF
+                </a>
+              </div>
+
+              {/* Money-back guarantee */}
+              <p className="mt-2 text-xs text-slate-300 mb-6 text-center sm:text-left">Love it or get $5 back—no questions asked.</p>
+
+              {/* Secondary CTA */}
+              <div className="mb-8">
                 <Button 
                   variant="outline"
                   onClick={() => scrollToSection('how-it-works')}
@@ -106,37 +132,40 @@ export default function Landing() {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            <div className="bg-gray-50 rounded-lg p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Mountain className="text-white h-8 w-8" />
+          {/* Centered hazard icons container */}
+          <div className="flex justify-center gap-8 mt-12">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl">
+              <div className="bg-white rounded-lg p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
+                <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Mountain className="text-white h-8 w-8" />
+                </div>
+                <h3 className="text-lg font-heading font-bold text-gray-900 mb-2">Earthquake & Wildfire</h3>
+                <p className="text-gray-600 text-sm font-body">Seismic safety, structural retrofits, fire-resistant landscaping</p>
               </div>
-              <h3 className="text-lg font-heading font-bold text-gray-900 mb-2">Earthquake & Wildfire</h3>
-              <p className="text-gray-600 text-sm font-body">Seismic safety, structural retrofits, fire-resistant landscaping</p>
-            </div>
-            
-            <div className="bg-gray-50 rounded-lg p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Wind className="text-white h-8 w-8" />
+              
+              <div className="bg-white rounded-lg p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
+                <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Wind className="text-white h-8 w-8" />
+                </div>
+                <h3 className="text-lg font-heading font-bold text-gray-900 mb-2">Hurricane Protection</h3>
+                <p className="text-gray-600 text-sm font-body">Storm shutters, evacuation planning, flood barriers</p>
               </div>
-              <h3 className="text-lg font-heading font-bold text-gray-900 mb-2">Hurricane Protection</h3>
-              <p className="text-gray-600 text-sm font-body">Storm shutters, evacuation planning, flood barriers</p>
-            </div>
-            
-            <div className="bg-gray-50 rounded-lg p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap className="text-white h-8 w-8" />
+              
+              <div className="bg-white rounded-lg p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
+                <div className="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Zap className="text-white h-8 w-8" />
+                </div>
+                <h3 className="text-lg font-heading font-bold text-gray-900 mb-2">Tornado & Flood</h3>
+                <p className="text-gray-600 text-sm font-body">Safe rooms, drainage systems, early warning systems</p>
               </div>
-              <h3 className="text-lg font-heading font-bold text-gray-900 mb-2">Tornado & Flood</h3>
-              <p className="text-gray-600 text-sm font-body">Safe rooms, drainage systems, early warning systems</p>
-            </div>
-            
-            <div className="bg-gray-50 rounded-lg p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-16 h-16 bg-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Snowflake className="text-white h-8 w-8" />
+              
+              <div className="bg-white rounded-lg p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
+                <div className="w-16 h-16 bg-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Snowflake className="text-white h-8 w-8" />
+                </div>
+                <h3 className="text-lg font-heading font-bold text-gray-900 mb-2">Winter Storms</h3>
+                <p className="text-gray-600 text-sm font-body">Heating backup, insulation, ice dam prevention</p>
               </div>
-              <h3 className="text-lg font-heading font-bold text-gray-900 mb-2">Winter Storms</h3>
-              <p className="text-gray-600 text-sm font-body">Heating backup, insulation, ice dam prevention</p>
             </div>
           </div>
 
@@ -217,9 +246,9 @@ export default function Landing() {
             </h2>
             <p className="text-xl text-gray-600 font-body">One audit, comprehensive results</p>
           </div>
-          <div className="max-w-lg mx-auto">
-            <Card className="border-4 border-emergency-red shadow-xl">
-              <div className="bg-emergency-red text-white text-center py-4">
+          <div className="max-w-lg mx-auto px-4">
+            <Card className="border-4 border-emergency-red shadow-lg bg-white rounded-2xl">
+              <div className="bg-emergency-red text-white text-center py-4 rounded-t-2xl">
                 <span className="text-lg font-semibold">Most Popular</span>
               </div>
               <CardContent className="p-8">
@@ -257,7 +286,8 @@ export default function Landing() {
                   </ul>
                   <Button 
                     onClick={startAudit} 
-                    className="w-full bg-emergency-red hover:bg-red-700 text-white py-4 text-lg font-heading font-bold rounded-lg"
+                    className="w-full bg-teal-600 hover:bg-teal-700 text-white py-4 px-8 rounded-lg font-semibold text-lg"
+                    aria-label="Start your disaster preparedness audit now"
                   >
                     Start Your Audit Now
                   </Button>

@@ -22,7 +22,6 @@ export default function Navigation({ onStartAudit }: NavigationProps) {
     { href: "#home", label: "Home" },
     { href: "#how-it-works", label: "How It Works" },
     { href: "#pricing", label: "Pricing" },
-    { href: "#faq", label: "FAQ" },
     { href: "#contact", label: "Contact" },
   ];
 
@@ -88,7 +87,7 @@ export default function Navigation({ onStartAudit }: NavigationProps) {
               <button
                 key={item.href}
                 onClick={() => scrollToSection(item.href.substring(1))}
-                className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium ${
+                className={`block w-full text-left px-3 py-4 rounded-md text-base font-medium ${
                   index === 0 
                     ? 'text-fema-blue' 
                     : 'text-gray-700 hover:text-fema-blue'
@@ -102,7 +101,7 @@ export default function Navigation({ onStartAudit }: NavigationProps) {
                 onStartAudit();
                 setIsMobileMenuOpen(false);
               }}
-              className="w-full bg-emergency-red hover:bg-red-700 text-white px-3 py-2 text-base font-medium mt-2"
+              className="w-full bg-emergency-red hover:bg-red-700 text-white px-3 py-4 text-base font-medium mt-2"
             >
               Start Audit
             </Button>
