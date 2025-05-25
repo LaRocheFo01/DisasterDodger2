@@ -169,32 +169,32 @@ export default function Landing() {
                   <ul className="text-left space-y-3 mb-8">
                     <li className="flex items-center">
                       <CheckCircle className="text-safety-green mr-3 h-5 w-5" />
-                      <span>Personalized 15-question audit</span>
+                      <span className="font-body">Personalized 15-question audit</span>
                     </li>
                     <li className="flex items-center">
                       <CheckCircle className="text-safety-green mr-3 h-5 w-5" />
-                      <span>Instant PDF report with recommendations</span>
+                      <span className="font-body">Instant PDF report with recommendations</span>
                     </li>
                     <li className="flex items-center">
                       <CheckCircle className="text-safety-green mr-3 h-5 w-5" />
-                      <span>FEMA-aligned citations and guidance</span>
+                      <span className="font-body">FEMA-aligned citations and guidance</span>
                     </li>
                     <li className="flex items-center">
                       <CheckCircle className="text-safety-green mr-3 h-5 w-5" />
-                      <span>Rebate and insurance savings links</span>
+                      <span className="font-body">Rebate and insurance savings links</span>
                     </li>
                     <li className="flex items-center">
                       <CheckCircle className="text-safety-green mr-3 h-5 w-5" />
-                      <span>Photo upload capability</span>
+                      <span className="font-body">Photo upload capability</span>
                     </li>
                     <li className="flex items-center">
                       <CheckCircle className="text-safety-green mr-3 h-5 w-5" />
-                      <span>Quick Win action items</span>
+                      <span className="font-body">Quick Win action items</span>
                     </li>
                   </ul>
                   <Button 
                     onClick={startAudit} 
-                    className="w-full bg-emergency-red hover:bg-red-700 text-white py-4 text-lg font-semibold"
+                    className="w-full bg-emergency-red hover:bg-red-700 text-white py-4 text-lg font-heading font-bold rounded-lg"
                   >
                     Start Your Audit Now
                   </Button>
