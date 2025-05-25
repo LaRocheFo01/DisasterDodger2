@@ -5,11 +5,10 @@ import { storage } from "./storage";
 import { insertAuditSchema } from "@shared/schema";
 import { z } from "zod";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
-}
+// Use provided Stripe test keys
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY || "sk_test_51RSg4YHJP5jPBhHmX3FS4OiQ5VHk5Xt7a0SVJFPpB75eQY5ysyM4491KMdq9JpgaheGDuDN9y74Kbv0QHACdMq4a009GuhsKqa";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+const stripe = new Stripe(stripeSecretKey, {
   apiVersion: "2023-10-16",
 });
 
