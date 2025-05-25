@@ -43,7 +43,7 @@ export default function Landing() {
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-black mb-6 leading-tight tracking-tight">
                 Protect Your Home in Under 5 Minutes
               </h1>
-              <p className="text-xl mb-8 text-blue-100 leading-relaxed font-body">
+              <p className="text-xl mb-8 text-white leading-relaxed font-body font-medium">
                 Get a personalized disaster preparedness audit with instant PDF report, 
                 FEMA citations, rebate opportunities, and insurance savings guidance.
               </p>
@@ -63,18 +63,18 @@ export default function Landing() {
                   Learn How It Works
                 </Button>
               </div>
-              <div className="flex items-center mt-8 text-blue-100 space-x-6">
+              <div className="flex items-center mt-8 text-white space-x-6">
                 <div className="flex items-center">
-                  <Clock className="mr-2 h-4 w-4" />
-                  <span className="text-sm font-body">Under 5 minutes</span>
+                  <Clock className="mr-2 h-4 w-4 text-warning-orange" />
+                  <span className="text-sm font-body font-medium">Under 5 minutes</span>
                 </div>
                 <div className="flex items-center">
-                  <Download className="mr-2 h-4 w-4" />
-                  <span className="text-sm font-body">Instant PDF report</span>
+                  <Download className="mr-2 h-4 w-4 text-warning-orange" />
+                  <span className="text-sm font-body font-medium">Instant PDF report</span>
                 </div>
                 <div className="flex items-center">
-                  <Shield className="mr-2 h-4 w-4" />
-                  <span className="text-sm font-body">FEMA citations</span>
+                  <Shield className="mr-2 h-4 w-4 text-warning-orange" />
+                  <span className="text-sm font-body font-medium">FEMA citations</span>
                 </div>
               </div>
             </div>
@@ -87,7 +87,7 @@ export default function Landing() {
                 />
                 <div className="mt-6 text-center">
                   <div className="text-3xl font-bold text-warning-orange">95%</div>
-                  <div className="text-sm text-blue-100">Average preparedness improvement</div>
+                  <div className="text-sm text-white font-body font-medium">Average preparedness improvement</div>
                 </div>
               </div>
             </div>
