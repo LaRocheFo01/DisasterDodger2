@@ -201,11 +201,11 @@ export default function StartAudit() {
                     We analyzed your location {zipCode} and identified the primary disaster risk for your specific zone
                   </p>
                 </div>
-                <h2 className="text-xl font-bold mb-4 text-gray-900">
-                  Your area is most likely to be affected by:
-                </h2>
-                <div className="bg-gradient-to-r from-emergency-red to-red-600 text-white rounded-lg p-6 mb-6">
-                  <div className="flex items-center justify-center gap-4 mb-4">
+                <div className="mb-4">
+                  <h2 className="text-lg font-bold mb-3 text-gray-900">
+                    Your area is most likely to be affected by:
+                  </h2>
+                  <div className="flex items-center justify-center gap-3 mb-4">
                     {(() => {
                       const hazardName = (hazardData as any).primaryHazard;
                       const disasterIcon = disasterIcons.find(d => 
@@ -218,11 +218,14 @@ export default function StartAudit() {
                         (d.name === 'Winter Storm' && hazardName?.toLowerCase().includes('winter'))
                       );
                       const IconComponent = disasterIcon?.icon || AlertCircle;
-                      return <IconComponent className="w-12 h-12 text-white" />;
+                      const iconColor = disasterIcon?.color || "text-emergency-red";
+                      return <IconComponent className={`w-10 h-10 ${iconColor}`} />;
                     })()}
-                    <div className="text-3xl font-bold">{(hazardData as any).primaryHazard}</div>
+                    <div className="text-2xl font-bold text-gray-900">{(hazardData as any).primaryHazard}</div>
                   </div>
-                  <div className="text-lg">Risk Level: {(hazardData as any).primaryRisk}/5 - High Priority</div>
+                </div>
+                <div className="bg-gradient-to-r from-emergency-red to-red-600 text-white rounded-lg p-6 mb-6">
+                  <div className="text-lg font-semibold">Risk Level: {(hazardData as any).primaryRisk}/5 - High Priority</div>
                   <div className="text-sm mt-2 opacity-90">Location: {(hazardData as any).state}</div>
                 </div>
                 <div className="bg-blue-50 rounded-lg p-4 mb-6">
