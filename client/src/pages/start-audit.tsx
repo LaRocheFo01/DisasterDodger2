@@ -205,7 +205,23 @@ export default function StartAudit() {
                   Your area is most likely to be affected by:
                 </h2>
                 <div className="bg-gradient-to-r from-emergency-red to-red-600 text-white rounded-lg p-6 mb-6">
-                  <div className="text-3xl font-bold mb-2">{(hazardData as any).primaryHazard}</div>
+                  <div className="flex items-center justify-center gap-4 mb-4">
+                    {(() => {
+                      const hazardName = (hazardData as any).primaryHazard;
+                      const disasterIcon = disasterIcons.find(d => 
+                        hazardName?.toLowerCase().includes(d.name.toLowerCase()) ||
+                        (d.name === 'Earthquake' && hazardName?.toLowerCase().includes('earthquake')) ||
+                        (d.name === 'Hurricane' && hazardName?.toLowerCase().includes('hurricane')) ||
+                        (d.name === 'Tornado' && hazardName?.toLowerCase().includes('tornado')) ||
+                        (d.name === 'Wildfire' && hazardName?.toLowerCase().includes('fire')) ||
+                        (d.name === 'Flood' && hazardName?.toLowerCase().includes('flood')) ||
+                        (d.name === 'Winter Storm' && hazardName?.toLowerCase().includes('winter'))
+                      );
+                      const IconComponent = disasterIcon?.icon || AlertCircle;
+                      return <IconComponent className="w-12 h-12 text-white" />;
+                    })()}
+                    <div className="text-3xl font-bold">{(hazardData as any).primaryHazard}</div>
+                  </div>
                   <div className="text-lg">Risk Level: {(hazardData as any).primaryRisk}/5 - High Priority</div>
                   <div className="text-sm mt-2 opacity-90">Location: {(hazardData as any).state}</div>
                 </div>
