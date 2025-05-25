@@ -5,11 +5,15 @@ import { storage } from "./storage";
 import { insertAuditSchema } from "@shared/schema";
 import { z } from "zod";
 
-// Use provided Stripe test keys
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY || "sk_test_51RSg4YHJP5jPBhHmX3FS4OiQ5VHk5Xt7a0SVJFPpB75eQY5ysyM4491KMdq9JpgaheGDuDN9y74Kbv0QHACdMq4a009GuhsKqa";
+// Stripe secret key from environment variables
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+
+if (!stripeSecretKey) {
+  throw new Error("STRIPE_SECRET_KEY environment variable is required");
+}
 
 const stripe = new Stripe(stripeSecretKey, {
-  apiVersion: "2023-10-16",
+  apiVersion: "2025-04-30.basil",
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
