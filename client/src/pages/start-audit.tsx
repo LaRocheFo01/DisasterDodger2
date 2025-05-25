@@ -113,10 +113,23 @@ export default function StartAudit() {
           </CardContent>
         </Card>
 
-        {/* Advanced Hazard Detection Display */}
-        {validateZip(zipCode) && (
+        {/* Simple Hazard Detection Display */}
+        {validateZip(zipCode) && hazardData && (
           <div className="mt-8">
-            <HazardMap zipCode={zipCode} />
+            <Card className="shadow-lg">
+              <CardContent className="p-6">
+                <div className="text-center">
+                  <h3 className="text-lg font-semibold mb-2">Detected Primary Hazard</h3>
+                  <div className="bg-emergency-red text-white rounded-lg p-4 mb-4">
+                    <div className="text-2xl font-bold">{hazardData.primaryHazard}</div>
+                    <div className="text-sm">Risk Level: {hazardData.primaryRisk}/5</div>
+                  </div>
+                  <p className="text-gray-600 text-sm">
+                    Based on ZIP code {zipCode} in {hazardData.state}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
       </div>
