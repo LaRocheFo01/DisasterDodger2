@@ -120,8 +120,16 @@ export default function StartAudit() {
               <CardContent className="p-6">
                 <div className="text-center">
                   <AlertCircle className="w-12 h-12 text-emergency-red mx-auto mb-4" />
+                  <div className="bg-blue-100 rounded-lg p-4 mb-4">
+                    <p className="text-blue-800 font-semibold text-lg">
+                      🔍 ZIP Code Analysis Complete
+                    </p>
+                    <p className="text-blue-700 text-sm mt-1">
+                      We analyzed your location {zipCode} and identified the primary disaster risk for your specific zone
+                    </p>
+                  </div>
                   <h3 className="text-xl font-bold mb-4 text-gray-900">
-                    According to your ZIP code {zipCode}, your area is likely to be affected by:
+                    Based on your ZIP code {zipCode} geographic analysis, your area is most likely to be affected by:
                   </h3>
                   <div className="bg-gradient-to-r from-emergency-red to-red-600 text-white rounded-lg p-6 mb-4">
                     <div className="text-3xl font-bold mb-2">{hazardData.primaryHazard}</div>
