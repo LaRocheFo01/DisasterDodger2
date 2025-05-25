@@ -109,7 +109,7 @@ export default function Landing() {
               <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 shadow-2xl">
                 <img 
                   src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600" 
-                  alt="Modern suburban home representing disaster preparedness" 
+                  alt="Modern suburban home with well-maintained yard showcasing disaster preparedness features and professional property protection" 
                   className="rounded-xl shadow-lg w-full h-auto"
                 />
                 <div className="mt-6 text-center">

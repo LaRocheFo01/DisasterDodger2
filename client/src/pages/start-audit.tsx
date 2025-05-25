@@ -94,7 +94,7 @@ export default function StartAudit() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-fema-blue to-blue-800 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
-        <Card className="shadow-2xl">
+        <Card className="bg-white rounded-2xl shadow-lg max-w-md mx-auto">
           <CardContent className="p-8">
             {/* Initial Form - Show when not analyzing and not complete */}
             {!isAnalyzing && !showAnalysisComplete && (
@@ -118,14 +118,14 @@ export default function StartAudit() {
                       value={zipCode}
                       onChange={(e) => handleZipChange(e.target.value)}
                       placeholder="12345"
-                      className={`text-center text-xl font-semibold focus:ring-2 focus:ring-fema-blue focus:border-transparent ${
-                        zipError ? 'border-emergency-red' : ''
+                      className={`w-full text-lg p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-600 text-center font-semibold ${
+                        zipError ? 'border-red-500' : ''
                       }`}
                       maxLength={5}
                       required
                     />
                     {zipError && (
-                      <div className="mt-2 text-emergency-red text-sm flex items-center">
+                      <div className="text-red-700 text-sm mt-2 flex items-center">
                         <AlertCircle className="mr-1 h-4 w-4" />
                         {zipError}
                       </div>
@@ -134,8 +134,9 @@ export default function StartAudit() {
                   
                   <Button 
                     type="submit" 
-                    className="w-full bg-emergency-red hover:bg-red-700 text-white py-4 text-lg font-semibold"
+                    className="w-full bg-teal-600 hover:bg-teal-700 text-white py-4 px-8 rounded-lg font-semibold text-lg"
                     disabled={!validateZip(zipCode)}
+                    aria-label="Analyze your location for disaster risks"
                   >
                     Analyze My Location
                   </Button>
