@@ -41,7 +41,12 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  const server = await registerRoutes(app);
+  try {
+    console.log("Starting server...");
+    console.log("NODE_ENV:", process.env.NODE_ENV);
+    console.log("Available env vars:", Object.keys(process.env).filter(key => !key.includes('PASSWORD')).length);
+    
+    const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
@@ -71,4 +76,10 @@ app.use((req, res, next) => {
   }, () => {
     log(`serving on port ${port}`);
   });
+  
+  } catch (error) {
+    console.error("Error starting server:", error);
+    console.error("Stack trace:", error.stack);
+    process.exit(1);
+  }
 })();

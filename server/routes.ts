@@ -9,6 +9,8 @@ import { z } from "zod";
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
 if (!stripeSecretKey) {
+  console.error("STRIPE_SECRET_KEY environment variable is missing");
+  console.error("Available environment variables:", Object.keys(process.env).filter(key => !key.includes('PASSWORD')));
   throw new Error("STRIPE_SECRET_KEY environment variable is required");
 }
 
