@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { MapPin, ArrowLeft, AlertCircle } from "lucide-react";
+import { MapPin, ArrowLeft, AlertCircle, Mountain, Wind, Zap, Snowflake, Flame, Droplets } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,9 @@ export default function StartAudit() {
   const [, setLocation] = useLocation();
   const [zipCode, setZipCode] = useState("");
   const [zipError, setZipError] = useState("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [showAnalysisComplete, setShowAnalysisComplete] = useState(false);
+  const [currentDisasterIcon, setCurrentDisasterIcon] = useState(0);
 
   const { data: hazardData, refetch: detectHazard } = useQuery({
     queryKey: [`/api/hazards/${zipCode}`],
@@ -30,6 +33,26 @@ export default function StartAudit() {
     setZipError("");
   };
 
+  // Disaster icons for loading animation
+  const disasterIcons = [
+    { icon: Mountain, name: "Earthquake", color: "text-red-500" },
+    { icon: Wind, name: "Hurricane", color: "text-blue-500" },
+    { icon: Zap, name: "Tornado", color: "text-yellow-500" },
+    { icon: Flame, name: "Wildfire", color: "text-orange-500" },
+    { icon: Droplets, name: "Flood", color: "text-blue-600" },
+    { icon: Snowflake, name: "Winter Storm", color: "text-indigo-500" }
+  ];
+
+  // Animate through disaster icons during analysis
+  useEffect(() => {
+    if (isAnalyzing) {
+      const interval = setInterval(() => {
+        setCurrentDisasterIcon((prev) => (prev + 1) % disasterIcons.length);
+      }, 300);
+      return () => clearInterval(interval);
+    }
+  }, [isAnalyzing]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -38,13 +61,25 @@ export default function StartAudit() {
       return;
     }
 
+    setIsAnalyzing(true);
+    setShowAnalysisComplete(false);
+
     try {
+      // Show loading animation for 2 seconds
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
       const result = await detectHazard();
       if (result.data) {
-        // Navigate to payment with ZIP and hazard data
-        setLocation(`/payment?zip=${zipCode}&hazard=${encodeURIComponent(result.data.primaryHazard)}`);
+        setIsAnalyzing(false);
+        setShowAnalysisComplete(true);
+        
+        // Show analysis complete message for 2 seconds, then go to payment
+        setTimeout(() => {
+          setLocation(`/payment?zip=${zipCode}&hazard=${encodeURIComponent(result.data.primaryHazard)}`);
+        }, 2500);
       }
     } catch (error) {
+      setIsAnalyzing(false);
       setZipError("Unable to detect hazard for this ZIP code. Please try again.");
     }
   };
@@ -94,9 +129,9 @@ export default function StartAudit() {
               <Button 
                 type="submit" 
                 className="w-full bg-emergency-red hover:bg-red-700 text-white py-4 text-lg font-semibold"
-                disabled={!validateZip(zipCode)}
+                disabled={!validateZip(zipCode) || isAnalyzing}
               >
-                Continue to Payment
+                {isAnalyzing ? "Analyzing..." : "Analyze My Location"}
               </Button>
             </form>
             
@@ -113,18 +148,59 @@ export default function StartAudit() {
           </CardContent>
         </Card>
 
-        {/* Enhanced Hazard Detection Display */}
-        {validateZip(zipCode) && hazardData && (
+        {/* Disaster Loading Animation */}
+        {isAnalyzing && (
           <div className="mt-8">
-            <Card className="shadow-lg border-l-4 border-emergency-red">
+            <Card className="shadow-lg border-l-4 border-blue-500">
+              <CardContent className="p-8">
+                <div className="text-center">
+                  <div className="relative">
+                    {disasterIcons.map((disaster, index) => {
+                      const IconComponent = disaster.icon;
+                      return (
+                        <div
+                          key={index}
+                          className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${
+                            index === currentDisasterIcon ? 'opacity-100' : 'opacity-0'
+                          }`}
+                        >
+                          <IconComponent className={`w-16 h-16 ${disaster.color} animate-pulse`} />
+                        </div>
+                      );
+                    })}
+                    <div className="w-16 h-16 mx-auto mb-4"></div>
+                  </div>
+                  <h3 className="text-xl font-bold mb-2 text-gray-900">
+                    Analyzing ZIP Code {zipCode}
+                  </h3>
+                  <p className="text-gray-600">
+                    Scanning for {disasterIcons[currentDisasterIcon].name} and other regional hazards...
+                  </p>
+                  <div className="mt-4">
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="bg-blue-500 h-2 rounded-full animate-pulse" style={{width: '75%'}}></div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Analysis Complete Message */}
+        {showAnalysisComplete && hazardData && (
+          <div className="mt-8">
+            <Card className="shadow-lg border-l-4 border-green-500">
               <CardContent className="p-6">
                 <div className="text-center">
-                  <AlertCircle className="w-12 h-12 text-emergency-red mx-auto mb-4" />
-                  <div className="bg-blue-100 rounded-lg p-4 mb-4">
-                    <p className="text-blue-800 font-semibold text-lg">
-                      🔍 ZIP Code Analysis Complete
+                  <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <AlertCircle className="w-10 h-10 text-white" />
+                  </div>
+                  <div className="bg-green-100 rounded-lg p-4 mb-4">
+                    <p className="text-green-800 font-semibold text-lg">
+                      ✅ ZIP Code Analysis Complete
                     </p>
-                    <p className="text-blue-700 text-sm mt-1">
+                    <p className="text-green-700 text-sm mt-1">
                       We analyzed your location {zipCode} and identified the primary disaster risk for your specific zone
                     </p>
                   </div>
@@ -132,16 +208,16 @@ export default function StartAudit() {
                     Based on your ZIP code {zipCode} geographic analysis, your area is most likely to be affected by:
                   </h3>
                   <div className="bg-gradient-to-r from-emergency-red to-red-600 text-white rounded-lg p-6 mb-4">
-                    <div className="text-3xl font-bold mb-2">{hazardData.primaryHazard}</div>
-                    <div className="text-lg">Risk Level: {hazardData.primaryRisk}/5 - High Priority</div>
-                    <div className="text-sm mt-2 opacity-90">Location: {hazardData.state}</div>
+                    <div className="text-3xl font-bold mb-2">{(hazardData as any).primaryHazard}</div>
+                    <div className="text-lg">Risk Level: {(hazardData as any).primaryRisk}/5 - High Priority</div>
+                    <div className="text-sm mt-2 opacity-90">Location: {(hazardData as any).state}</div>
                   </div>
                   <div className="bg-blue-50 rounded-lg p-4 mb-4">
                     <p className="text-gray-700 font-medium">
-                      🏠 Get a personalized preparedness plan for your specific home and location
+                      🏠 Redirecting to secure payment to get your personalized preparedness plan
                     </p>
                     <p className="text-gray-600 text-sm mt-2">
-                      Our audit will provide targeted recommendations to protect against {hazardData.primaryHazard.toLowerCase()} 
+                      Your audit will provide targeted recommendations to protect against {(hazardData as any).primaryHazard?.toLowerCase()} 
                       and other regional hazards.
                     </p>
                   </div>
