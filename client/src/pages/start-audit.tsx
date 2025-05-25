@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
+import HazardMap from "@/components/hazard-map";
 
 export default function StartAudit() {
   const [, setLocation] = useLocation();
@@ -111,6 +112,13 @@ export default function StartAudit() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Advanced Hazard Detection Display */}
+        {validateZip(zipCode) && (
+          <div className="mt-8">
+            <HazardMap zipCode={zipCode} />
+          </div>
+        )}
       </div>
     </div>
   );
