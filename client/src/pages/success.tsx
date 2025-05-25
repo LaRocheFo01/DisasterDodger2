@@ -112,6 +112,33 @@ export default function Success() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Additional Disaster Protection Offer */}
+            <Card className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white mb-8">
+              <CardContent className="p-8 text-center">
+                <Shield className="w-16 h-16 mx-auto mb-4 text-yellow-300" />
+                <h3 className="text-2xl font-bold mb-4">Want Complete Protection?</h3>
+                <p className="text-lg mb-6 text-blue-100">
+                  You've protected against your primary hazard. Get comprehensive coverage 
+                  for ALL disaster types in your region with our Premium Multi-Disaster Audit.
+                </p>
+                <div className="bg-white/20 rounded-lg p-4 mb-6">
+                  <div className="text-yellow-300 font-bold text-lg mb-2">Premium Audit Covers:</div>
+                  <div className="grid md:grid-cols-2 gap-2 text-sm">
+                    <div>🏔️ Earthquakes & Wildfires</div>
+                    <div>🌊 Hurricanes & Floods</div>
+                    <div>🌪️ Tornadoes & Severe Weather</div>
+                    <div>❄️ Winter Storms & Ice</div>
+                  </div>
+                </div>
+                <Button 
+                  onClick={() => setLocation("/start-audit")}
+                  className="bg-yellow-500 hover:bg-yellow-400 text-gray-900 px-8 py-3 text-lg font-bold rounded-lg"
+                >
+                  Get Premium Multi-Disaster Audit - $49
+                </Button>
+              </CardContent>
+            </Card>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 

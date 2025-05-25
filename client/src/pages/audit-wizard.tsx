@@ -233,7 +233,7 @@ export default function AuditWizard() {
                   </div>
                   <div className="text-sm text-gray-600 ml-7">
                     • Instant PDF report with FEMA citations
-                    • Personalized recommendations
+                    • Personalized recommendations for primary hazard
                     • Regional hazard analysis
                   </div>
                 </div>
@@ -260,6 +260,7 @@ export default function AuditWizard() {
                   </div>
                   <div className="text-sm text-gray-600 ml-7">
                     • Everything in Basic Plan
+                    • <strong>ALL disaster types coverage</strong> (Earthquake, Hurricane, Tornado, Flood, Wildfire, Winter Storm)
                     • Insurance savings guidance
                     • Rebate opportunities database
                     • Priority email support

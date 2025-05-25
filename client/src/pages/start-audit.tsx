@@ -113,20 +113,30 @@ export default function StartAudit() {
           </CardContent>
         </Card>
 
-        {/* Simple Hazard Detection Display */}
+        {/* Enhanced Hazard Detection Display */}
         {validateZip(zipCode) && hazardData && (
           <div className="mt-8">
-            <Card className="shadow-lg">
+            <Card className="shadow-lg border-l-4 border-emergency-red">
               <CardContent className="p-6">
                 <div className="text-center">
-                  <h3 className="text-lg font-semibold mb-2">Detected Primary Hazard</h3>
-                  <div className="bg-emergency-red text-white rounded-lg p-4 mb-4">
-                    <div className="text-2xl font-bold">{hazardData.primaryHazard}</div>
-                    <div className="text-sm">Risk Level: {hazardData.primaryRisk}/5</div>
+                  <AlertCircle className="w-12 h-12 text-emergency-red mx-auto mb-4" />
+                  <h3 className="text-xl font-bold mb-4 text-gray-900">
+                    According to your ZIP code {zipCode}, your area is likely to be affected by:
+                  </h3>
+                  <div className="bg-gradient-to-r from-emergency-red to-red-600 text-white rounded-lg p-6 mb-4">
+                    <div className="text-3xl font-bold mb-2">{hazardData.primaryHazard}</div>
+                    <div className="text-lg">Risk Level: {hazardData.primaryRisk}/5 - High Priority</div>
+                    <div className="text-sm mt-2 opacity-90">Location: {hazardData.state}</div>
                   </div>
-                  <p className="text-gray-600 text-sm">
-                    Based on ZIP code {zipCode} in {hazardData.state}
-                  </p>
+                  <div className="bg-blue-50 rounded-lg p-4 mb-4">
+                    <p className="text-gray-700 font-medium">
+                      🏠 Get a personalized preparedness plan for your specific home and location
+                    </p>
+                    <p className="text-gray-600 text-sm mt-2">
+                      Our audit will provide targeted recommendations to protect against {hazardData.primaryHazard.toLowerCase()} 
+                      and other regional hazards.
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>

@@ -1,6 +1,7 @@
 import { Shield, Play, Clock, Download, CheckCircle, 
          Camera, ChevronDown, ChevronUp, MapPin, 
-         Phone, Mail, AlertCircle } from "lucide-react";
+         Phone, Mail, AlertCircle, Mountain, Wind, 
+         Zap, Snowflake, FileText, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -95,8 +96,70 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Disaster Protection Showcase */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">Comprehensive Disaster Protection</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto font-body">
+              Get expert preparedness guidance for all major disaster types affecting your region
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div className="bg-gray-50 rounded-lg p-6 text-center hover:shadow-lg transition-shadow">
+              <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Mountain className="text-white h-8 w-8" />
+              </div>
+              <h3 className="text-lg font-heading font-bold text-gray-900 mb-2">Earthquake & Wildfire</h3>
+              <p className="text-gray-600 text-sm font-body">Seismic safety, structural retrofits, fire-resistant landscaping</p>
+            </div>
+            
+            <div className="bg-gray-50 rounded-lg p-6 text-center hover:shadow-lg transition-shadow">
+              <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Wind className="text-white h-8 w-8" />
+              </div>
+              <h3 className="text-lg font-heading font-bold text-gray-900 mb-2">Hurricane Protection</h3>
+              <p className="text-gray-600 text-sm font-body">Storm shutters, evacuation planning, flood barriers</p>
+            </div>
+            
+            <div className="bg-gray-50 rounded-lg p-6 text-center hover:shadow-lg transition-shadow">
+              <div className="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Zap className="text-white h-8 w-8" />
+              </div>
+              <h3 className="text-lg font-heading font-bold text-gray-900 mb-2">Tornado & Flood</h3>
+              <p className="text-gray-600 text-sm font-body">Safe rooms, drainage systems, early warning systems</p>
+            </div>
+            
+            <div className="bg-gray-50 rounded-lg p-6 text-center hover:shadow-lg transition-shadow">
+              <div className="w-16 h-16 bg-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Snowflake className="text-white h-8 w-8" />
+              </div>
+              <h3 className="text-lg font-heading font-bold text-gray-900 mb-2">Winter Storms</h3>
+              <p className="text-gray-600 text-sm font-body">Heating backup, insulation, ice dam prevention</p>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <div className="bg-gradient-to-r from-fema-blue to-blue-700 rounded-lg p-8 text-white">
+              <h3 className="text-2xl font-heading font-bold mb-4">Premium Multi-Disaster Audit - $49</h3>
+              <p className="text-lg mb-6 font-body">
+                Get comprehensive protection guidance for ALL disaster types in your region, 
+                plus insurance savings and rebate opportunities
+              </p>
+              <Button 
+                onClick={startAudit}
+                className="bg-warning-orange hover:bg-orange-600 text-white px-8 py-3 text-lg font-heading font-semibold rounded-lg"
+              >
+                Start Premium Assessment
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-20 bg-white">
+      <section id="how-it-works" className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">How It Works</h2>
