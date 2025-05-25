@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRoute, useLocation } from "wouter";
-import { Shield, ArrowLeft, ArrowRight, FileText, Lightbulb } from "lucide-react";
+import { Shield, ArrowLeft, ArrowRight, FileText, Lightbulb, CreditCard, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -70,6 +70,7 @@ export default function AuditWizard() {
 
   const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
+  const [showPaymentGate, setShowPaymentGate] = useState(false);
 
   const updateField = (field: keyof AuditData, value: any) => {
     setAuditData(prev => ({
@@ -104,10 +105,18 @@ export default function AuditWizard() {
   };
 
   const nextStep = () => {
-    if (validateCurrentStep() && currentStep < totalSteps) {
-      setCurrentStep(prev => prev + 1);
-      // Save data for each step
-      updateAuditMutation.mutate(auditData);
+    if (validateCurrentStep()) {
+      // After 5 questions (completing steps 1 and 2), show payment gate
+      if (currentStep === 2 && !showPaymentGate) {
+        setShowPaymentGate(true);
+        return;
+      }
+      
+      if (currentStep < totalSteps) {
+        setCurrentStep(prev => prev + 1);
+        // Save data for each step
+        updateAuditMutation.mutate(auditData);
+      }
     }
   };
 
@@ -115,6 +124,10 @@ export default function AuditWizard() {
     if (currentStep > 1) {
       setCurrentStep(prev => prev - 1);
     }
+  };
+
+  const continueWithPayment = () => {
+    setLocation(`/payment?auditId=${auditId}`);
   };
 
   const generateReport = async () => {
@@ -175,6 +188,59 @@ export default function AuditWizard() {
           </div>
         </div>
       </div>
+
+      {/* Payment Gate Modal */}
+      {showPaymentGate && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <Card className="max-w-md w-full shadow-2xl">
+            <CardContent className="p-8 text-center">
+              <div className="mb-6">
+                <div className="w-16 h-16 bg-emergency-red rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Lock className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  Complete Your Personalized Report
+                </h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  You've answered 5 questions! To continue and receive your complete 
+                  disaster preparedness audit with FEMA citations and personalized 
+                  recommendations, please complete your payment.
+                </p>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-600">Disaster Preparedness Audit</span>
+                  <span className="font-bold text-xl">$29.00</span>
+                </div>
+                <div className="text-sm text-gray-500">
+                  • Instant PDF report with FEMA citations
+                  • Personalized recommendations
+                  • Regional hazard analysis
+                  • Insurance savings guidance
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowPaymentGate(false)}
+                  className="flex-1"
+                >
+                  Back to Questions
+                </Button>
+                <Button 
+                  onClick={continueWithPayment}
+                  className="flex-1 bg-emergency-red hover:bg-red-700 text-white"
+                >
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Continue to Payment
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

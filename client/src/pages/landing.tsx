@@ -30,7 +30,7 @@ export default function Landing() {
       <Navigation onStartAudit={startAudit} />
       
       {/* Hero Section */}
-      <section id="home" className="bg-gradient-to-br from-fema-blue to-blue-800 text-white">
+      <section id="home" className="bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
