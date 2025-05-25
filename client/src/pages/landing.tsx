@@ -40,17 +40,17 @@ export default function Landing() {
                   FEMA-Aligned Official Audit
                 </span>
               </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-black mb-6 leading-tight tracking-tight">
                 Protect Your Home in Under 5 Minutes
               </h1>
-              <p className="text-xl mb-8 text-blue-100 leading-relaxed">
+              <p className="text-xl mb-8 text-blue-100 leading-relaxed font-body">
                 Get a personalized disaster preparedness audit with instant PDF report, 
                 FEMA citations, rebate opportunities, and insurance savings guidance.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
                   onClick={startAudit}
-                  className="bg-emergency-red hover:bg-red-700 text-white px-8 py-4 text-lg font-semibold transition-all transform hover:scale-105 shadow-xl"
+                  className="bg-emergency-red hover:bg-red-700 text-white px-8 py-4 text-lg font-heading font-bold transition-all transform hover:scale-105 shadow-xl rounded-lg"
                 >
                   <Play className="mr-2 h-5 w-5" />
                   Start Your $29 Audit
@@ -58,7 +58,7 @@ export default function Landing() {
                 <Button 
                   variant="outline"
                   onClick={() => scrollToSection('how-it-works')}
-                  className="border-2 border-white text-white hover:bg-white hover:text-fema-blue px-8 py-4 text-lg font-semibold transition-all"
+                  className="border-2 border-white text-white hover:bg-white hover:text-fema-blue px-8 py-4 text-lg font-heading font-bold transition-all rounded-lg"
                 >
                   Learn How It Works
                 </Button>
@@ -66,15 +66,15 @@ export default function Landing() {
               <div className="flex items-center mt-8 text-blue-100 space-x-6">
                 <div className="flex items-center">
                   <Clock className="mr-2 h-4 w-4" />
-                  <span className="text-sm">Under 5 minutes</span>
+                  <span className="text-sm font-body">Under 5 minutes</span>
                 </div>
                 <div className="flex items-center">
                   <Download className="mr-2 h-4 w-4" />
-                  <span className="text-sm">Instant PDF report</span>
+                  <span className="text-sm font-body">Instant PDF report</span>
                 </div>
                 <div className="flex items-center">
                   <Shield className="mr-2 h-4 w-4" />
-                  <span className="text-sm">FEMA citations</span>
+                  <span className="text-sm font-body">FEMA citations</span>
                 </div>
               </div>
             </div>
@@ -99,8 +99,8 @@ export default function Landing() {
       <section id="how-it-works" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">How It Works</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">How It Works</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto font-body">
               Get your personalized disaster preparedness audit in 4 simple steps
             </p>
           </div>
@@ -109,8 +109,8 @@ export default function Landing() {
               <div className="bg-fema-blue text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 1
               </div>
-              <h3 className="text-xl font-semibold mb-3">Enter ZIP Code</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-heading font-bold mb-3">Enter ZIP Code</h3>
+              <p className="text-gray-600 font-body">
                 Start by entering your 5-digit ZIP code to identify your primary disaster risks
               </p>
             </div>
@@ -118,8 +118,8 @@ export default function Landing() {
               <div className="bg-emergency-red text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 2
               </div>
-              <h3 className="text-xl font-semibold mb-3">Secure Payment</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-heading font-bold mb-3">Secure Payment</h3>
+              <p className="text-gray-600 font-body">
                 One-time $29 payment through secure Stripe checkout for your comprehensive audit
               </p>
             </div>
@@ -127,8 +127,8 @@ export default function Landing() {
               <div className="bg-safety-green text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 3
               </div>
-              <h3 className="text-xl font-semibold mb-3">Complete Audit</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-heading font-bold mb-3">Complete Audit</h3>
+              <p className="text-gray-600 font-body">
                 Answer 15 quick questions about your home with optional photo uploads
               </p>
             </div>
@@ -136,8 +136,8 @@ export default function Landing() {
               <div className="bg-warning-orange text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 4
               </div>
-              <h3 className="text-xl font-semibold mb-3">Get Report</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-heading font-bold mb-3">Get Report</h3>
+              <p className="text-gray-600 font-body">
                 Instant PDF with personalized recommendations, FEMA citations, and savings opportunities
               </p>
             </div>
@@ -149,10 +149,10 @@ export default function Landing() {
       <section id="pricing" className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">
               Simple, Transparent Pricing
             </h2>
-            <p className="text-xl text-gray-600">One audit, comprehensive results</p>
+            <p className="text-xl text-gray-600 font-body">One audit, comprehensive results</p>
           </div>
           <div className="max-w-lg mx-auto">
             <Card className="border-4 border-emergency-red shadow-xl">
@@ -161,7 +161,7 @@ export default function Landing() {
               </div>
               <CardContent className="p-8">
                 <div className="text-center">
-                  <h3 className="text-2xl font-bold mb-4">Complete Audit</h3>
+                  <h3 className="text-2xl font-heading font-bold mb-4">Complete Audit</h3>
                   <div className="mb-6">
                     <span className="text-5xl font-bold text-fema-blue">$29</span>
                     <span className="text-gray-600 ml-2">one-time</span>
