@@ -1054,7 +1054,7 @@ export default function AuditWizard() {
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-gray-600">ZIP Code:</span>
-                          <span className="font-medium">{auditData.zipCode || zipCodeFromUrl}</span>
+                          <span className="font-medium">{auditData.zipCode || audit?.zipCode}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Primary Hazard:</span>
@@ -1142,12 +1142,12 @@ export default function AuditWizard() {
                         ...auditData,
                         primaryHazard,
                         photosUploaded: uploadedPhotos.length,
-                        zipCode: auditData.zipCode || zipCodeFromUrl
+                        zipCode: auditData.zipCode || audit?.zipCode
                       };
                       
                       // Create audit record
                       apiRequest("POST", "/api/audits", {
-                        zipCode: auditData.zipCode || audit?.zipCode,
+                        zipCode: audit?.zipCode,
                         primaryHazard: primaryHazard,
                         data: auditDataWithPhotos,
                       }).then((response) => response.json())
