@@ -1,12 +1,49 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { MapPin, ArrowLeft, AlertCircle, Mountain, Wind, Zap, Snowflake, Flame, Droplets } from "lucide-react";
+import { MapPin, ArrowLeft, AlertCircle, Mountain, Wind, Zap, Snowflake, Flame, Droplets, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import HazardMap from "@/components/hazard-map";
+
+// Multi-hazard ZIP code mapping based on Hazard Combo Matrix
+const hazardMap = {
+  ranges: [
+    // California - Wildfire + Earthquake
+    { start: 900, end: 961, hazards: ['Wildfire', 'Earthquake'] },
+    
+    // Florida - Flood + Hurricane
+    { start: 320, end: 349, hazards: ['Flood', 'Hurricane'] },
+    
+    // Texas - Flood + Hurricane
+    { start: 750, end: 799, hazards: ['Flood', 'Hurricane'] },
+    
+    // Colorado - Wildfire only
+    { start: 800, end: 816, hazards: ['Wildfire'] },
+    
+    // Oregon - Wildfire only
+    { start: 970, end: 979, hazards: ['Wildfire'] },
+    
+    // Louisiana - Flood only
+    { start: 700, end: 714, hazards: ['Flood'] },
+    
+    // North Carolina - Hurricane only
+    { start: 270, end: 289, hazards: ['Hurricane'] },
+    
+    // Washington - Earthquake only
+    { start: 980, end: 994, hazards: ['Earthquake'] },
+  ],
+};
+
+function getHazardsForZip(zip: string) {
+  const prefix = parseInt(zip.slice(0, 3), 10);
+  for (let { start, end, hazards } of hazardMap.ranges) {
+    if (prefix >= start && prefix <= end) return hazards;
+  }
+  return [];
+}
 
 export default function StartAudit() {
   const [, setLocation] = useLocation();
@@ -15,6 +52,8 @@ export default function StartAudit() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showAnalysisComplete, setShowAnalysisComplete] = useState(false);
   const [currentDisasterIcon, setCurrentDisasterIcon] = useState(0);
+  const [foundHazards, setFoundHazards] = useState<string[]>([]);
+  const [showHazardModal, setShowHazardModal] = useState(false);
 
   const { data: hazardData, refetch: detectHazard } = useQuery({
     queryKey: [`/api/hazards/${zipCode}`],
@@ -63,21 +102,62 @@ export default function StartAudit() {
 
     setIsAnalyzing(true);
     setShowAnalysisComplete(false);
+    setZipError("");
 
     try {
+      // Get hazards for this ZIP code using our matrix
+      const hazards = getHazardsForZip(zipCode);
+      
+      if (hazards.length === 0) {
+        setIsAnalyzing(false);
+        setZipError("We don't currently serve your area. Please try another ZIP code.");
+        return;
+      }
+      
       // Show loading animation for 2 seconds
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      const result = await detectHazard();
-      if (result.data) {
-        setIsAnalyzing(false);
+      setFoundHazards(hazards);
+      setIsAnalyzing(false);
+      
+      if (hazards.length === 1) {
+        // Single hazard - show analysis complete then redirect
         setShowAnalysisComplete(true);
-        
-        // Just show analysis complete, let user click to continue
+        setTimeout(() => {
+          setLocation(`/audit/wizard?hazard=${hazards[0]}&zipCode=${zipCode}`);
+        }, 2000);
+      } else {
+        // Multiple hazards - show choice modal
+        setShowHazardModal(true);
       }
     } catch (error) {
       setIsAnalyzing(false);
-      setZipError("Unable to detect hazard for this ZIP code. Please try again.");
+      setZipError("Unable to analyze this ZIP code. Please try again.");
+    }
+  };
+
+  const selectHazardAudit = (hazard: string) => {
+    setShowHazardModal(false);
+    setLocation(`/audit/wizard?hazard=${hazard}&zipCode=${zipCode}`);
+  };
+
+  const getHazardIcon = (hazard: string) => {
+    switch (hazard) {
+      case 'Earthquake': return <Mountain className="h-6 w-6" />;
+      case 'Wildfire': return <Flame className="h-6 w-6" />;
+      case 'Hurricane': return <Wind className="h-6 w-6" />;
+      case 'Flood': return <Droplets className="h-6 w-6" />;
+      default: return <AlertCircle className="h-6 w-6" />;
+    }
+  };
+
+  const getHazardColor = (hazard: string) => {
+    switch (hazard) {
+      case 'Earthquake': return 'text-yellow-600 border-yellow-200 hover:bg-yellow-50';
+      case 'Wildfire': return 'text-red-600 border-red-200 hover:bg-red-50';
+      case 'Hurricane': return 'text-blue-600 border-blue-200 hover:bg-blue-50';
+      case 'Flood': return 'text-cyan-600 border-cyan-200 hover:bg-cyan-50';
+      default: return 'text-gray-600 border-gray-200 hover:bg-gray-50';
     }
   };
 
