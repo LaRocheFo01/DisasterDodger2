@@ -1,0 +1,84 @@
+1. Double-check your route definitions
+In your App.jsx (or wherever you configure React Router), make sure you have a route that matches exactly what you’re navigating to. For example, if you want to render a questionnaire component at /audit/:hazard, it should look something like:
+
+jsx
+Copy
+Edit
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import ZipAuditSelector from './ZipAuditSelector'
+import QuestionnairePage from './QuestionnairePage'
+import ReportPage from './ReportPage'
+import NotFound from './NotFound'
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<ZipAuditSelector />} />
+        <Route path="audit/:hazard" element={<QuestionnairePage />} />
+        <Route path="report" element={<ReportPage />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  )
+}
+audit/:hazard must exactly match the path you pass to navigate().
+
+A catch-all * route can help you debug “not found” errors.
+
+2. Update your navigation calls
+In your selector component, change the navigate calls to point at the route you’ve defined:
+
+diff
+Copy
+Edit
+-    // when there’s exactly one hazard
+-    navigate(`/audit/${hazards[0].toLowerCase()}`)
++    // make sure this matches your Route: "audit/:hazard"
++    navigate(`/audit/${hazards[0].toLowerCase()}`)
+
+// …
+
+-    {found.map(h => (
+-      <button onClick={() => navigate(`/audit/${h.toLowerCase()}`)}>
++    {found.map(h => (
++      <button onClick={() => navigate(`/audit/${h.toLowerCase()}`)}>
+If your questionnaire route is actually something like /questionnaire/:hazard, then you’d instead do:
+
+js
+Copy
+Edit
+ navigate(`/questionnaire/${h.toLowerCase()}`)
+3. Verify your QuestionnairePage
+Inside QuestionnairePage, use useParams() to grab that :hazard and load the right form:
+
+jsx
+Copy
+Edit
+import { useParams } from 'react-router-dom'
+
+export default function QuestionnairePage() {
+  const { hazard } = useParams()  // e.g. "earthquake" or "flood"
+  
+  // load your questions based on hazard
+  // e.g. const questions = questionBank[hazard]
+  
+  return (
+    <div>
+      <h1>{hazard.charAt(0).toUpperCase() + hazard.slice(1)} Audit</h1>
+      {/* render your survey here */}
+    </div>
+  )
+}
+4. Debugging tips
+Log the path right before you navigate:
+
+js
+Copy
+Edit
+console.log('navigating to:', `/audit/${h.toLowerCase()}`)
+Check the URL bar after you click—does it match one of your <Route> paths?
+
+Add a wildcard NotFound route to catch bad URLs and show you exactly what was requested.
+
+Once your navigate() URL and your <Route> path line up, clicking an audit button will take you straight into the right questionnaire component rather than hitting “not found.” Let me know if you still run into trouble!
