@@ -133,10 +133,12 @@ export default function AuditWizard() {
   useEffect(() => {
     if (isNewWizard && hazardFromUrl) {
       // New wizard flow - initialize from URL parameters
+      console.log('Loading new wizard for hazard:', hazardFromUrl);
       setPrimaryHazard(hazardFromUrl);
       setAuditData(prev => ({ ...prev, zipCode: zipCodeFromUrl }));
       
       const hazardQuestions = getQuestionsForHazard(hazardFromUrl);
+      console.log('Loaded questions:', hazardQuestions.length);
       setQuestions(hazardQuestions);
     } else if (audit) {
       // Existing audit editing flow
