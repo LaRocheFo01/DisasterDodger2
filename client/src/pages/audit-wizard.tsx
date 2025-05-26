@@ -15,15 +15,85 @@ import { apiRequest } from "@/lib/queryClient";
 import PhotoUpload from "@/components/photo-upload";
 
 interface AuditData {
+  // General Home Information (Section A)
+  zipCode?: string;
   homeType?: string;
   yearBuilt?: string;
-  foundationType?: string;
-  stories?: string;
+  ownershipStatus?: string;
+  insuredValue?: string;
+  insurancePolicies?: string[];
+  previousGrants?: string;
+  previousGrantsProgram?: string;
+
+  // Earthquake Questions (Section B)
+  waterHeaterSecurity?: string;
+  anchoredItems?: string[];
+  cabinetLatches?: string;
+  electronicsStability?: string;
+  gasShutoffPlan?: string;
+  chimneyInspection?: string;
+  garageRetrofit?: string;
+  applianceConnectors?: string;
+  woodStoveAnchor?: string;
+  earthquakeDrill?: string;
+  emergencyKit?: string[];
+  hangingDecor?: string;
+  foundationWork?: string;
+  ceilingFixtures?: string;
+  roomByRoomChecklist?: string;
+
+  // Hurricane/Wind Questions (Section C)
+  roofInspection?: string;
+  atticVents?: string;
+  roofCovering?: string;
+  windowDoorProtection?: string;
+  garageDoorUpgrade?: string;
+  gableEndBracing?: string;
+  soffitOverhangs?: string;
+  chimneyTies?: string;
+  attachedStructures?: string;
+  continuousLoadPath?: string;
+  sidingMaterial?: string;
+  retrofitEvaluation?: string;
+  gutterAnchors?: string;
+  retrofitLevel?: string;
+  completedMeasures?: string[];
+
+  // Wildfire Questions (Section D)
+  defensibleSpaceWidth?: string;
   roofMaterial?: string;
-  safetySystems?: string[];
-  waterStorage?: string;
-  foodStorage?: string;
-  backupPower?: string;
+  emberBarriers?: string;
+  underlaymentType?: string;
+  ventProtection?: string;
+  crawlspaceVents?: string[];
+  wallCladding?: string;
+  vegetationSpacing?: string;
+  outbuildingDistance?: string;
+  patioFurniturePlan?: string;
+  gutterGuards?: string;
+  windowGlazing?: string;
+  entryDoorRating?: string;
+  siteOrientation?: string;
+  underElevationFinish?: string;
+
+  // Flood Questions (Section E)
+  equipmentElevation?: string;
+  floodBarriers?: string;
+  backflowPrevention?: string;
+  appliancePlatforms?: string;
+  houseWrapSeal?: string;
+  automaticFloodVents?: string;
+  ventPlacement?: string;
+  sumpPump?: string;
+  fuelTankAnchoring?: string;
+  floodResistantMaterials?: string;
+  underSlabDrainage?: string;
+  electricalLocation?: string;
+  landscapeSwales?: string;
+  floodShields?: string;
+  perimeterDrainage?: string;
+
+  // Additional
   photosUploaded?: number;
 }
 
@@ -35,9 +105,21 @@ export default function AuditWizard() {
   
   const [currentStep, setCurrentStep] = useState(1);
   const [auditData, setAuditData] = useState<AuditData>({
-    safetySystems: []
+    insurancePolicies: [],
+    anchoredItems: [],
+    emergencyKit: [],
+    completedMeasures: [],
+    crawlspaceVents: []
   });
   const [uploadedPhotos, setUploadedPhotos] = useState<File[]>([]);
+  const [primaryHazard, setPrimaryHazard] = useState<string>("");
+
+  // Get primary hazard from URL params or audit data
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const hazard = urlParams.get('hazard') || audit?.primaryHazard || "";
+    setPrimaryHazard(hazard);
+  }, [audit]);
 
   const auditId = params?.auditId ? parseInt(params.auditId) : 0;
 
