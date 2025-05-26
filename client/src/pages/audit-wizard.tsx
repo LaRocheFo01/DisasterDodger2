@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRoute, useLocation } from "wouter";
-import { Shield, ArrowLeft, ArrowRight, FileText, Download, ExternalLink, CreditCard, Lock, Lightbulb } from "lucide-react";
+import { Shield, ArrowLeft, ArrowRight, FileText, Download, ExternalLink, CreditCard, Lock, Lightbulb, Upload, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -111,8 +111,8 @@ export default function AuditWizard() {
     completedMeasures: [],
     crawlspaceVents: []
   });
-  const [uploadedPhotos, setUploadedPhotos] = useState<File[]>([]);
   const [primaryHazard, setPrimaryHazard] = useState<string>("");
+  const [uploadedPhotos, setUploadedPhotos] = useState<File[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
 
   const auditId = params?.auditId ? parseInt(params.auditId) : 0;
@@ -158,24 +158,78 @@ export default function AuditWizard() {
 
   const [showPaymentGate, setShowPaymentGate] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<'basic' | 'premium'>('basic');
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [photoUploadError, setPhotoUploadError] = useState<string>('');
 
   const updateField = (field: keyof AuditData, value: any) => {
     setAuditData(prev => ({
       ...prev,
       [field]: value
     }));
+    // Clear error when user provides answer
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
   };
 
   const updateMultipleChoice = (field: keyof AuditData, option: string, checked: boolean) => {
     setAuditData(prev => {
       const currentArray = (prev[field] as string[]) || [];
+      const newArray = checked 
+        ? [...currentArray, option]
+        : currentArray.filter(item => item !== option);
+      
+      // Clear error when user selects at least one option
+      if (newArray.length > 0 && errors[field]) {
+        setErrors(prevErrors => ({ ...prevErrors, [field]: '' }));
+      }
+      
       return {
         ...prev,
-        [field]: checked 
-          ? [...currentArray, option]
-          : currentArray.filter(item => item !== option)
+        [field]: newArray
       };
     });
+  };
+
+  // Photo upload handling
+  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    const maxSize = 10 * 1024 * 1024; // 10MB per file
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    
+    const validFiles: File[] = [];
+    let errorMessage = '';
+    
+    files.forEach(file => {
+      if (!allowedTypes.includes(file.type)) {
+        errorMessage = 'Only JPEG, PNG, and WebP images are allowed.';
+        return;
+      }
+      if (file.size > maxSize) {
+        errorMessage = 'Files must be smaller than 10MB.';
+        return;
+      }
+      validFiles.push(file);
+    });
+    
+    if (uploadedPhotos.length + validFiles.length > 5) {
+      errorMessage = 'Maximum 5 photos allowed.';
+      setPhotoUploadError(errorMessage);
+      return;
+    }
+    
+    if (errorMessage) {
+      setPhotoUploadError(errorMessage);
+      return;
+    }
+    
+    setPhotoUploadError('');
+    setUploadedPhotos(prev => [...prev, ...validFiles]);
+  };
+
+  const removePhoto = (index: number) => {
+    setUploadedPhotos(prev => prev.filter((_, i) => i !== index));
   };
 
   const validateCurrentStep = () => {
@@ -186,11 +240,28 @@ export default function AuditWizard() {
     
     const fieldValue = auditData[currentQuestion.id as keyof AuditData];
     
+    // Set error if no answer provided
     if (currentQuestion.type === 'checkbox') {
-      return Array.isArray(fieldValue) && fieldValue.length > 0;
+      const isValid = Array.isArray(fieldValue) && fieldValue.length > 0;
+      if (!isValid) {
+        setErrors(prev => ({ ...prev, [currentQuestion.id]: 'Please select at least one option' }));
+      }
+      return isValid;
     }
     
-    return fieldValue !== undefined && fieldValue !== '';
+    if (currentQuestion.type === 'text') {
+      const isValid = fieldValue !== undefined && fieldValue !== '' && String(fieldValue).trim() !== '';
+      if (!isValid) {
+        setErrors(prev => ({ ...prev, [currentQuestion.id]: 'Please provide an answer' }));
+      }
+      return isValid;
+    }
+    
+    const isValid = fieldValue !== undefined && fieldValue !== '';
+    if (!isValid) {
+      setErrors(prev => ({ ...prev, [currentQuestion.id]: 'Please select an option' }));
+    }
+    return isValid;
   };
 
   const totalSteps = questions.length + 1; // +1 for final review/submit step
@@ -222,6 +293,8 @@ export default function AuditWizard() {
 
   const renderQuestion = (question: Question) => {
     const fieldValue = auditData[question.id as keyof AuditData];
+    const currentError = errors[question.id];
+    const isLastQuestion = currentStep === questions.length;
 
     return (
       <Card className="bg-white rounded-2xl shadow-lg max-w-2xl mx-auto">
@@ -236,8 +309,13 @@ export default function AuditWizard() {
 
           <div className="space-y-6">
             <div>
-              <Label className="text-lg font-semibold text-gray-900 mb-4 block">
+              <Label 
+                className="text-lg font-semibold text-gray-900 mb-4 block"
+                htmlFor={`question-${question.id}`}
+                aria-describedby={currentError ? `error-${question.id}` : undefined}
+              >
                 {question.question}
+                <span className="text-red-500 ml-1" aria-label="required">*</span>
               </Label>
 
               {question.type === 'radio' && question.options && (
@@ -245,10 +323,18 @@ export default function AuditWizard() {
                   value={fieldValue as string || ''}
                   onValueChange={(value) => updateField(question.id as keyof AuditData, value)}
                   className="space-y-3"
+                  aria-label={question.question}
+                  aria-required="true"
                 >
                   {question.options.map((option, index) => (
-                    <div key={index} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
-                      <RadioGroupItem value={option} id={`${question.id}-${index}`} />
+                    <div key={index} className={`flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors ${
+                      currentError ? 'border-red-300' : 'border-gray-200'
+                    }`}>
+                      <RadioGroupItem 
+                        value={option} 
+                        id={`${question.id}-${index}`}
+                        aria-describedby={currentError ? `error-${question.id}` : undefined}
+                      />
                       <Label 
                         htmlFor={`${question.id}-${index}`} 
                         className="text-gray-700 cursor-pointer flex-1"
@@ -261,15 +347,24 @@ export default function AuditWizard() {
               )}
 
               {question.type === 'checkbox' && question.options && (
-                <div className="space-y-3">
+                <div 
+                  className="space-y-3"
+                  role="group"
+                  aria-label={question.question}
+                  aria-required="true"
+                  aria-describedby={currentError ? `error-${question.id}` : undefined}
+                >
                   {question.options.map((option, index) => (
-                    <div key={index} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
+                    <div key={index} className={`flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 transition-colors ${
+                      currentError ? 'border-red-300' : 'border-gray-200'
+                    }`}>
                       <Checkbox
                         id={`${question.id}-${index}`}
                         checked={Array.isArray(fieldValue) && fieldValue.includes(option)}
                         onCheckedChange={(checked) => 
                           updateMultipleChoice(question.id as keyof AuditData, option, checked as boolean)
                         }
+                        aria-describedby={currentError ? `error-${question.id}` : undefined}
                       />
                       <Label 
                         htmlFor={`${question.id}-${index}`} 
@@ -285,13 +380,105 @@ export default function AuditWizard() {
               {question.type === 'text' && (
                 <input
                   type="text"
+                  id={`question-${question.id}`}
                   value={fieldValue as string || ''}
                   onChange={(e) => updateField(question.id as keyof AuditData, e.target.value)}
-                  className="w-full text-lg p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-600"
-                  placeholder="Enter your answer..."
+                  className={`w-full text-lg p-3 rounded-lg border focus:ring-2 focus:ring-teal-600 transition-colors ${
+                    currentError ? 'border-red-300' : 'border-slate-300'
+                  }`}
+                  placeholder={question.id === 'zipCode' ? 'Enter 5-digit ZIP code' : 'Enter your answer...'}
+                  aria-required="true"
+                  aria-describedby={currentError ? `error-${question.id}` : undefined}
+                  maxLength={question.id === 'zipCode' ? 5 : undefined}
                 />
               )}
+
+              {/* Error message */}
+              {currentError && (
+                <div 
+                  id={`error-${question.id}`}
+                  className="mt-2 text-sm text-red-600 flex items-center"
+                  role="alert"
+                  aria-live="polite"
+                >
+                  <span className="font-medium">{currentError}</span>
+                </div>
+              )}
             </div>
+
+            {/* Photo Upload Section - Show after question 15 */}
+            {isLastQuestion && (
+              <div className="mt-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  <Upload className="mr-2 h-5 w-5 text-blue-600" />
+                  Upload Photos (Optional)
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Add up to 5 photos of your home's disaster preparedness features to enhance your report.
+                </p>
+
+                {/* Photo Upload Input */}
+                <div className="mb-4">
+                  <label 
+                    htmlFor="photo-upload"
+                    className="flex items-center justify-center w-full p-6 border-2 border-dashed border-blue-300 rounded-lg cursor-pointer hover:border-blue-400 transition-colors"
+                  >
+                    <div className="text-center">
+                      <Upload className="mx-auto h-8 w-8 text-blue-400 mb-2" />
+                      <span className="text-sm font-medium text-blue-600">Choose photos</span>
+                      <span className="block text-xs text-gray-500 mt-1">PNG, JPG, WebP up to 10MB each</span>
+                    </div>
+                  </label>
+                  <input
+                    id="photo-upload"
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handlePhotoUpload}
+                    className="hidden"
+                    aria-label="Upload photos of your home's disaster preparedness features"
+                  />
+                </div>
+
+                {/* Photo Upload Error */}
+                {photoUploadError && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-600">{photoUploadError}</p>
+                  </div>
+                )}
+
+                {/* Photo Previews */}
+                {uploadedPhotos.length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {uploadedPhotos.map((photo, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={URL.createObjectURL(photo)}
+                          alt={`Uploaded photo ${index + 1}`}
+                          className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                        />
+                        <button
+                          onClick={() => removePhoto(index)}
+                          className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                          aria-label={`Remove photo ${index + 1}`}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                        <div className="absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-xs px-1 rounded">
+                          {(photo.size / (1024 * 1024)).toFixed(1)}MB
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {uploadedPhotos.length > 0 && (
+                  <p className="text-xs text-gray-500 mt-2">
+                    {uploadedPhotos.length} of 5 photos uploaded
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex justify-between mt-8">
@@ -300,6 +487,7 @@ export default function AuditWizard() {
               variant="outline"
               disabled={currentStep === 1}
               className="px-6 py-3"
+              aria-label="Go to previous question"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Previous
@@ -307,9 +495,10 @@ export default function AuditWizard() {
             <Button
               onClick={nextStep}
               disabled={!validateCurrentStep()}
-              className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3"
+              className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label={isLastQuestion ? 'Complete audit and generate report' : 'Go to next question'}
             >
-              {currentStep === questions.length ? 'Complete Audit' : 'Next'}
+              {isLastQuestion ? 'Complete Audit' : 'Next'}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
@@ -495,15 +684,45 @@ export default function AuditWizard() {
                 Thank you for completing your {primaryHazard.toLowerCase()} preparedness audit. 
                 Your personalized report is being generated with tailored mitigation recommendations.
               </p>
+
+              {/* Show uploaded photos summary */}
+              {uploadedPhotos.length > 0 && (
+                <div className="mb-6 p-4 bg-green-50 rounded-lg border border-green-200">
+                  <p className="text-sm text-green-800 flex items-center justify-center">
+                    <FileText className="mr-2 h-4 w-4" />
+                    {uploadedPhotos.length} photo{uploadedPhotos.length !== 1 ? 's' : ''} uploaded and will be included in your report
+                  </p>
+                </div>
+              )}
+
+              {/* Error display */}
+              {generatePdfMutation.isError && (
+                <div 
+                  className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg"
+                  role="alert"
+                  aria-live="polite"
+                >
+                  <p className="text-sm text-red-800 font-medium mb-2">
+                    Report Generation Failed
+                  </p>
+                  <p className="text-xs text-red-600">
+                    {generatePdfMutation.error?.message || 'Unable to generate your report. Please try again or contact support if the issue persists.'}
+                  </p>
+                </div>
+              )}
               
               <Button
-                onClick={() => generatePdfMutation.mutate()}
-                disabled={generatePdfMutation.isPending}
-                className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-3 text-lg mb-4"
+                onClick={() => {
+                  setIsGeneratingPdf(true);
+                  generatePdfMutation.mutate();
+                }}
+                disabled={generatePdfMutation.isPending || isGeneratingPdf}
+                className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-3 text-lg mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Generate your personalized disaster preparedness report"
               >
-                {generatePdfMutation.isPending ? (
+                {generatePdfMutation.isPending || isGeneratingPdf ? (
                   <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                    <Loader2 className="animate-spin mr-2 h-5 w-5" />
                     Generating Report...
                   </>
                 ) : (
@@ -514,15 +733,30 @@ export default function AuditWizard() {
                 )}
               </Button>
 
+              {/* Loading progress indicator */}
+              {(generatePdfMutation.isPending || isGeneratingPdf) && (
+                <div className="mb-6">
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="bg-teal-600 h-2 rounded-full animate-pulse w-3/4"></div>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Analyzing your responses and generating personalized recommendations...
+                  </p>
+                </div>
+              )}
+
               <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                 <p className="text-sm text-blue-800 mb-2">
                   Your report will include:
                 </p>
-                <ul className="text-xs text-blue-700 space-y-1">
+                <ul className="text-xs text-blue-700 space-y-1 text-left">
                   <li>• Personalized mitigation recommendations based on your answers</li>
                   <li>• FEMA-aligned citations and guidance</li>
                   <li>• Available grants and rebates for your area</li>
                   <li>• Quick-win action items to start immediately</li>
+                  {uploadedPhotos.length > 0 && (
+                    <li>• Your uploaded photos with analysis notes</li>
+                  )}
                 </ul>
               </div>
 
@@ -531,7 +765,8 @@ export default function AuditWizard() {
                   href="/Mitigation-Funding-Matrix.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center text-teal-600 hover:text-teal-700 text-sm font-medium"
+                  className="inline-flex items-center text-teal-600 hover:text-teal-700 text-sm font-medium transition-colors"
+                  aria-label="View the complete mitigation and funding matrix in a new window"
                 >
                   <ExternalLink className="mr-1 h-4 w-4" />
                   View Full Mitigation & Funding Matrix
