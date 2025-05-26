@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRoute, useLocation } from "wouter";
 import { Shield, ArrowLeft, ArrowRight, FileText, Download, ExternalLink, CreditCard, Lock, Lightbulb, Upload, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -232,7 +232,7 @@ export default function AuditWizard() {
     setUploadedPhotos(prev => prev.filter((_, i) => i !== index));
   };
 
-  const validateCurrentStep = () => {
+  const isCurrentStepValid = useMemo(() => {
     if (questions.length === 0) return false;
     
     const currentQuestion = questions[currentStep - 1];
@@ -240,35 +240,22 @@ export default function AuditWizard() {
     
     const fieldValue = auditData[currentQuestion.id as keyof AuditData];
     
-    // Set error if no answer provided
     if (currentQuestion.type === 'checkbox') {
-      const isValid = Array.isArray(fieldValue) && fieldValue.length > 0;
-      if (!isValid) {
-        setErrors(prev => ({ ...prev, [currentQuestion.id]: 'Please select at least one option' }));
-      }
-      return isValid;
+      return Array.isArray(fieldValue) && fieldValue.length > 0;
     }
     
     if (currentQuestion.type === 'text') {
-      const isValid = fieldValue !== undefined && fieldValue !== '' && String(fieldValue).trim() !== '';
-      if (!isValid) {
-        setErrors(prev => ({ ...prev, [currentQuestion.id]: 'Please provide an answer' }));
-      }
-      return isValid;
+      return fieldValue !== undefined && fieldValue !== '' && String(fieldValue).trim() !== '';
     }
     
-    const isValid = fieldValue !== undefined && fieldValue !== '';
-    if (!isValid) {
-      setErrors(prev => ({ ...prev, [currentQuestion.id]: 'Please select an option' }));
-    }
-    return isValid;
-  };
+    return fieldValue !== undefined && fieldValue !== '';
+  }, [questions, currentStep, auditData]);
 
   const totalSteps = questions.length + 1; // +1 for final review/submit step
   const progress = questions.length > 0 ? (currentStep / totalSteps) * 100 : 0;
 
   const nextStep = () => {
-    if (validateCurrentStep()) {
+    if (isCurrentStepValid) {
       if (currentStep < totalSteps) {
         setCurrentStep(prev => prev + 1);
         // Save data after each question
@@ -276,6 +263,28 @@ export default function AuditWizard() {
       } else {
         // Final step - generate PDF
         generatePdfMutation.mutate();
+      }
+    } else {
+      // Show validation errors
+      if (questions.length > 0) {
+        const currentQuestion = questions[currentStep - 1];
+        if (currentQuestion) {
+          const fieldValue = auditData[currentQuestion.id as keyof AuditData];
+          
+          if (currentQuestion.type === 'checkbox') {
+            if (!(Array.isArray(fieldValue) && fieldValue.length > 0)) {
+              setErrors(prev => ({ ...prev, [currentQuestion.id]: 'Please select at least one option' }));
+            }
+          } else if (currentQuestion.type === 'text') {
+            if (!(fieldValue !== undefined && fieldValue !== '' && String(fieldValue).trim() !== '')) {
+              setErrors(prev => ({ ...prev, [currentQuestion.id]: 'Please provide an answer' }));
+            }
+          } else {
+            if (!(fieldValue !== undefined && fieldValue !== '')) {
+              setErrors(prev => ({ ...prev, [currentQuestion.id]: 'Please select an option' }));
+            }
+          }
+        }
       }
     }
   };
@@ -494,7 +503,7 @@ export default function AuditWizard() {
             </Button>
             <Button
               onClick={nextStep}
-              disabled={!validateCurrentStep()}
+              disabled={!isCurrentStepValid}
               className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label={isLastQuestion ? 'Complete audit and generate report' : 'Go to next question'}
             >
@@ -1154,7 +1163,7 @@ export default function AuditWizard() {
           {currentStep < totalSteps && (
             <Button 
               onClick={nextStep}
-              disabled={!validateCurrentStep()}
+              disabled={!isCurrentStepValid}
               className="bg-fema-blue hover:bg-blue-700 text-white px-6 py-3 font-medium"
             >
               Next
