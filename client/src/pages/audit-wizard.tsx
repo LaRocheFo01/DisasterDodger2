@@ -129,30 +129,15 @@ export default function AuditWizard() {
     enabled: !!auditId && !isNewWizard,
   });
 
-  const createAuditMutation = useMutation({
-    mutationFn: (data: { zipCode: string; primaryHazard: string }) => 
-      apiRequest("POST", "/api/audits", data),
-    onSuccess: (newAudit: any) => {
-      // Redirect to the new audit with proper ID
-      setLocation(`/audit/${newAudit.id}`);
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to create audit",
-        variant: "destructive",
-      });
-    },
-  });
-
   // Initialize wizard from URL params or existing audit
   useEffect(() => {
-    if (isNewWizard && hazardFromUrl && !createAuditMutation.isPending) {
-      // New wizard flow - create a new audit first
-      createAuditMutation.mutate({
-        zipCode: zipCodeFromUrl,
-        primaryHazard: hazardFromUrl,
-      });
+    if (isNewWizard && hazardFromUrl) {
+      // New wizard flow - initialize from URL parameters
+      setPrimaryHazard(hazardFromUrl);
+      setAuditData(prev => ({ ...prev, zipCode: zipCodeFromUrl }));
+      
+      const hazardQuestions = getQuestionsForHazard(hazardFromUrl);
+      setQuestions(hazardQuestions);
     } else if (audit) {
       // Existing audit editing flow
       setPrimaryHazard(audit.primaryHazard || "");
@@ -565,16 +550,7 @@ export default function AuditWizard() {
     );
   }
 
-  if (createAuditMutation.isPending) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4" />
-          <p className="text-gray-600">Setting up your {hazardFromUrl} audit...</p>
-        </div>
-      </div>
-    );
-  }
+
 
   if (!audit && !isNewWizard) {
     return (
@@ -1174,15 +1150,35 @@ export default function AuditWizard() {
                 
                 <div className="text-center">
                   <Button 
-                    onClick={generateReport}
-                    disabled={generatePdfMutation.isPending}
+                    onClick={() => {
+                      // For new wizard flow, go to payment
+                      if (isNewWizard) {
+                        const auditDataWithPhotos = {
+                          ...auditData,
+                          primaryHazard,
+                          photosUploaded: uploadedPhotos.length
+                        };
+                        
+                        const params = new URLSearchParams({
+                          hazard: primaryHazard,
+                          zipCode: auditData.zipCode || zipCodeFromUrl,
+                          data: JSON.stringify(auditDataWithPhotos)
+                        });
+                        
+                        setLocation(`/payment?${params.toString()}`);
+                      } else {
+                        // Existing audit flow - generate PDF directly
+                        generateReport();
+                      }
+                    }}
+                    disabled={generatePdfMutation.isPending && !isNewWizard}
                     className="bg-emergency-red hover:bg-red-700 text-white px-8 py-4 text-lg font-semibold"
                   >
-                    <FileText className="mr-2 h-5 w-5" />
-                    {generatePdfMutation.isPending ? "Generating..." : "Generate My Report"}
+                    <CreditCard className="mr-2 h-5 w-5" />
+                    {isNewWizard ? "Proceed to Payment" : (generatePdfMutation.isPending ? "Generating..." : "Generate My Report")}
                   </Button>
                   <p className="text-sm text-gray-600 mt-3">
-                    Report will be generated and downloaded automatically
+                    {isNewWizard ? "Complete your purchase to receive your personalized report" : "Report will be generated and downloaded automatically"}
                   </p>
                 </div>
               </div>
