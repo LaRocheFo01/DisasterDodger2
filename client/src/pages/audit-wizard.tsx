@@ -1151,34 +1151,39 @@ export default function AuditWizard() {
                 <div className="text-center">
                   <Button 
                     onClick={() => {
-                      // For new wizard flow, go to payment
-                      if (isNewWizard) {
-                        const auditDataWithPhotos = {
-                          ...auditData,
-                          primaryHazard,
-                          photosUploaded: uploadedPhotos.length
-                        };
-                        
-                        const params = new URLSearchParams({
-                          hazard: primaryHazard,
-                          zipCode: auditData.zipCode || zipCodeFromUrl,
-                          data: JSON.stringify(auditDataWithPhotos)
+                      // Create audit and redirect to success page
+                      const auditDataWithPhotos = {
+                        ...auditData,
+                        primaryHazard,
+                        photosUploaded: uploadedPhotos.length,
+                        zipCode: auditData.zipCode || zipCodeFromUrl
+                      };
+                      
+                      // Create audit record
+                      apiRequest("POST", "/api/audits", {
+                        zipCode: auditData.zipCode || zipCodeFromUrl,
+                        primaryHazard: primaryHazard,
+                        data: auditDataWithPhotos,
+                      }).then((response) => response.json())
+                        .then((audit) => {
+                          // Redirect to success page
+                          setLocation(`/success/${audit.id}`);
+                        })
+                        .catch((error) => {
+                          toast({
+                            title: "Error",
+                            description: "Failed to complete audit. Please try again.",
+                            variant: "destructive",
+                          });
                         });
-                        
-                        setLocation(`/payment?${params.toString()}`);
-                      } else {
-                        // Existing audit flow - generate PDF directly
-                        generateReport();
-                      }
                     }}
-                    disabled={generatePdfMutation.isPending && !isNewWizard}
                     className="bg-emergency-red hover:bg-red-700 text-white px-8 py-4 text-lg font-semibold"
                   >
-                    <CreditCard className="mr-2 h-5 w-5" />
-                    {isNewWizard ? "Proceed to Payment" : (generatePdfMutation.isPending ? "Generating..." : "Generate My Report")}
+                    <FileText className="mr-2 h-5 w-5" />
+                    Complete Audit
                   </Button>
                   <p className="text-sm text-gray-600 mt-3">
-                    {isNewWizard ? "Complete your purchase to receive your personalized report" : "Report will be generated and downloaded automatically"}
+                    Complete your audit to receive your personalized report
                   </p>
                 </div>
               </div>
