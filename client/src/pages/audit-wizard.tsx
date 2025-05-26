@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRoute, useLocation } from "wouter";
-import { Shield, ArrowLeft, ArrowRight, FileText, Download, ExternalLink } from "lucide-react";
+import { Shield, ArrowLeft, ArrowRight, FileText, Download, ExternalLink, CreditCard, Lock, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -156,8 +156,6 @@ export default function AuditWizard() {
     },
   });
 
-  const totalSteps = 4;
-  const progress = (currentStep / totalSteps) * 100;
   const [showPaymentGate, setShowPaymentGate] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<'basic' | 'premium'>('basic');
 
@@ -168,43 +166,45 @@ export default function AuditWizard() {
     }));
   };
 
-  const updateSafetySystems = (system: string, checked: boolean) => {
-    setAuditData(prev => ({
-      ...prev,
-      safetySystems: checked 
-        ? [...(prev.safetySystems || []), system]
-        : (prev.safetySystems || []).filter(s => s !== system)
-    }));
+  const updateMultipleChoice = (field: keyof AuditData, option: string, checked: boolean) => {
+    setAuditData(prev => {
+      const currentArray = (prev[field] as string[]) || [];
+      return {
+        ...prev,
+        [field]: checked 
+          ? [...currentArray, option]
+          : currentArray.filter(item => item !== option)
+      };
+    });
   };
 
   const validateCurrentStep = () => {
-    switch (currentStep) {
-      case 1:
-        return auditData.homeType && auditData.yearBuilt && auditData.foundationType && 
-               auditData.stories && auditData.roofMaterial;
-      case 2:
-        return auditData.waterStorage && auditData.foodStorage && auditData.backupPower;
-      case 3:
-        return true; // Photo upload is optional
-      case 4:
-        return true; // Review step
-      default:
-        return false;
+    if (questions.length === 0) return false;
+    
+    const currentQuestion = questions[currentStep - 1];
+    if (!currentQuestion) return true;
+    
+    const fieldValue = auditData[currentQuestion.id as keyof AuditData];
+    
+    if (currentQuestion.type === 'checkbox') {
+      return Array.isArray(fieldValue) && fieldValue.length > 0;
     }
+    
+    return fieldValue !== undefined && fieldValue !== '';
   };
+
+  const totalSteps = questions.length + 1; // +1 for final review/submit step
+  const progress = questions.length > 0 ? (currentStep / totalSteps) * 100 : 0;
 
   const nextStep = () => {
     if (validateCurrentStep()) {
-      // After 5 questions (completing steps 1 and 2), show payment gate
-      if (currentStep === 2 && !showPaymentGate) {
-        setShowPaymentGate(true);
-        return;
-      }
-      
       if (currentStep < totalSteps) {
         setCurrentStep(prev => prev + 1);
-        // Save data for each step
+        // Save data after each question
         updateAuditMutation.mutate(auditData);
+      } else {
+        // Final step - generate PDF
+        generatePdfMutation.mutate();
       }
     }
   };
@@ -377,8 +377,93 @@ export default function AuditWizard() {
         </div>
       )}
 
+      {/* Dynamic Question Rendering */}
+      {questions.length > 0 && currentStep <= questions.length && (
+        <div className="max-w-4xl mx-auto">
+          {renderQuestion(questions[currentStep - 1])}
+        </div>
+      )}
+
+      {/* Final Report Generation Step */}
+      {currentStep > questions.length && (
+        <div className="max-w-2xl mx-auto">
+          <Card className="bg-white rounded-2xl shadow-lg">
+            <CardContent className="p-8 text-center">
+              <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <FileText className="w-12 h-12 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Audit Complete!</h2>
+              <p className="text-gray-600 mb-6">
+                Thank you for completing your {primaryHazard.toLowerCase()} preparedness audit. 
+                Your personalized report is being generated with tailored mitigation recommendations.
+              </p>
+              
+              <Button
+                onClick={() => generatePdfMutation.mutate()}
+                disabled={generatePdfMutation.isPending}
+                className="bg-teal-600 hover:bg-teal-700 text-white px-8 py-3 text-lg mb-4"
+              >
+                {generatePdfMutation.isPending ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                    Generating Report...
+                  </>
+                ) : (
+                  <>
+                    <Download className="mr-2 h-5 w-5" />
+                    Generate My Report
+                  </>
+                )}
+              </Button>
+
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                <p className="text-sm text-blue-800 mb-2">
+                  Your report will include:
+                </p>
+                <ul className="text-xs text-blue-700 space-y-1">
+                  <li>• Personalized mitigation recommendations based on your answers</li>
+                  <li>• FEMA-aligned citations and guidance</li>
+                  <li>• Available grants and rebates for your area</li>
+                  <li>• Quick-win action items to start immediately</li>
+                </ul>
+              </div>
+
+              <div className="mt-4">
+                <a
+                  href="/Mitigation-Funding-Matrix.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center text-teal-600 hover:text-teal-700 text-sm font-medium"
+                >
+                  <ExternalLink className="mr-1 h-4 w-4" />
+                  View Full Mitigation & Funding Matrix
+                </a>
+                <p className="text-xs text-gray-500 mt-1">
+                  This matrix shows all potential grants and rebates—tailored recommendations appear in your report.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Loading state for questionnaire */}
+      {questions.length === 0 && !isLoading && (
+        <div className="max-w-2xl mx-auto">
+          <Card className="bg-white rounded-2xl shadow-lg">
+            <CardContent className="p-8 text-center">
+              <Shield className="h-16 w-16 mx-auto mb-4 text-gray-400" />
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Loading Questions...</h2>
+              <p className="text-gray-600">
+                Preparing your personalized {primaryHazard.toLowerCase()} assessment questionnaire
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8" style={{display: 'none'}}>
         
         {/* Step 1: Basic Information */}
         {currentStep === 1 && (
