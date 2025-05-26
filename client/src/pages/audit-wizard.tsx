@@ -99,7 +99,7 @@ interface AuditData {
 
 export default function AuditWizard() {
   const [, params] = useRoute("/audit/:auditId");
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -115,24 +115,40 @@ export default function AuditWizard() {
   const [uploadedPhotos, setUploadedPhotos] = useState<File[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
 
+  // Handle both new wizard flow and existing audit editing
   const auditId = params?.auditId ? parseInt(params.auditId) : 0;
+  const isNewWizard = location.includes('/audit/wizard');
+  
+  // Get URL parameters for new wizard flow
+  const urlParams = new URLSearchParams(location.split('?')[1] || '');
+  const hazardFromUrl = urlParams.get('hazard') || '';
+  const zipCodeFromUrl = urlParams.get('zipCode') || '';
 
   const { data: audit, isLoading } = useQuery({
     queryKey: [`/api/audits/${auditId}`],
     enabled: !!auditId,
   });
 
-  // Get primary hazard from URL params and load appropriate questions
+  // Initialize wizard from URL params or existing audit
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const hazard = urlParams.get('hazard') || audit?.primaryHazard || "";
-    setPrimaryHazard(hazard);
-    
-    if (hazard) {
-      const hazardQuestions = getQuestionsForHazard(hazard);
+    if (isNewWizard && hazardFromUrl) {
+      // New wizard flow - initialize from URL parameters
+      setPrimaryHazard(hazardFromUrl);
+      setAuditData(prev => ({ ...prev, zipCode: zipCodeFromUrl }));
+      
+      const hazardQuestions = getQuestionsForHazard(hazardFromUrl);
       setQuestions(hazardQuestions);
+    } else if (audit) {
+      // Existing audit editing flow
+      setPrimaryHazard(audit.primaryHazard || "");
+      setAuditData(audit.data || {});
+      
+      if (audit.primaryHazard) {
+        const hazardQuestions = getQuestionsForHazard(audit.primaryHazard);
+        setQuestions(hazardQuestions);
+      }
     }
-  }, [audit]);
+  }, [audit, isNewWizard, hazardFromUrl, zipCodeFromUrl]);
 
   const updateAuditMutation = useMutation({
     mutationFn: (data: Partial<AuditData>) => 
