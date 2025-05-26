@@ -98,7 +98,7 @@ interface AuditData {
 }
 
 export default function AuditWizard() {
-  const [, params] = useRoute("/audit/:auditId");
+  const [, params] = useRoute("/questionnaire/:auditId") || useRoute("/audit/:auditId");
   const [location, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -115,42 +115,28 @@ export default function AuditWizard() {
   const [uploadedPhotos, setUploadedPhotos] = useState<File[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
 
-  // Handle both new wizard flow and existing audit editing
+  // Get audit ID from params
   const auditId = params?.auditId ? parseInt(params.auditId) : 0;
-  const isNewWizard = location.includes('/audit/wizard');
-  
-  // Get URL parameters for new wizard flow
-  const urlParams = new URLSearchParams(location.split('?')[1] || '');
-  const hazardFromUrl = urlParams.get('hazard') || '';
-  const zipCodeFromUrl = urlParams.get('zipCode') || '';
 
   const { data: audit, isLoading } = useQuery({
     queryKey: [`/api/audits/${auditId}`],
-    enabled: !!auditId && !isNewWizard,
+    enabled: !!auditId,
   });
 
-  // Initialize wizard from URL params or existing audit
+  // Initialize wizard from audit data
   useEffect(() => {
-    if (isNewWizard && hazardFromUrl) {
-      // New wizard flow - initialize from URL parameters
-      console.log('Loading new wizard for hazard:', hazardFromUrl);
-      setPrimaryHazard(hazardFromUrl);
-      setAuditData(prev => ({ ...prev, zipCode: zipCodeFromUrl }));
-      
-      const hazardQuestions = getQuestionsForHazard(hazardFromUrl);
-      console.log('Loaded questions:', hazardQuestions.length);
-      setQuestions(hazardQuestions);
-    } else if (audit) {
-      // Existing audit editing flow
+    if (audit) {
+      console.log('Loading audit:', audit);
       setPrimaryHazard(audit.primaryHazard || "");
       setAuditData(audit.data || {});
       
       if (audit.primaryHazard) {
         const hazardQuestions = getQuestionsForHazard(audit.primaryHazard);
+        console.log('Loaded questions for', audit.primaryHazard, ':', hazardQuestions.length);
         setQuestions(hazardQuestions);
       }
     }
-  }, [audit, isNewWizard, hazardFromUrl, zipCodeFromUrl]);
+  }, [audit]);
 
   const updateAuditMutation = useMutation({
     mutationFn: (data: Partial<AuditData>) => 
@@ -544,7 +530,7 @@ export default function AuditWizard() {
     generatePdfMutation.mutate();
   };
 
-  if (isLoading && !isNewWizard) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
@@ -552,9 +538,7 @@ export default function AuditWizard() {
     );
   }
 
-
-
-  if (!audit && !isNewWizard) {
+  if (!audit) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Card>
@@ -1163,13 +1147,13 @@ export default function AuditWizard() {
                       
                       // Create audit record
                       apiRequest("POST", "/api/audits", {
-                        zipCode: auditData.zipCode || zipCodeFromUrl,
+                        zipCode: auditData.zipCode || audit?.zipCode,
                         primaryHazard: primaryHazard,
                         data: auditDataWithPhotos,
                       }).then((response) => response.json())
-                        .then((audit) => {
-                          // Redirect to success page
-                          setLocation(`/success/${audit.id}`);
+                        .then((updatedAudit) => {
+                          // Redirect to complete page
+                          setLocation(`/complete/${auditId}`);
                         })
                         .catch((error) => {
                           toast({

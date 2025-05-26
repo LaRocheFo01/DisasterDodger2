@@ -121,10 +121,21 @@ export default function StartAudit() {
       setIsAnalyzing(false);
       
       if (hazards.length === 1) {
-        // Single hazard - show analysis complete then redirect
+        // Single hazard - create audit and redirect
         setShowAnalysisComplete(true);
-        setTimeout(() => {
-          setLocation(`/audit/wizard?hazard=${hazards[0]}&zipCode=${zipCode}`);
+        setTimeout(async () => {
+          try {
+            const response = await fetch('/api/audits', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ zipCode, primaryHazard: hazards[0] })
+            });
+            
+            const audit = await response.json();
+            setLocation(`/questionnaire/${audit.id}`);
+          } catch (error) {
+            console.error('Failed to create audit:', error);
+          }
         }, 2000);
       } else {
         // Multiple hazards - show choice modal
@@ -136,9 +147,24 @@ export default function StartAudit() {
     }
   };
 
-  const selectHazardAudit = (hazard: string) => {
+  const selectHazardAudit = async (hazard: string) => {
     setShowHazardModal(false);
-    setLocation(`/audit/wizard?hazard=${hazard}&zipCode=${zipCode}`);
+    
+    try {
+      // Create audit record first
+      const response = await fetch('/api/audits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ zipCode, primaryHazard: hazard })
+      });
+      
+      const audit = await response.json();
+      
+      // Navigate to questionnaire with audit ID
+      setLocation(`/questionnaire/${audit.id}`);
+    } catch (error) {
+      console.error('Failed to create audit:', error);
+    }
   };
 
   const getHazardIcon = (hazard: string) => {

@@ -16,7 +16,8 @@ function Router() {
       <Route path="/" component={Landing} />
       <Route path="/start-audit" component={StartAudit} />
       <Route path="/payment" component={Payment} />
-      <Route path="/audit/wizard" component={AuditWizard} />
+      <Route path="/questionnaire/:auditId" component={AuditWizard} />
+      <Route path="/complete/:auditId" component={Success} />
       <Route path="/audit/:auditId" component={AuditWizard} />
       <Route path="/success/:auditId" component={Success} />
       <Route component={NotFound} />
