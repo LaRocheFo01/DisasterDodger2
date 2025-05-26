@@ -340,7 +340,67 @@ export default function StartAudit() {
           </CardContent>
         </Card>
 
-
+        {/* Multi-Hazard Selection Modal */}
+        {showHazardModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Multiple Hazards Detected
+                </h2>
+                <button
+                  onClick={() => setShowHazardModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                  aria-label="Close modal"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              
+              <p className="text-gray-600 mb-6">
+                Your area is at risk for {foundHazards.length} different hazards. Choose which audit you'd like to start with:
+              </p>
+              
+              <div className="space-y-3">
+                {foundHazards.map((hazard, index) => (
+                  <button
+                    key={index}
+                    onClick={() => selectHazardAudit(hazard)}
+                    className={`w-full flex items-center p-4 border-2 rounded-lg transition-all ${getHazardColor(hazard)}`}
+                  >
+                    <div className="mr-4">
+                      {getHazardIcon(hazard)}
+                    </div>
+                    <div className="text-left flex-1">
+                      <div className="font-semibold text-lg">
+                        {hazard} Audit
+                      </div>
+                      <div className="text-sm opacity-75">
+                        Get personalized {hazard.toLowerCase()} preparedness recommendations
+                      </div>
+                    </div>
+                    <div className="text-sm font-medium">
+                      Start →
+                    </div>
+                  </button>
+                ))}
+              </div>
+              
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                <p className="text-xs text-blue-800">
+                  <strong>Pro tip:</strong> You can always come back to complete additional audits for the other hazards in your area.
+                </p>
+              </div>
+              
+              <button
+                onClick={() => setShowHazardModal(false)}
+                className="mt-4 w-full text-gray-500 hover:text-gray-700 text-sm"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
