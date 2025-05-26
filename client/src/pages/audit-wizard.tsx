@@ -126,7 +126,7 @@ export default function AuditWizard() {
 
   const { data: audit, isLoading } = useQuery({
     queryKey: [`/api/audits/${auditId}`],
-    enabled: !!auditId,
+    enabled: !!auditId && !isNewWizard,
   });
 
   // Initialize wizard from URL params or existing audit
@@ -542,7 +542,7 @@ export default function AuditWizard() {
     generatePdfMutation.mutate();
   };
 
-  if (isLoading) {
+  if (isLoading && !isNewWizard) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
@@ -550,7 +550,7 @@ export default function AuditWizard() {
     );
   }
 
-  if (!audit) {
+  if (!audit && !isNewWizard) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Card>
@@ -1066,11 +1066,11 @@ export default function AuditWizard() {
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-gray-600">ZIP Code:</span>
-                          <span className="font-medium">{audit.zipCode}</span>
+                          <span className="font-medium">{auditData.zipCode || zipCodeFromUrl}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Primary Hazard:</span>
-                          <span className="font-medium text-emergency-red">{audit.primaryHazard}</span>
+                          <span className="font-medium text-emergency-red">{primaryHazard}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Home Type:</span>
