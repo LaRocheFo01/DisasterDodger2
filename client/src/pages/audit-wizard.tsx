@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
 import { useRoute, useLocation } from "wouter";
-import { Shield, ArrowLeft, ArrowRight, FileText, Lightbulb, CreditCard, Lock } from "lucide-react";
+import { Shield, ArrowLeft, ArrowRight, FileText, Download, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import PhotoUpload from "@/components/photo-upload";
+import { getQuestionsForHazard, Question } from "@/data/questionnaire";
 
 interface AuditData {
   // General Home Information (Section A)
@@ -113,13 +113,7 @@ export default function AuditWizard() {
   });
   const [uploadedPhotos, setUploadedPhotos] = useState<File[]>([]);
   const [primaryHazard, setPrimaryHazard] = useState<string>("");
-
-  // Get primary hazard from URL params or audit data
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const hazard = urlParams.get('hazard') || audit?.primaryHazard || "";
-    setPrimaryHazard(hazard);
-  }, [audit]);
+  const [questions, setQuestions] = useState<Question[]>([]);
 
   const auditId = params?.auditId ? parseInt(params.auditId) : 0;
 
@@ -127,6 +121,18 @@ export default function AuditWizard() {
     queryKey: [`/api/audits/${auditId}`],
     enabled: !!auditId,
   });
+
+  // Get primary hazard from URL params and load appropriate questions
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const hazard = urlParams.get('hazard') || audit?.primaryHazard || "";
+    setPrimaryHazard(hazard);
+    
+    if (hazard) {
+      const hazardQuestions = getQuestionsForHazard(hazard);
+      setQuestions(hazardQuestions);
+    }
+  }, [audit]);
 
   const updateAuditMutation = useMutation({
     mutationFn: (data: Partial<AuditData>) => 
