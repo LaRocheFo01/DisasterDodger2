@@ -1,0 +1,464 @@
+ZIP code
+ Short answer
+
+
+Home type
+ ○ Single-family detached
+ ○ Townhouse / rowhouse
+ ○ Duplex / triplex / four-plex
+ ○ Condominium / apartment
+ ○ Mobile home or other
+
+
+Year your home was built
+ ○ Before 1980
+ ○ 1980 – 1999
+ ○ 2000 – 2010
+ ○ After 2010
+ ○ Not sure
+
+
+Ownership status
+ ○ Owner-occupied (primary residence)
+ ○ Secondary home / vacation rental
+ ○ Investment property / rental
+
+
+Approximate insured value
+ ○ Under $200 000
+ ○ $200 000–$500 000
+ ○ $500 000–$1 000 000
+ ○ Over $1 000 000
+ ○ Not sure
+
+
+Do you currently carry any of these policies? (check all)
+ [ ] Flood insurance (NFIP or private)
+ [ ] Earthquake insurance
+ [ ] Standard homeowners insurance only
+ [ ] None of the above
+
+
+Have you ever received a home-improvement grant or rebate?
+ ○ Yes – which program? ______
+ ○ No
+ ○ Not sure
+
+
+
+🌐 Section B: Earthquake Readiness
+Water heater security
+ ○ Not secured at all
+ ○ Strapped to wall only
+ ○ Strapped + flexible connectors
+ ○ Not sure
+
+
+Anchored heavy items (check all)
+ [ ] Bookcases [ ] Cabinets [ ] Refrigerator
+ [ ] Electronics [ ] None anchored [ ] Other: ______
+
+
+Upper-cabinet latches
+ ○ No latches
+ ○ Child-proof latches
+ ○ Magnetic catches
+ ○ Not sure
+
+
+Electronics stability
+ ○ Unsecured
+ ○ Putty/wax only
+ ○ Straps or anchors
+ ○ Not sure
+
+
+Gas-shutoff plan
+ ○ No wrench or plan
+ ○ Wrench stored, nobody trained
+ ○ Wrench stored and everyone trained
+ ○ Not sure
+
+
+Chimney & masonry
+ ○ Never inspected
+ ○ Inspected over 5 yrs ago
+ ○ Inspected within 5 yrs
+ ○ Not sure
+
+
+Garage-below living area
+ ○ No upgrades
+ ○ Added shear panels
+ ○ Installed steel posts
+ ○ Not applicable / no garage
+
+
+Appliance connectors
+ ○ Rigid pipes only
+ ○ Flexible connectors
+ ○ Flexible + seismic straps
+ ○ Not sure
+
+
+Wood stove or fireplace
+ ○ Not secured
+ ○ Anchored to floor
+ ○ Anchored + straps
+ ○ Not sure
+
+
+Family earthquake drill
+ ○ Never practiced
+ ○ Once a year
+ ○ Multiple times a year
+ ○ Not sure
+
+
+Emergency 72-hour kit (check all)
+ [ ] Water [ ] Food [ ] First-aid [ ] Flashlight/batteries [ ] None
+
+
+Hanging décor
+ ○ Hung on nails only
+ ○ Two-point anchors
+ ○ Museum-wax putty
+ ○ Not secured
+
+
+Crawlspace & foundation
+ ○ No work done
+ ○ Added anchor bolts
+ ○ Installed shear panels
+ ○ Not sure
+
+
+Ceiling-hung fixtures
+ ○ Standard screws
+ ○ Earthquake-rated connectors
+ ○ Not sure
+
+
+Room-by-room checklist
+ ○ Never used FEMA’s audit
+ ○ Partially completed
+ ○ Fully completed
+ ○ Not sure
+
+
+
+💨 Section C: Hurricane & High-Wind Protection
+Roof-deck inspection
+ ○ Never checked
+ ○ DIY yearly
+ ○ Pro inspection
+ ○ Not sure
+
+
+Attic vents
+ ○ Standard vents
+ ○ Wind-resistant covers
+ ○ Fully sealed
+ ○ Not sure
+
+
+Roof covering
+ ○ Standard shingles
+ ○ Wind-rated shingles
+ ○ Metal panels
+ ○ Not sure
+
+
+Window & door protection
+ ○ None
+ ○ Storm shutters
+ ○ Impact glazing
+ ○ Protective film
+
+
+Garage-door upgrades
+ ○ None
+ ○ Reinforced panels
+ ○ Stronger tracks
+ ○ Not sure
+
+
+Gable-end bracing
+ ○ None
+ ○ Added braces
+ ○ Engineered panels
+ ○ Not sure
+
+
+Soffit/overhangs
+ ○ Unchanged
+ ○ Reinforced
+ ○ Fully replaced
+ ○ Not sure
+
+
+Chimney ties
+ ○ None
+ ○ Straps only
+ ○ Straps + anchors
+ ○ Not sure
+
+
+Attached structures
+ ○ Not tied in
+ ○ Strapped in
+ ○ Engineered connectors
+ ○ Not applicable
+
+
+Continuous load path
+ ○ Partial
+ ○ Complete
+ ○ Not sure
+
+
+Siding material
+ ○ Vinyl/wood
+ ○ Fiber-cement
+ ○ Masonry/brick
+ ○ Not sure
+
+
+Post-retrofit evaluation
+ ○ None
+ ○ Contractor only
+ ○ Registered professional
+ ○ Not sure
+
+
+Gutter & downspout anchors
+ ○ Standard hangers
+ ○ Reinforced hangers
+ ○ Wind-rated fasteners
+ ○ Not sure
+
+
+Retrofit level chosen
+ ○ Basic
+ ○ Intermediate
+ ○ Advanced
+ ○ Not decided
+
+
+Completed measures (check all)
+ [ ] Roof-deck reinf.
+ [ ] Storm shutters/film
+ [ ] Garage-door upgrade
+ [ ] Load-path tie-ins
+ [ ] Siding upgrade
+ [ ] None
+
+
+
+🔥 Section D: Wildfire Hardening
+Defensible space width
+ ○ < 10 ft ○ 10 – 30 ft ○ 30 – 50 ft ○ > 50 ft
+
+
+Roof material
+ ○ Standard shingles
+ ○ Class A tile/shingle
+ ○ Metal panels
+ ○ Not sure
+
+
+Ember barriers
+ ○ None
+ ○ Birdstops only
+ ○ Fully mortared
+ ○ Not sure
+
+
+Underlayment type
+ ○ Standard felt
+ ○ Mineral cap sheet
+ ○ Gypsum board
+ ○ Not sure
+
+
+Vent protection
+ ○ None
+ ○ Mesh only
+ ○ Mesh + shutters
+ ○ Not sure
+
+
+Crawlspace & HVAC vents (check all)
+ [ ] No mesh
+ [ ] ¼″ mesh only
+ [ ] Mesh + shutters
+ [ ] Not sure
+
+
+Wall cladding
+ ○ Vinyl/wood
+ ○ Fiber-cement/stucco
+ ○ Masonry
+ ○ Not sure
+
+
+Vegetation spacing
+ ○ Crowded
+ ○ Some thinning
+ ○ Proper spacing
+ ○ Not sure
+
+
+Outbuilding distance
+ ○ < 10 ft
+ ○ 10 – 50 ft
+ ○ > 50 ft
+ ○ No outbuildings
+
+
+Patio-furniture plan
+ ○ Unprotected
+ ○ Metal only
+ ○ Stored indoors
+ ○ Not sure
+
+
+Gutter guards
+ ○ None
+ ○ Plastic guards
+ ○ Metal guards
+ ○ Not sure
+
+
+Window glazing
+ ○ Standard glass
+ ○ Tempered only
+ ○ Fire-rated
+ ○ Not sure
+
+
+Entry-door rating
+ ○ Standard
+ ○ Fire-rated door
+ ○ Door + fire trim
+ ○ Not sure
+
+
+Site orientation
+ ○ No plan
+ ○ Basic plan
+ ○ Detailed plan
+ ○ Not sure
+
+
+Under-elevation finish
+ ○ Exposed wood
+ ○ Noncombustible sheathing
+ ○ Fire-resistant panels
+ ○ N/A
+
+
+
+🌊 Section E: Flood Mitigation
+Equipment elevation
+ ○ Below flood level
+ ○ At flood level
+ ○ Above flood level
+ ○ Not sure
+
+
+Flood barriers
+ ○ None
+ ○ Removable shields
+ ○ Low concrete wall
+ ○ Not sure
+
+
+Backflow prevention
+ ○ None
+ ○ Single check valve
+ ○ Dual backflow valves
+ ○ Not sure
+
+
+Appliance platforms
+ ○ Ground level
+ ○ Raised platform
+ ○ Upstairs
+ ○ Not sure
+
+
+House-wrap seal
+ ○ Loose at top
+ ○ Buried at bottom
+ ○ Fully sealed
+ ○ Not sure
+
+
+Automatic flood vents
+ ○ None
+ ○ One opening
+ ○ ≥ 2 on one wall
+ ○ ≥ 2 on two walls
+
+
+Vent placement
+ ○ All on one wall
+ ○ Spread on two walls
+ ○ Not sure
+
+
+Sump pump
+ ○ None
+ ○ Pump only
+ ○ Pump + backup power
+ ○ Not sure
+
+
+Fuel-tank anchoring
+ ○ Untethered
+ ○ Strapped only
+ ○ Strapped + anchors
+ ○ Not sure
+
+
+Flood-resistant materials
+ ○ Standard materials
+ ○ Pressure-treated wood
+ ○ Concrete/masonry
+ ○ Not sure
+
+
+Under-slab drainage
+ ○ None
+ ○ Perforated pipe
+ ○ Stone trench + pipe
+ ○ Not sure
+
+
+Electrical location
+ ○ Below water line
+ ○ At water line
+ ○ Above water line
+ ○ Not sure
+
+
+Landscape swales
+ ○ None
+ ○ Basic grading
+ ○ Engineered swales
+ ○ Not sure
+
+
+Flood shields
+ ○ None
+ ○ Doors only
+ ○ Doors & windows
+ ○ Not sure
+
+
+Perimeter drainage
+ ○ None
+ ○ Gravel trench
+ ○ Gravel + pipe
+ ○ Not sure

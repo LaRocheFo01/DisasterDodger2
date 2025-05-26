@@ -220,6 +220,104 @@ export default function AuditWizard() {
     setLocation(`/payment?auditId=${auditId}&amount=${amount}&plan=${selectedPlan}`);
   };
 
+  const renderQuestion = (question: Question) => {
+    const fieldValue = auditData[question.id as keyof AuditData];
+
+    return (
+      <Card className="bg-white rounded-2xl shadow-lg max-w-2xl mx-auto">
+        <CardContent className="p-8">
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-teal-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FileText className="text-white h-8 w-8" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">{question.section}</h2>
+            <p className="text-gray-600">Question {currentStep} of {questions.length}</p>
+          </div>
+
+          <div className="space-y-6">
+            <div>
+              <Label className="text-lg font-semibold text-gray-900 mb-4 block">
+                {question.question}
+              </Label>
+
+              {question.type === 'radio' && question.options && (
+                <RadioGroup
+                  value={fieldValue as string || ''}
+                  onValueChange={(value) => updateField(question.id as keyof AuditData, value)}
+                  className="space-y-3"
+                >
+                  {question.options.map((option, index) => (
+                    <div key={index} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
+                      <RadioGroupItem value={option} id={`${question.id}-${index}`} />
+                      <Label 
+                        htmlFor={`${question.id}-${index}`} 
+                        className="text-gray-700 cursor-pointer flex-1"
+                      >
+                        {option}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              )}
+
+              {question.type === 'checkbox' && question.options && (
+                <div className="space-y-3">
+                  {question.options.map((option, index) => (
+                    <div key={index} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
+                      <Checkbox
+                        id={`${question.id}-${index}`}
+                        checked={Array.isArray(fieldValue) && fieldValue.includes(option)}
+                        onCheckedChange={(checked) => 
+                          updateMultipleChoice(question.id as keyof AuditData, option, checked as boolean)
+                        }
+                      />
+                      <Label 
+                        htmlFor={`${question.id}-${index}`} 
+                        className="text-gray-700 cursor-pointer flex-1"
+                      >
+                        {option}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {question.type === 'text' && (
+                <input
+                  type="text"
+                  value={fieldValue as string || ''}
+                  onChange={(e) => updateField(question.id as keyof AuditData, e.target.value)}
+                  className="w-full text-lg p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-teal-600"
+                  placeholder="Enter your answer..."
+                />
+              )}
+            </div>
+          </div>
+
+          <div className="flex justify-between mt-8">
+            <Button
+              onClick={previousStep}
+              variant="outline"
+              disabled={currentStep === 1}
+              className="px-6 py-3"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Previous
+            </Button>
+            <Button
+              onClick={nextStep}
+              disabled={!validateCurrentStep()}
+              className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3"
+            >
+              {currentStep === questions.length ? 'Complete Audit' : 'Next'}
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
   const generateReport = async () => {
     // Final save before generating PDF
     await updateAuditMutation.mutateAsync({
