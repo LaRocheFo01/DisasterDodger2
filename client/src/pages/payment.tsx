@@ -14,10 +14,11 @@ if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
-const CheckoutForm = ({ zipCode, hazard, amount, onSuccess }: { 
+const CheckoutForm = ({ zipCode, hazard, amount, auditData, onSuccess }: { 
   zipCode: string; 
   hazard: string; 
   amount: number;
+  auditData: any;
   onSuccess: (auditId: number) => void; 
 }) => {
   const stripe = useStripe();
@@ -50,10 +51,11 @@ const CheckoutForm = ({ zipCode, hazard, amount, onSuccess }: {
           variant: "destructive",
         });
       } else {
-        // Create audit record after successful payment
+        // Create audit record after successful payment with questionnaire data
         const auditResponse = await apiRequest("POST", "/api/audits", {
           zipCode,
           primaryHazard: hazard,
+          data: auditData,
           stripePaymentId: "temp_payment_id", // In real implementation, get from Stripe
         });
 
@@ -98,12 +100,13 @@ export default function Payment() {
   const [hazard, setHazard] = useState("");
   const [amount, setAmount] = useState(29);
   const [plan, setPlan] = useState("basic");
+  const [auditData, setAuditData] = useState({});
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const zip = urlParams.get('zip') || '';
+    const zip = urlParams.get('zipCode') || '';
     const detectedHazard = urlParams.get('hazard') || '';
-    const auditId = urlParams.get('auditId') || '';
+    const dataString = urlParams.get('data') || '{}';
     const planAmount = parseInt(urlParams.get('amount') || '29');
     const selectedPlan = urlParams.get('plan') || 'basic';
     
@@ -111,6 +114,14 @@ export default function Payment() {
     setHazard(detectedHazard);
     setAmount(planAmount);
     setPlan(selectedPlan);
+    
+    try {
+      const parsedData = JSON.parse(dataString);
+      setAuditData(parsedData);
+    } catch (error) {
+      console.error('Failed to parse audit data:', error);
+      setAuditData({});
+    }
 
     // Create payment intent with the selected amount
     apiRequest("POST", "/api/create-payment-intent", { 
@@ -130,7 +141,7 @@ export default function Payment() {
   };
 
   const onPaymentSuccess = (auditId: number) => {
-    setLocation(`/audit/${auditId}`);
+    setLocation(`/success/${auditId}`);
   };
 
   if (!clientSecret || !zipCode || !hazard) {
@@ -183,6 +194,7 @@ export default function Payment() {
                 zipCode={zipCode} 
                 hazard={hazard} 
                 amount={amount}
+                auditData={auditData}
                 onSuccess={onPaymentSuccess} 
               />
             </Elements>
