@@ -3,8 +3,13 @@ import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
 import { generatePDFReport } from "./report";
-import { insertAuditSchema } from "@shared/schema";
+import { insertAuditSchema, audits } from "@shared/schema";
 import { z } from "zod";
+import { drizzle } from "drizzle-orm/neon-http";
+import { neon } from "@neondatabase/serverless";
+
+const sql = neon(process.env.DATABASE_URL!);
+const db = drizzle(sql);
 
 // Stripe secret key from environment variables
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -52,18 +57,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log("Creating audit with data:", req.body);
       
-      // Create minimal audit data that matches our new schema exactly
-      const auditData: any = {
+      // Direct database insert to avoid schema validation issues
+      const [audit] = await db.insert(audits).values({
         zipCode: req.body.zipCode,
         primaryHazard: req.body.primaryHazard,
-      };
-      
-      // Only add optional fields if they exist
-      if (req.body.stripePaymentId) {
-        auditData.stripePaymentId = req.body.stripePaymentId;
-      }
-      
-      const audit = await storage.createAudit(auditData);
+        stripePaymentId: req.body.stripePaymentId || null,
+      }).returning();
       res.json(audit);
     } catch (error: any) {
       console.error("Error creating audit:", error);
