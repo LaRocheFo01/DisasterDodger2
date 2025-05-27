@@ -31,7 +31,7 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-disaster-green-600 flex items-center justify-center p-4">
+    <div className="min-h-screen hero-bg flex items-center justify-center p-4">
       <div className="max-w-3xl w-full mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
         {/* Header */}
         <header className="flex items-center justify-between h-16 px-6 bg-white">

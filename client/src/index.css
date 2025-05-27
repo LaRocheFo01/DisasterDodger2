@@ -103,6 +103,30 @@
   background-color: hsl(var(--safety-green));
 }
 
+/* Hero Background - Responsive and Reusable */
+.hero-bg {
+  background-image: url('/hero.png');
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* Responsive adjustments for hero background */
+@media (max-width: 768px) {
+  .hero-bg {
+    background-attachment: scroll;
+    background-position: center center;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-bg {
+    background-size: cover;
+    background-position: bottom center;
+  }
+}
+
 .text-warning-orange {
   color: hsl(var(--warning-orange));
 }
