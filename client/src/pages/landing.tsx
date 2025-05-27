@@ -58,8 +58,12 @@ export default function Landing() {
         {/* Hero Section with Background */}
         <div className="relative">
           <div 
-            className="h-64 sm:h-80 md:h-96 bg-center bg-cover"
-            style={{backgroundImage: "url('/assets/hero-house-landscape.svg')"}}
+            className="h-64 sm:h-80 md:h-96 bg-center bg-cover bg-no-repeat"
+            style={{
+              backgroundImage: "url('/assets/hero-house-landscape.svg')",
+              backgroundSize: 'cover',
+              backgroundPosition: 'center center'
+            }}
           ></div>
           <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
             <h1 className="text-4xl sm:text-5xl font-semibold text-gray-900 text-center mb-4">
