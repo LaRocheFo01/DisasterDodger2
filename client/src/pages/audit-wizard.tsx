@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useLocation, useRoute } from "wouter";
 import { ArrowLeft, ArrowRight, CheckCircle, Upload, X, Shield, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -95,6 +95,7 @@ interface AuditData {
 
 export default function AuditWizard() {
   const [, setLocation] = useLocation();
+  const [, params] = useRoute("/audit-wizard/:auditId");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [auditData, setAuditData] = useState<AuditData>({});
   const [uploadedPhotos, setUploadedPhotos] = useState<File[]>([]);
@@ -102,8 +103,8 @@ export default function AuditWizard() {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const queryClient = useQueryClient();
 
-  // Get audit ID from URL
-  const auditId = parseInt(window.location.pathname.split('/').pop() || '0', 10);
+  // Get audit ID from URL params
+  const auditId = params?.auditId ? parseInt(params.auditId, 10) : 0;
 
   // Fetch audit data
   const { data: audit, isLoading: auditLoading } = useQuery({
