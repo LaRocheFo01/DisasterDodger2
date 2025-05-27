@@ -59,7 +59,7 @@ export default function Landing() {
         <div className="relative">
           <div 
             className="h-64 sm:h-80 md:h-96 bg-center bg-cover"
-            style={{backgroundImage: "url('/assets/Hero.svg')"}}
+            style={{backgroundImage: "url('/assets/hero-generated.svg')"}}
           ></div>
           <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
             <h1 className="text-4xl sm:text-5xl font-semibold text-gray-900 text-center mb-4">
@@ -105,19 +105,19 @@ export default function Landing() {
         <section className="pb-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4 sm:px-6 lg:px-8">
             <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
-              <img src="/assets/earthquake.svg" alt="Earthquake" className="mx-auto h-12 w-12 mb-4"/>
+              <img src="/assets/earthquake-icon.svg" alt="Earthquake" className="mx-auto h-12 w-12 mb-4"/>
               <h3 className="text-lg font-medium text-gray-900">Earthquake</h3>
             </div>
             <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
-              <img src="/assets/flood.svg" alt="Flood" className="mx-auto h-12 w-12 mb-4"/>
+              <img src="/assets/flood-icon.svg" alt="Flood" className="mx-auto h-12 w-12 mb-4"/>
               <h3 className="text-lg font-medium text-gray-900">Flood</h3>
             </div>
             <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
-              <img src="/assets/wildfire.svg" alt="Wildfire" className="mx-auto h-12 w-12 mb-4"/>
+              <img src="/assets/wildfire-icon.svg" alt="Wildfire" className="mx-auto h-12 w-12 mb-4"/>
               <h3 className="text-lg font-medium text-gray-900">Wildfire</h3>
             </div>
             <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
-              <img src="/assets/hurricane.svg" alt="Hurricane" className="mx-auto h-12 w-12 mb-4"/>
+              <img src="/assets/hurricane-icon.svg" alt="Hurricane" className="mx-auto h-12 w-12 mb-4"/>
               <h3 className="text-lg font-medium text-gray-900">Hurricane</h3>
             </div>
           </div>
@@ -203,6 +203,59 @@ export default function Landing() {
                 )}
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Pricing Section */}
+        <section className="px-4 sm:px-6 lg:px-8 py-12 bg-gray-50">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-semibold text-gray-900 mb-4">Simple, Transparent Pricing</h2>
+            <p className="text-lg text-gray-600">Get your comprehensive disaster preparedness audit today</p>
+          </div>
+          
+          <div className="max-w-lg mx-auto">
+            <div className="bg-white rounded-xl shadow-lg p-8 text-center border-2 border-disaster-green-600">
+              <div className="mb-6">
+                <h3 className="text-2xl font-semibold text-gray-900 mb-2">Complete Home Audit</h3>
+                <div className="text-4xl font-bold text-disaster-green-600 mb-2">$39</div>
+                <p className="text-gray-600">One-time comprehensive assessment</p>
+              </div>
+              
+              <ul className="space-y-3 mb-8 text-left">
+                <li className="flex items-center">
+                  <CheckCircle className="h-5 w-5 text-disaster-green-600 mr-3 flex-shrink-0" />
+                  <span>FEMA-aligned disaster risk assessment</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="h-5 w-5 text-disaster-green-600 mr-3 flex-shrink-0" />
+                  <span>Personalized mitigation recommendations</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="h-5 w-5 text-disaster-green-600 mr-3 flex-shrink-0" />
+                  <span>Downloadable PDF report with action plan</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="h-5 w-5 text-disaster-green-600 mr-3 flex-shrink-0" />
+                  <span>Insurance cost reduction guidance</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="h-5 w-5 text-disaster-green-600 mr-3 flex-shrink-0" />
+                  <span>Photo upload for detailed analysis</span>
+                </li>
+              </ul>
+              
+              <button 
+                onClick={startAudit}
+                className="w-full py-3 px-6 bg-disaster-green-600 text-white rounded-lg hover:bg-disaster-mint-500 transition-colors font-medium text-lg"
+              >
+                Start Your Audit Now
+              </button>
+              
+              <p className="text-sm text-gray-500 mt-4">
+                <Shield className="inline h-4 w-4 mr-1" />
+                Secure payment • 30-day money-back guarantee
+              </p>
+            </div>
           </div>
         </section>
 

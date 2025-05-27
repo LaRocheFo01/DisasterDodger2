@@ -1,0 +1,42 @@
+<svg width="1024" height="768" viewBox="0 0 1024 768" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Sky gradient -->
+  <defs>
+    <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E0F2FE;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#BAE6FD;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="hill1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#22C55E;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16A34A;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="hill2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="hill3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#34D399;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#10B981;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Sky background -->
+  <rect width="1024" height="768" fill="url(#skyGradient)" />
+  
+  <!-- Back hill layer -->
+  <path d="M0 400 Q256 300 512 350 T1024 320 L1024 768 L0 768 Z" fill="url(#hill1)" opacity="0.8"/>
+  
+  <!-- Middle hill layer -->
+  <path d="M0 450 Q200 380 400 420 Q600 460 800 400 Q900 380 1024 390 L1024 768 L0 768 Z" fill="url(#hill2)" opacity="0.9"/>
+  
+  <!-- Front hill layer -->
+  <path d="M0 500 Q150 420 300 480 Q450 540 600 480 Q750 420 900 460 Q962 480 1024 470 L1024 768 L0 768 Z" fill="url(#hill3)"/>
+  
+  <!-- Subtle cloud shapes -->
+  <ellipse cx="200" cy="150" rx="40" ry="20" fill="white" opacity="0.6"/>
+  <ellipse cx="220" cy="140" rx="50" ry="25" fill="white" opacity="0.5"/>
+  <ellipse cx="180" cy="160" rx="35" ry="18" fill="white" opacity="0.7"/>
+  
+  <ellipse cx="700" cy="120" rx="45" ry="22" fill="white" opacity="0.5"/>
+  <ellipse cx="720" cy="110" rx="55" ry="28" fill="white" opacity="0.4"/>
+  <ellipse cx="680" cy="130" rx="40" ry="20" fill="white" opacity="0.6"/>
+</svg>
