@@ -80,7 +80,6 @@ export default function StartAudit() {
     setIsLoading(true);
     setLoadingStep(0);
     setShowHazardAnalysis(false);
-    setShowHazardSelection(false);
     
     // Simulate loading progress through steps
     for (let i = 0; i < loadingSteps.length; i++) {
@@ -140,11 +139,7 @@ export default function StartAudit() {
     }
   };
 
-  const handleHazardSelection = async (hazard: string) => {
-    setSelectedHazard(hazard);
-    setShowHazardSelection(false);
-    await createAuditAndProceed(zipCode, hazard);
-  };
+
 
   const hazardIcons = {
     'Earthquake': Mountain,
@@ -324,53 +319,7 @@ export default function StartAudit() {
           </div>
         )}
 
-        {/* Hazard Selection Modal */}
-        {showHazardSelection && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">Choose Your Focus Area</h3>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => setShowHazardSelection(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-              <p className="text-gray-600 mb-6">
-                Your area has multiple disaster risks. Choose which one you'd like to focus on for this assessment:
-              </p>
-              <div className="grid grid-cols-1 gap-4">
-                {availableHazards.map((hazard) => {
-                  const Icon = hazardIcons[hazard as keyof typeof hazardIcons] || AlertCircle;
-                  const colorClass = hazardColors[hazard as keyof typeof hazardColors] || 'bg-gray-500';
-                  
-                  return (
-                    <button
-                      key={hazard}
-                      onClick={() => handleHazardSelection(hazard)}
-                      className="bg-white shadow-lg rounded-xl p-4 cursor-pointer hover:shadow-xl transition-shadow border-2 border-transparent hover:border-disaster-green-200 focus:outline-none focus:ring-2 focus:ring-disaster-green-500"
-                    >
-                      <div className="flex items-center space-x-4">
-                        <div className={`w-12 h-12 ${colorClass} rounded-full flex items-center justify-center`}>
-                          <Icon className="text-white h-6 w-6" />
-                        </div>
-                        <div className="text-left">
-                          <h4 className="text-lg font-medium text-gray-800">{hazard}</h4>
-                          <p className="text-sm text-gray-600">
-                            Get tailored recommendations for {hazard.toLowerCase()} preparedness
-                          </p>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        )}
+
       </main>
     </div>
   );
