@@ -79,10 +79,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Validate and clean the updates object to match schema
       const cleanUpdates: any = {};
       
-      // Handle audit responses properly
-      if (updates.auditResponses) {
-        cleanUpdates.auditResponses = updates.auditResponses;
-        console.log("Saving audit responses:", cleanUpdates.auditResponses);
+      // Handle questionnaire responses properly
+      if (updates.questionnaireResponses) {
+        cleanUpdates.questionnaireResponses = updates.questionnaireResponses;
+        console.log("Saving questionnaire responses:", cleanUpdates.questionnaireResponses);
       }
       
       // Handle other valid fields

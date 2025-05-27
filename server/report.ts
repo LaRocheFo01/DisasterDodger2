@@ -4,13 +4,13 @@ import { storage } from "./storage";
 import type { Audit } from "@shared/schema";
 
 function calculateRiskScore(audit: Audit): number {
-  // Simple risk calculation based on audit responses
+  // Simple risk calculation based on questionnaire responses
   let score = 5; // Base score
   
-  // Add risk based on various factors in audit responses
-  if (audit.auditResponses) {
-    Object.keys(audit.auditResponses).forEach(key => {
-      const value = audit.auditResponses![key];
+  // Add risk based on various factors in questionnaire responses
+  if (audit.questionnaireResponses) {
+    Object.keys(audit.questionnaireResponses).forEach(key => {
+      const value = audit.questionnaireResponses![key];
       if (typeof value === 'string' && value.toLowerCase().includes('no')) {
         score += 1;
       }

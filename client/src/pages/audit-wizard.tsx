@@ -141,7 +141,7 @@ export default function AuditWizard() {
   useEffect(() => {
     const saveProgress = () => {
       if (Object.keys(auditData).length > 0) {
-        updateAuditMutation.mutate({ auditResponses: auditData });
+        updateAuditMutation.mutate({ questionnaireResponses: auditData });
       }
     };
 
@@ -164,9 +164,9 @@ export default function AuditWizard() {
   const nextStep = () => {
     if (!validateCurrentQuestion()) return;
 
-    // Save current answer to auditResponses
+    // Save current answer to questionnaireResponses
     const updates = { 
-      auditResponses: {
+      questionnaireResponses: {
         ...auditData,
         [currentQuestion.id]: auditData[currentQuestion.id as keyof AuditData]
       }
@@ -212,7 +212,7 @@ export default function AuditWizard() {
     try {
       // Update audit with final data and mark as completed
       await updateAuditMutation.mutateAsync({
-        auditResponses: auditData,
+        questionnaireResponses: auditData,
         photosUploaded: uploadedPhotos.length,
         completed: true
       });
