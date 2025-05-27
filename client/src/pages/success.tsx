@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { DownloadReportButton } from "@/components/download-report-button";
 
 export default function Success() {
   const [, params] = useRoute("/success/:auditId");
@@ -181,12 +182,11 @@ export default function Success() {
                 <p className="text-sm text-gray-600">Get your personalized PDF recommendations</p>
               </div>
             </div>
-            <Button 
-              onClick={downloadReport}
-              className="w-full bg-disaster-green-600 hover:bg-disaster-green-700 active:scale-95 transition-all"
-            >
-              Download PDF Report
-            </Button>
+            <DownloadReportButton 
+              auditId={auditId}
+              zipCode={audit?.zipCode}
+              className="w-full active:scale-95 transition-all"
+            />
           </div>
 
           <div className="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow">
