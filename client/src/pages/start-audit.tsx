@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import React from "react";
 import { useLocation } from "wouter";
 import { MapPin, ArrowLeft, AlertCircle, Mountain, Wind, Zap, Snowflake, Flame, Droplets, X, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -52,6 +53,8 @@ export default function StartAudit() {
   const [showHazardSelection, setShowHazardSelection] = useState(false);
   const [availableHazards, setAvailableHazards] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
+  const [showHazardAnalysis, setShowHazardAnalysis] = useState(false);
 
   // Get ZIP code from URL if present
   useEffect(() => {
@@ -63,11 +66,29 @@ export default function StartAudit() {
     }
   }, []);
 
+  const loadingSteps = [
+    { icon: MapPin, text: "Analyzing your location...", color: "text-blue-600" },
+    { icon: Zap, text: "Checking earthquake risk...", color: "text-red-600" },
+    { icon: Droplets, text: "Evaluating flood zones...", color: "text-blue-500" },
+    { icon: Flame, text: "Assessing wildfire danger...", color: "text-orange-600" },
+    { icon: Wind, text: "Scanning hurricane patterns...", color: "text-purple-600" },
+    { icon: Shield, text: "Generating risk report...", color: "text-disaster-green-600" }
+  ];
+
   const handleZipSubmit = async (zip?: string) => {
     const targetZip = zip || zipCode;
     if (!targetZip || targetZip.length !== 5) return;
 
     setIsLoading(true);
+    setLoadingStep(0);
+    setShowHazardAnalysis(false);
+    setShowHazardSelection(false);
+    
+    // Simulate loading progress through steps
+    for (let i = 0; i < loadingSteps.length; i++) {
+      setLoadingStep(i);
+      await new Promise(resolve => setTimeout(resolve, 800)); // 800ms per step
+    }
     
     try {
       const hazards = getHazardsForZip(targetZip);
@@ -79,14 +100,20 @@ export default function StartAudit() {
         return;
       }
 
-      if (hazards.length === 1) {
-        // Single hazard - create audit and go directly to questionnaire
-        await createAuditAndProceed(targetZip, hazards[0]);
-      } else {
-        // Multiple hazards - show selection modal
-        setShowHazardSelection(true);
-        setIsLoading(false);
-      }
+      // First show hazard analysis
+      setIsLoading(false);
+      setShowHazardAnalysis(true);
+      
+      // Then show hazard selection after viewing analysis
+      setTimeout(() => {
+        if (hazards.length === 1) {
+          // Single hazard - create audit and go directly to questionnaire
+          createAuditAndProceed(targetZip, hazards[0]);
+        } else {
+          // Multiple hazards - show selection
+          setShowHazardSelection(true);
+        }
+      }, 2000);
     } catch (error) {
       console.error('Error processing ZIP code:', error);
       alert("An error occurred. Please try again.");
@@ -177,13 +204,82 @@ export default function StartAudit() {
 
       {/* Main Content */}
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-disaster-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-            <MapPin className="text-white h-8 w-8" />
+        {/* Loading Progress */}
+        {isLoading && (
+          <div className="text-center mb-8">
+            <div className="w-20 h-20 bg-disaster-green-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
+              {loadingStep === 0 && <MapPin className="text-white h-10 w-10" />}
+              {loadingStep === 1 && <Zap className="text-white h-10 w-10" />}
+              {loadingStep === 2 && <Droplets className="text-white h-10 w-10" />}
+              {loadingStep === 3 && <Flame className="text-white h-10 w-10" />}
+              {loadingStep === 4 && <Wind className="text-white h-10 w-10" />}
+              {loadingStep === 5 && <Shield className="text-white h-10 w-10" />}
+            </div>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-3">
+              {loadingSteps[loadingStep].text}
+            </h2>
+            <div className="w-full bg-gray-200 rounded-full h-3 mb-4 max-w-md mx-auto">
+              <div 
+                className="bg-disaster-green-600 h-3 rounded-full transition-all duration-800" 
+                style={{width: `${((loadingStep + 1) / loadingSteps.length) * 100}%`}}
+              ></div>
+            </div>
+            <p className="text-gray-600">
+              Step {loadingStep + 1} of {loadingSteps.length}
+            </p>
           </div>
-          <h1 className="text-3xl font-semibold text-gray-900 mb-2">Enter Your ZIP Code</h1>
-          <p className="text-lg text-gray-600">We'll analyze your area's specific disaster risks</p>
-        </div>
+        )}
+
+        {/* Hazard Analysis Results */}
+        {showHazardAnalysis && !isLoading && (
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-disaster-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Shield className="text-white h-8 w-8" />
+            </div>
+            <h2 className="text-3xl font-semibold text-gray-900 mb-4">Risk Analysis Complete</h2>
+            <div className="bg-white shadow-lg rounded-lg p-6 mb-6">
+              <h3 className="text-xl font-medium text-gray-900 mb-4">
+                Primary Risks for ZIP {zipCode}:
+              </h3>
+              <div className="grid gap-4">
+                {availableHazards.map((hazard, index) => (
+                  <div key={index} className="flex items-center justify-center p-4 bg-gray-50 rounded-lg">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${
+                      hazard === 'Earthquake' ? 'bg-red-100' :
+                      hazard === 'Flood' ? 'bg-blue-100' :
+                      hazard === 'Wildfire' ? 'bg-orange-100' :
+                      'bg-purple-100'
+                    }`}>
+                      {hazard === 'Earthquake' && <Zap className="h-5 w-5 text-red-600" />}
+                      {hazard === 'Flood' && <Droplets className="h-5 w-5 text-blue-600" />}
+                      {hazard === 'Wildfire' && <Flame className="h-5 w-5 text-orange-600" />}
+                      {hazard === 'Hurricane' && <Wind className="h-5 w-5 text-purple-600" />}
+                    </div>
+                    <span className="font-medium text-gray-900">{hazard}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {!showHazardSelection && (
+              <p className="text-gray-600">
+                {availableHazards.length === 1 
+                  ? "Preparing your personalized questionnaire..." 
+                  : "Choose your focus area below..."}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Initial ZIP Entry */}
+        {!isLoading && !showHazardAnalysis && (
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-disaster-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <MapPin className="text-white h-8 w-8" />
+            </div>
+            <h1 className="text-3xl font-semibold text-gray-900 mb-2">Enter Your ZIP Code</h1>
+            <p className="text-lg text-gray-600">We'll analyze your area's specific disaster risks</p>
+          </div>
+        )}
         
         {/* ZIP Entry Card */}
         <div className="bg-white shadow-md rounded-lg p-8 mb-8">
