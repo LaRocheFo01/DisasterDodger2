@@ -59,7 +59,7 @@ export default function Landing() {
         <div className="relative">
           <div 
             className="h-64 sm:h-80 md:h-96 bg-center bg-cover"
-            style={{backgroundImage: "url('/assets/hero.svg')"}}
+            style={{backgroundImage: "url('/assets/Hero.svg')"}}
           ></div>
           <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
             <h1 className="text-4xl sm:text-5xl font-semibold text-gray-900 text-center mb-4">
@@ -105,27 +105,19 @@ export default function Landing() {
         <section className="pb-12">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4 sm:px-6 lg:px-8">
             <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <div className="w-6 h-6 bg-white rounded-full"></div>
-              </div>
+              <img src="/assets/earthquake.svg" alt="Earthquake" className="mx-auto h-12 w-12 mb-4"/>
               <h3 className="text-lg font-medium text-gray-900">Earthquake</h3>
             </div>
             <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <div className="w-6 h-6 bg-white rounded-full"></div>
-              </div>
+              <img src="/assets/flood.svg" alt="Flood" className="mx-auto h-12 w-12 mb-4"/>
               <h3 className="text-lg font-medium text-gray-900">Flood</h3>
             </div>
             <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <div className="w-6 h-6 bg-white rounded-full"></div>
-              </div>
+              <img src="/assets/wildfire.svg" alt="Wildfire" className="mx-auto h-12 w-12 mb-4"/>
               <h3 className="text-lg font-medium text-gray-900">Wildfire</h3>
             </div>
             <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <div className="w-6 h-6 bg-white rounded-full"></div>
-              </div>
+              <img src="/assets/hurricane.svg" alt="Hurricane" className="mx-auto h-12 w-12 mb-4"/>
               <h3 className="text-lg font-medium text-gray-900">Hurricane</h3>
             </div>
           </div>
