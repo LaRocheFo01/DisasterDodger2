@@ -22,47 +22,46 @@ function calculateRiskScore(audit: Audit): number {
 
 function generateRecommendations(audit: Audit): string[] {
   const recommendations: string[] = [];
-  const responses = audit.auditResponses || {};
   
-  // Generate recommendations based on hazard type and responses
+  // Generate recommendations based on hazard type and individual column responses
   if (audit.primaryHazard === 'Earthquake') {
-    if (responses.waterHeaterSecurity === 'Not secured at all') {
+    if (audit.waterHeaterSecurity === 'Not secured at all') {
       recommendations.push("Secure your water heater with straps and flexible connectors to prevent damage during earthquakes");
     }
-    if (responses.gasShutoffPlan === 'No wrench or plan') {
+    if (audit.gasShutoffPlan === 'No wrench or plan') {
       recommendations.push("Install a gas shutoff wrench and train all family members on its location and use");
     }
-    if (responses.emergencyKit?.includes('None')) {
+    if (audit.emergencyKit?.includes('None')) {
       recommendations.push("Assemble a 72-hour emergency kit with water, food, first-aid supplies, and flashlights");
     }
   } else if (audit.primaryHazard === 'Wildfire') {
-    if (responses.defensibleSpaceWidth === '< 10 ft') {
+    if (audit.defensibleSpaceWidth === '< 10 ft') {
       recommendations.push("Expand defensible space to at least 30 feet around your home for wildfire protection");
     }
-    if (responses.roofMaterial === 'Standard shingles') {
+    if (audit.roofMaterial === 'Standard shingles') {
       recommendations.push("Consider upgrading to Class A fire-rated roofing materials");
     }
-    if (responses.ventProtection === 'None') {
+    if (audit.ventProtection === 'None') {
       recommendations.push("Install mesh screens and shutters on all vents to prevent ember intrusion");
     }
   } else if (audit.primaryHazard === 'Flood') {
-    if (responses.equipmentElevation === 'Below flood level') {
+    if (audit.equipmentElevation === 'Below flood level') {
       recommendations.push("Elevate utilities and equipment above the base flood elevation");
     }
-    if (responses.backflowPrevention === 'None') {
+    if (audit.backflowPrevention === 'None') {
       recommendations.push("Install backflow prevention valves to protect against sewer backup");
     }
-    if (responses.floodBarriers === 'None') {
+    if (audit.floodBarriers === 'None') {
       recommendations.push("Consider installing flood shields or barriers for doors and windows");
     }
   } else if (audit.primaryHazard === 'Hurricane') {
-    if (responses.windowDoorProtection === 'None') {
+    if (audit.windowDoorProtection === 'None') {
       recommendations.push("Install storm shutters or impact-resistant windows for hurricane protection");
     }
-    if (responses.roofInspection === 'Never checked') {
+    if (audit.roofInspection === 'Never checked') {
       recommendations.push("Have your roof professionally inspected and secure loose shingles or tiles");
     }
-    if (responses.garageDoorUpgrade === 'None') {
+    if (audit.garageDoorUpgrade === 'None') {
       recommendations.push("Upgrade garage doors with reinforced panels and stronger tracks");
     }
   }
@@ -168,7 +167,7 @@ export async function generatePDFReport(req: Request, res: Response) {
       doc.moveDown(0.5);
     });
 
-    // --- Page 4: Audit Details by Section ---
+    // --- Page 4: Detailed Assessment Results ---
     doc.addPage();
     doc.fontSize(24).fillColor(colors.primary)
        .text("Detailed Assessment Results");
@@ -176,75 +175,109 @@ export async function generatePDFReport(req: Request, res: Response) {
     doc.moveDown(1);
 
     // Section A: General Home Information
-    if (audit.sectionAResponses && Object.keys(audit.sectionAResponses).length > 0) {
-      doc.fontSize(16).fillColor(colors.secondary)
-         .text("🏡 General Home Information");
-      doc.moveDown(0.5);
-      
-      Object.entries(audit.sectionAResponses).forEach(([key, value]) => {
-        if (value && typeof value === 'string') {
-          doc.fontSize(11).fillColor(colors.text)
-             .text(`${key}: ${value}`, { width: 495 });
-          doc.moveDown(0.2);
-        }
-      });
-      doc.moveDown(0.5);
-    }
-
-    // Primary Hazard Section
-    const hazardSections: Record<string, { emoji: string; title: string; data: any }> = {
-      'Earthquake': { 
-        emoji: '🌐', 
-        title: 'Earthquake Readiness Assessment', 
-        data: audit.sectionBEarthquake 
-      },
-      'Hurricane': { 
-        emoji: '💨', 
-        title: 'Hurricane & High-Wind Protection', 
-        data: audit.sectionCHurricane 
-      },
-      'Wildfire': { 
-        emoji: '🔥', 
-        title: 'Wildfire Hardening Assessment', 
-        data: audit.sectionDWildfire 
-      },
-      'Flood': { 
-        emoji: '🌊', 
-        title: 'Flood Mitigation Assessment', 
-        data: audit.sectionEFlood 
+    doc.fontSize(16).fillColor(colors.secondary)
+       .text("🏡 General Home Information");
+    doc.moveDown(0.5);
+    
+    const generalInfo = [
+      { label: "Home Type", value: audit.homeTypeResponse },
+      { label: "Year Built", value: audit.yearBuiltResponse },
+      { label: "Ownership Status", value: audit.ownershipStatusResponse },
+      { label: "Insured Value", value: audit.insuredValueResponse },
+      { label: "Previous Grants", value: audit.previousGrantsResponse }
+    ];
+    
+    generalInfo.forEach(item => {
+      if (item.value) {
+        doc.fontSize(11).fillColor(colors.text)
+           .text(`${item.label}: ${item.value}`, { width: 495 });
+        doc.moveDown(0.2);
       }
-    };
+    });
+    doc.moveDown(0.5);
 
-    // Display the primary hazard section
-    const primarySection = hazardSections[audit.primaryHazard];
-    if (primarySection && audit.auditResponses && Object.keys(audit.auditResponses).length > 0) {
+    // Primary Hazard Specific Questions
+    if (audit.primaryHazard === 'Earthquake') {
       doc.fontSize(16).fillColor(colors.secondary)
-         .text(`${primarySection.emoji} ${primarySection.title}`);
+         .text("🌐 Earthquake Readiness Assessment");
       doc.moveDown(0.5);
       
-      Object.entries(audit.auditResponses).forEach(([key, value]) => {
-        if (value && typeof value === 'string') {
+      const earthquakeResponses = [
+        { label: "Water Heater Security", value: audit.waterHeaterSecurity },
+        { label: "Gas Shutoff Plan", value: audit.gasShutoffPlan },
+        { label: "Cabinet Latches", value: audit.cabinetLatches },
+        { label: "Electronics Stability", value: audit.electronicsStability },
+        { label: "Foundation Work", value: audit.foundationWork }
+      ];
+      
+      earthquakeResponses.forEach(item => {
+        if (item.value) {
           doc.fontSize(11).fillColor(colors.text)
-             .text(`${key}: ${value}`, { width: 495 });
+             .text(`${item.label}: ${item.value}`, { width: 495 });
           doc.moveDown(0.2);
         }
       });
-    } else if (audit.auditResponses && Object.keys(audit.auditResponses).length > 0) {
-      // Fallback for legacy data
+    } else if (audit.primaryHazard === 'Flood') {
       doc.fontSize(16).fillColor(colors.secondary)
-         .text("Assessment Responses");
+         .text("🌊 Flood Mitigation Assessment");
       doc.moveDown(0.5);
       
-      Object.entries(audit.auditResponses).forEach(([key, value]) => {
-        if (value && typeof value === 'string') {
+      const floodResponses = [
+        { label: "Equipment Elevation", value: audit.equipmentElevation },
+        { label: "Flood Barriers", value: audit.floodBarriers },
+        { label: "Backflow Prevention", value: audit.backflowPrevention },
+        { label: "Sump Pump", value: audit.sumpPump },
+        { label: "Flood Shields", value: audit.floodShields },
+        { label: "Perimeter Drainage", value: audit.perimeterDrainage }
+      ];
+      
+      floodResponses.forEach(item => {
+        if (item.value) {
           doc.fontSize(11).fillColor(colors.text)
-             .text(`${key}: ${value}`, { width: 495 });
+             .text(`${item.label}: ${item.value}`, { width: 495 });
           doc.moveDown(0.2);
         }
       });
-    } else {
-      doc.fontSize(12).fillColor(colors.text)
-         .text("Assessment in progress. Complete responses will appear in your final report.");
+    } else if (audit.primaryHazard === 'Wildfire') {
+      doc.fontSize(16).fillColor(colors.secondary)
+         .text("🔥 Wildfire Hardening Assessment");
+      doc.moveDown(0.5);
+      
+      const wildfireResponses = [
+        { label: "Defensible Space Width", value: audit.defensibleSpaceWidth },
+        { label: "Roof Material", value: audit.roofMaterial },
+        { label: "Vent Protection", value: audit.ventProtection },
+        { label: "Wall Cladding", value: audit.wallCladding },
+        { label: "Window Glazing", value: audit.windowGlazing }
+      ];
+      
+      wildfireResponses.forEach(item => {
+        if (item.value) {
+          doc.fontSize(11).fillColor(colors.text)
+             .text(`${item.label}: ${item.value}`, { width: 495 });
+          doc.moveDown(0.2);
+        }
+      });
+    } else if (audit.primaryHazard === 'Hurricane') {
+      doc.fontSize(16).fillColor(colors.secondary)
+         .text("💨 Hurricane & High-Wind Protection");
+      doc.moveDown(0.5);
+      
+      const hurricaneResponses = [
+        { label: "Roof Inspection", value: audit.roofInspection },
+        { label: "Window/Door Protection", value: audit.windowDoorProtection },
+        { label: "Garage Door Upgrade", value: audit.garageDoorUpgrade },
+        { label: "Roof Covering", value: audit.roofCovering },
+        { label: "Siding Material", value: audit.sidingMaterial }
+      ];
+      
+      hurricaneResponses.forEach(item => {
+        if (item.value) {
+          doc.fontSize(11).fillColor(colors.text)
+             .text(`${item.label}: ${item.value}`, { width: 495 });
+          doc.moveDown(0.2);
+        }
+      });
     }
 
     // --- Footer ---

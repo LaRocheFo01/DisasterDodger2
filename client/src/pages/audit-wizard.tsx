@@ -164,28 +164,99 @@ export default function AuditWizard() {
   const nextStep = () => {
     if (!validateCurrentQuestion()) return;
 
-    // Organize responses by section for better data structure
+    // Save to individual columns based on question ID
     const currentAnswer = auditData[currentQuestion.id as keyof AuditData];
     let updates: any = {};
 
-    // Determine which section this question belongs to
-    if (currentQuestion.section === 'General Information') {
-      updates.sectionAResponses = {
-        ...auditData,
-        [currentQuestion.id]: currentAnswer
-      };
-    } else {
-      // Store in the comprehensive audit responses for compatibility
-      updates.auditResponses = {
-        ...auditData,
-        [currentQuestion.id]: currentAnswer
-      };
+    // Map question IDs to database column names
+    const questionColumnMap: Record<string, string> = {
+      // Section A: General Information
+      'homeType': 'homeTypeResponse',
+      'yearBuilt': 'yearBuiltResponse', 
+      'ownershipStatus': 'ownershipStatusResponse',
+      'insuredValue': 'insuredValueResponse',
+      'insurancePolicies': 'insurancePoliciesResponse',
+      'previousGrants': 'previousGrantsResponse',
+      'previousGrantsProgram': 'previousGrantsProgramResponse',
+      
+      // Section B: Earthquake
+      'waterHeaterSecurity': 'waterHeaterSecurity',
+      'anchoredItems': 'anchoredItems',
+      'cabinetLatches': 'cabinetLatches',
+      'electronicsStability': 'electronicsStability',
+      'gasShutoffPlan': 'gasShutoffPlan',
+      'chimneyInspection': 'chimneyInspection',
+      'garageRetrofit': 'garageRetrofit',
+      'applianceConnectors': 'applianceConnectors',
+      'woodStoveAnchor': 'woodStoveAnchor',
+      'earthquakeDrill': 'earthquakeDrill',
+      'emergencyKit': 'emergencyKit',
+      'hangingDecor': 'hangingDecor',
+      'foundationWork': 'foundationWork',
+      'ceilingFixtures': 'ceilingFixtures',
+      'roomByRoomChecklist': 'roomByRoomChecklist',
+      
+      // Section C: Hurricane
+      'roofInspection': 'roofInspection',
+      'atticVents': 'atticVents',
+      'roofCovering': 'roofCovering',
+      'windowDoorProtection': 'windowDoorProtection',
+      'garageDoorUpgrade': 'garageDoorUpgrade',
+      'gableEndBracing': 'gableEndBracing',
+      'soffitOverhangs': 'soffitOverhangs',
+      'chimneyTies': 'chimneyTies',
+      'attachedStructures': 'attachedStructures',
+      'continuousLoadPath': 'continuousLoadPath',
+      'sidingMaterial': 'sidingMaterial',
+      'retrofitEvaluation': 'retrofitEvaluation',
+      'gutterAnchors': 'gutterAnchors',
+      'retrofitLevel': 'retrofitLevel',
+      'completedMeasures': 'completedMeasures',
+      
+      // Section D: Wildfire
+      'defensibleSpaceWidth': 'defensibleSpaceWidth',
+      'roofMaterial': 'roofMaterial',
+      'emberBarriers': 'emberBarriers',
+      'underlaymentType': 'underlaymentType',
+      'ventProtection': 'ventProtection',
+      'crawlspaceVents': 'crawlspaceVents',
+      'wallCladding': 'wallCladding',
+      'vegetationSpacing': 'vegetationSpacing',
+      'outbuildingDistance': 'outbuildingDistance',
+      'patioFurniturePlan': 'patioFurniturePlan',
+      'gutterGuards': 'gutterGuards',
+      'windowGlazing': 'windowGlazing',
+      'entryDoorRating': 'entryDoorRating',
+      'siteOrientation': 'siteOrientation',
+      'underElevationFinish': 'underElevationFinish',
+      
+      // Section E: Flood
+      'equipmentElevation': 'equipmentElevation',
+      'floodBarriers': 'floodBarriers',
+      'backflowPrevention': 'backflowPrevention',
+      'appliancePlatforms': 'appliancePlatforms',
+      'houseWrapSeal': 'houseWrapSeal',
+      'automaticFloodVents': 'automaticFloodVents',
+      'ventPlacement': 'ventPlacement',
+      'sumpPump': 'sumpPump',
+      'fuelTankAnchoring': 'fuelTankAnchoring',
+      'floodResistantMaterials': 'floodResistantMaterials',
+      'underSlabDrainage': 'underSlabDrainage',
+      'electricalLocation': 'electricalLocation',
+      'landscapeSwales': 'landscapeSwales',
+      'floodShields': 'floodShields',
+      'perimeterDrainage': 'perimeterDrainage'
+    };
+
+    // Save to specific column if mapping exists
+    const columnName = questionColumnMap[currentQuestion.id];
+    if (columnName) {
+      updates[columnName] = currentAnswer;
     }
 
     updateAuditMutation.mutate(updates);
 
     if (isLastQuestion) {
-      // Complete the audit
       completeAudit();
     } else {
       setCurrentQuestionIndex(prev => prev + 1);
