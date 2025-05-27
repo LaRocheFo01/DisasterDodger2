@@ -210,8 +210,7 @@ export default function StartAudit() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           zipCode: zip,
-          primaryHazard: hazard,
-          status: 'in_progress'
+          primaryHazard: hazard
         })
       });
 
