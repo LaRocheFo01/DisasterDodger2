@@ -59,7 +59,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const result = await sql`
         INSERT INTO audits (zip, hazard) 
         VALUES (${req.body.zipCode}, ${req.body.primaryHazard}) 
-        RETURNING id, zip as zipCode, hazard as primaryHazard, created_at
+        RETURNING id, zip, hazard, created_at
       `;
       
       console.log("Audit created successfully:", result[0]);
@@ -112,9 +112,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const auditId = parseInt(req.params.id);
       
-      // Get audit data
+      // Get audit data with proper field mapping
       const auditResult = await sql`
-        SELECT * FROM audits WHERE id = ${auditId}
+        SELECT id, zip as zipCode, hazard as primaryHazard, created_at 
+        FROM audits WHERE id = ${auditId}
       `;
       
       if (auditResult.length === 0) {
