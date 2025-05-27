@@ -52,12 +52,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log("Creating audit with data:", req.body);
       
-      // Create minimal audit data that matches our new schema
-      const auditData = {
+      // Create minimal audit data that matches our new schema exactly
+      const auditData: any = {
         zipCode: req.body.zipCode,
         primaryHazard: req.body.primaryHazard,
-        stripePaymentId: req.body.stripePaymentId || null,
       };
+      
+      // Only add optional fields if they exist
+      if (req.body.stripePaymentId) {
+        auditData.stripePaymentId = req.body.stripePaymentId;
+      }
       
       const audit = await storage.createAudit(auditData);
       res.json(audit);
