@@ -122,7 +122,7 @@ export default function AuditWizard() {
 
   // Update audit mutation with autosave
   const updateAuditMutation = useMutation({
-    mutationFn: async (updates: any) => {
+    mutationFn: async (updates: Partial<AuditData>) => {
       const response = await fetch(`/api/audits/${auditId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -141,7 +141,7 @@ export default function AuditWizard() {
   useEffect(() => {
     const saveProgress = () => {
       if (Object.keys(auditData).length > 0) {
-        updateAuditMutation.mutate({ questionnaireResponses: auditData });
+        updateAuditMutation.mutate(auditData);
       }
     };
 
@@ -164,9 +164,9 @@ export default function AuditWizard() {
   const nextStep = () => {
     if (!validateCurrentQuestion()) return;
 
-    // Save current answer to questionnaireResponses
+    // Save current answer to auditResponses
     const updates = { 
-      questionnaireResponses: {
+      auditResponses: {
         ...auditData,
         [currentQuestion.id]: auditData[currentQuestion.id as keyof AuditData]
       }
@@ -212,7 +212,7 @@ export default function AuditWizard() {
     try {
       // Update audit with final data and mark as completed
       await updateAuditMutation.mutateAsync({
-        questionnaireResponses: auditData,
+        auditResponses: auditData,
         photosUploaded: uploadedPhotos.length,
         completed: true
       });
