@@ -1,5 +1,5 @@
 import { useRoute, useLocation } from "wouter";
-import { CheckCircle, FileText, Wrench, DollarSign, Share, Shield, RotateCcw } from "lucide-react";
+import { CheckCircle, FileText, Wrench, DollarSign, Share, Shield, RotateCcw, Download, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
@@ -20,7 +20,7 @@ export default function Success() {
   const shareResults = () => {
     if (navigator.share) {
       navigator.share({
-        title: 'My Disaster Preparedness Score',
+        title: 'My Disaster Preparedness Assessment',
         text: 'I just completed my disaster preparedness audit with Disaster Dodger™',
         url: window.location.href
       });
@@ -43,132 +43,222 @@ export default function Success() {
     }
   };
 
-  const getInsuranceQuote = () => {
+  const downloadReport = () => {
     toast({
-      title: "Insurance Quote",
-      description: "Redirecting to insurance partner for personalized quote...",
+      title: "Report Ready",
+      description: "Your personalized disaster preparedness report is being generated...",
     });
-    // In real implementation, redirect to insurance partner
+    // In a real implementation, this would generate and download a PDF
   };
 
-  const startOver = () => {
-    setLocation("/");
+  const startNewAudit = () => {
+    setLocation("/start-audit");
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-safety-green to-green-700 flex items-center justify-center px-4">
-        <div className="animate-spin w-8 h-8 border-4 border-white border-t-transparent rounded-full" />
+      <div className="min-h-screen bg-gradient-to-br from-disaster-green-50 to-disaster-green-100 flex items-center justify-center">
+        <div className="animate-pulse space-y-4 max-w-md mx-auto">
+          <div className="h-6 bg-gray-300 rounded"></div>
+          <div className="h-4 bg-gray-300 rounded"></div>
+          <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+        </div>
       </div>
     );
   }
 
   if (!audit) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-safety-green to-green-700 flex items-center justify-center px-4">
-        <Card>
-          <CardContent className="p-8 text-center">
-            <h2 className="text-xl font-bold mb-4">Audit Not Found</h2>
-            <Button onClick={() => setLocation("/")}>Return Home</Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-gradient-to-br from-disaster-green-50 to-disaster-green-100 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-semibold text-gray-900 mb-4">Audit Not Found</h1>
+          <p className="text-gray-600 mb-6">The audit you're looking for could not be found.</p>
+          <Button onClick={() => setLocation("/start-audit")} className="bg-disaster-green-600 hover:bg-disaster-green-700">
+            Start New Audit
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-safety-green to-green-700 flex items-center justify-center px-4">
-      <div className="max-w-2xl w-full text-center">
-        <Card className="shadow-2xl">
-          <CardContent className="p-8">
-            <div className="w-20 h-20 bg-safety-green rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="text-white h-12 w-12" />
+    <div className="min-h-screen bg-gradient-to-br from-disaster-green-50 to-disaster-green-100">
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center">
+              <Shield className="h-6 w-6 text-disaster-green-600 mr-2" />
+              <span className="text-lg font-semibold text-gray-900">Disaster Dodger™</span>
             </div>
-            
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Audit Complete!</h2>
-            <p className="text-gray-600 mb-8">
-              Your personalized disaster preparedness report has been generated and downloaded.
-            </p>
-            
-            <Card className="bg-gray-50 mb-8">
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-gray-900 mb-4">What's Next?</h3>
-                <div className="grid md:grid-cols-3 gap-4 text-sm">
-                  <div className="text-center">
-                    <FileText className="text-fema-blue h-8 w-8 mx-auto mb-2" />
-                    <div className="font-medium">Review Your Report</div>
-                    <div className="text-gray-600">Check your downloads folder</div>
-                  </div>
-                  <div className="text-center">
-                    <Wrench className="text-warning-orange h-8 w-8 mx-auto mb-2" />
-                    <div className="font-medium">Start with Quick Wins</div>
-                    <div className="text-gray-600">Easy improvements first</div>
-                  </div>
-                  <div className="text-center">
-                    <DollarSign className="text-safety-green h-8 w-8 mx-auto mb-2" />
-                    <div className="font-medium">Claim Rebates</div>
-                    <div className="text-gray-600">Save money on upgrades</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <Button 
+              variant="ghost" 
+              onClick={() => setLocation("/")}
+              className="text-gray-600 hover:text-disaster-green-600"
+            >
+              <Home className="h-4 w-4 mr-2" />
+              Home
+            </Button>
+          </div>
+        </div>
+      </header>
 
-            {/* Additional Disaster Protection Offer */}
-            <Card className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white mb-8">
-              <CardContent className="p-8 text-center">
-                <Shield className="w-16 h-16 mx-auto mb-4 text-yellow-300" />
-                <h3 className="text-2xl font-bold mb-4">Want Complete Protection?</h3>
-                <p className="text-lg mb-6 text-blue-100">
-                  You've protected against your primary hazard. Get comprehensive coverage 
-                  for ALL disaster types in your region with our Premium Multi-Disaster Audit.
-                </p>
-                <div className="bg-white/20 rounded-lg p-4 mb-6">
-                  <div className="text-yellow-300 font-bold text-lg mb-2">Premium Audit Covers:</div>
-                  <div className="grid md:grid-cols-2 gap-2 text-sm">
-                    <div>🏔️ Earthquakes & Wildfires</div>
-                    <div>🌊 Hurricanes & Floods</div>
-                    <div>🌪️ Tornadoes & Severe Weather</div>
-                    <div>❄️ Winter Storms & Ice</div>
-                  </div>
-                </div>
-                <Button 
-                  onClick={() => setLocation("/start-audit")}
-                  className="bg-yellow-500 hover:bg-yellow-400 text-gray-900 px-8 py-3 text-lg font-bold rounded-lg"
-                >
-                  Get Premium Multi-Disaster Audit - $49
-                </Button>
-              </CardContent>
-            </Card>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                onClick={shareResults}
-                className="bg-fema-blue hover:bg-blue-700 text-white px-6 py-3 font-medium"
-              >
-                <Share className="mr-2 h-4 w-4" />
-                Share Your Score
-              </Button>
-              
-              <Button 
-                onClick={getInsuranceQuote}
-                className="bg-warning-orange hover:bg-yellow-600 text-white px-6 py-3 font-medium"
-              >
-                <Shield className="mr-2 h-4 w-4" />
-                Get Insurance Quote
-              </Button>
-              
-              <Button 
-                onClick={startOver}
-                variant="outline"
-                className="border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-3 font-medium"
-              >
-                <RotateCcw className="mr-2 h-4 w-4" />
-                Start New Audit
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Progress Indicator */}
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+          <div className="bg-disaster-green-600 h-2 rounded-full" style={{width: '100%'}}></div>
+        </div>
+        <p className="text-sm text-gray-600 mb-8">Step 3 of 3: Assessment Complete</p>
       </div>
+
+      {/* Main Content */}
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        {/* Success Hero */}
+        <div className="text-center mb-12">
+          <div className="w-20 h-20 bg-disaster-mint-600 rounded-full flex items-center justify-center mx-auto mb-6">
+            <CheckCircle className="text-white h-10 w-10" />
+          </div>
+          <h1 className="text-3xl font-semibold text-gray-900 mb-4">
+            Assessment Complete!
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Congratulations! You've completed your {audit.primaryHazard} preparedness assessment. 
+            Your personalized recommendations are ready.
+          </p>
+        </div>
+
+        {/* Results Summary */}
+        <div className="bg-white shadow-md rounded-lg p-8 mb-8">
+          <h2 className="text-xl font-medium text-gray-900 mb-6 text-center">Your Assessment Summary</h2>
+          
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-disaster-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Shield className="text-disaster-green-600 h-8 w-8" />
+              </div>
+              <h3 className="font-medium text-gray-900 mb-1">Hazard Focus</h3>
+              <p className="text-sm text-gray-600">{audit.primaryHazard}</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-disaster-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <FileText className="text-disaster-green-600 h-8 w-8" />
+              </div>
+              <h3 className="font-medium text-gray-900 mb-1">Questions Answered</h3>
+              <p className="text-sm text-gray-600">22 of 22</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-disaster-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Wrench className="text-disaster-green-600 h-8 w-8" />
+              </div>
+              <h3 className="font-medium text-gray-900 mb-1">Recommendations</h3>
+              <p className="text-sm text-gray-600">Available in Report</p>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-200 pt-6">
+            <div className="text-center mb-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Your Assessment Details</h3>
+              <div className="bg-disaster-green-50 rounded-lg p-4 inline-block">
+                <p className="text-sm text-gray-700">
+                  <strong>Location:</strong> ZIP {audit.zipCode} • 
+                  <strong> Hazard Type:</strong> {audit.primaryHazard} • 
+                  <strong> Status:</strong> <span className="text-disaster-mint-600 font-medium">Complete</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Cards */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+          <div className="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow">
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-disaster-green-600 rounded-full flex items-center justify-center mr-4">
+                <Download className="text-white h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900">Download Report</h3>
+                <p className="text-sm text-gray-600">Get your personalized PDF recommendations</p>
+              </div>
+            </div>
+            <Button 
+              onClick={downloadReport}
+              className="w-full bg-disaster-green-600 hover:bg-disaster-green-700 active:scale-95 transition-all"
+            >
+              Download PDF Report
+            </Button>
+          </div>
+
+          <div className="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow">
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-disaster-mint-500 rounded-full flex items-center justify-center mr-4">
+                <Share className="text-white h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900">Share Results</h3>
+                <p className="text-sm text-gray-600">Share your preparedness journey</p>
+              </div>
+            </div>
+            <Button 
+              onClick={shareResults}
+              variant="outline"
+              className="w-full border-disaster-green-600 text-disaster-green-600 hover:bg-disaster-green-50"
+            >
+              Share Assessment
+            </Button>
+          </div>
+        </div>
+
+        {/* Next Steps */}
+        <div className="bg-white shadow-md rounded-lg p-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">What's Next?</h3>
+          <div className="space-y-4">
+            <div className="flex items-start">
+              <div className="w-6 h-6 bg-disaster-green-600 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                <span className="text-white text-xs font-bold">1</span>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900">Review Your Report</h4>
+                <p className="text-sm text-gray-600">Download and carefully review all personalized recommendations for your home.</p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <div className="w-6 h-6 bg-disaster-green-600 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                <span className="text-white text-xs font-bold">2</span>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900">Implement Priority Actions</h4>
+                <p className="text-sm text-gray-600">Start with the quick wins and high-impact recommendations in your report.</p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <div className="w-6 h-6 bg-disaster-green-600 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                <span className="text-white text-xs font-bold">3</span>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900">Assess Other Hazards</h4>
+                <p className="text-sm text-gray-600">Consider completing assessments for other disaster types in your area.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Call to Action */}
+        <div className="text-center mt-12">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Ready for Another Assessment?</h3>
+          <p className="text-gray-600 mb-6">
+            Protect your home from all potential disasters by completing assessments for other hazard types.
+          </p>
+          <Button 
+            onClick={startNewAudit}
+            variant="outline"
+            className="border-disaster-green-600 text-disaster-green-600 hover:bg-disaster-green-50 px-8"
+          >
+            <RotateCcw className="mr-2 h-4 w-4" />
+            Start New Assessment
+          </Button>
+        </div>
+      </main>
     </div>
   );
 }
