@@ -26,6 +26,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { zipCode, primaryHazard } = req.body;
       
+      if (!zipCode || !primaryHazard) {
+        return res.status(400).json({ 
+          message: "ZIP code and primary hazard are required" 
+        });
+      }
+      
       const paymentIntent = await stripe.paymentIntents.create({
         amount: 2900, // $29.00 in cents
         currency: "usd",
@@ -41,8 +47,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         paymentIntentId: paymentIntent.id
       });
     } catch (error: any) {
+      console.error("Payment intent creation error:", {
+        message: error.message,
+        type: error.type,
+        code: error.code
+      });
       res.status(500).json({ 
-        message: "Error creating payment intent: " + error.message 
+        message: "Error creating payment intent: " + (error.message || "Unknown error")
       });
     }
   });
@@ -60,9 +71,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const audit = await storage.createAudit(basicAuditData);
       res.json(audit);
     } catch (error: any) {
-      console.error("Error creating audit:", error);
+      console.error("Error creating audit:", {
+        message: error.message,
+        stack: error.stack,
+        details: error
+      });
       res.status(500).json({ 
-        message: "Error creating audit: " + error.message 
+        message: "Error creating audit: " + (error.message || "Unknown error"),
+        error: process.env.NODE_ENV === 'development' ? error.stack : undefined
       });
     }
   });
@@ -73,6 +89,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       const updates = req.body;
       
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid audit ID" });
+      }
+      
       const audit = await storage.updateAudit(id, updates);
       if (!audit) {
         return res.status(404).json({ message: "Audit not found" });
@@ -80,8 +100,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(audit);
     } catch (error: any) {
+      console.error("Error updating audit:", {
+        message: error.message,
+        auditId: req.params.id,
+        updates: req.body
+      });
       res.status(500).json({ 
-        message: "Error updating audit: " + error.message 
+        message: "Error updating audit: " + (error.message || "Unknown error")
       });
     }
   });
@@ -117,6 +142,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Hazard detection error:", error);
       res.status(500).json({ 
         message: "Error detecting hazard: " + error.message 
+      });
+    }
+  });
+
+  // Location analysis endpoint (detailed analysis)
+  app.get("/api/location-analysis/:zipCode", async (req, res) => {
+    try {
+      const zipCode = req.params.zipCode;
+      const hazardData = getEnhancedRegionalHazardData(zipCode);
+      
+      // Enhanced analysis with additional details
+      const analysisData = {
+        ...hazardData,
+        detailedRiskFactors: getDetailedRiskFactors(zipCode),
+        mitigationPriorities: getMitigationPriorities(hazardData.primaryHazard),
+        regionalContext: getRegionalContext(zipCode)
+      };
+      
+      res.json(analysisData);
+    } catch (error: any) {
+      console.error("Location analysis error:", error);
+      res.status(500).json({ 
+        message: "Error analyzing location: " + error.message 
       });
     }
   });
@@ -191,5 +239,51 @@ function getEnhancedRegionalHazardData(zipCode: string) {
     confidence: 'high',
     dataSource: 'Regional Analysis',
     lastUpdated: new Date().toISOString()
+  };
+}
+
+function getDetailedRiskFactors(zipCode: string) {
+  const twoDigitPrefix = zipCode.substring(0, 2);
+  
+  // Risk factor mapping by region
+  const riskFactors: { [key: string]: string[] } = {
+    '90': ['High seismic activity', 'Fault line proximity', 'Wildfire-prone vegetation'],
+    '91': ['Drought conditions', 'High fire risk', 'Strong winds'],
+    '32': ['Hurricane season', 'Storm surge risk', 'Heavy rainfall'],
+    '33': ['Coastal flooding', 'Wind damage', 'Storm surge'],
+    '75': ['Tornado alley', 'Severe thunderstorms', 'Hail damage'],
+    '77': ['Flood plains', 'Heavy rainfall', 'Hurricane remnants'],
+    '10': ['Nor\'easter storms', 'Heavy snow', 'Ice storms']
+  };
+  
+  return riskFactors[twoDigitPrefix] || ['Variable weather patterns', 'Regional climate risks'];
+}
+
+function getMitigationPriorities(primaryHazard: string) {
+  const priorities: { [key: string]: string[] } = {
+    'Earthquake': ['Foundation anchoring', 'Water heater strapping', 'Gas shutoff valves'],
+    'Wildfire': ['Defensible space', 'Fire-resistant materials', 'Ember protection'],
+    'Flood': ['Elevation', 'Drainage systems', 'Waterproofing'],
+    'Hurricane': ['Wind resistance', 'Impact protection', 'Roof strengthening'],
+    'Tornado': ['Safe room', 'Impact windows', 'Structural reinforcement'],
+    'Winter Storm': ['Insulation', 'Heating backup', 'Pipe protection']
+  };
+  
+  return priorities[primaryHazard] || ['General preparedness', 'Emergency planning'];
+}
+
+function getRegionalContext(zipCode: string) {
+  const twoDigitPrefix = zipCode.substring(0, 2);
+  
+  const context: { [key: string]: any } = {
+    '90': { climate: 'Mediterranean', season: 'Year-round risk', buildingCodes: 'Strict seismic' },
+    '32': { climate: 'Subtropical', season: 'June-November peak', buildingCodes: 'Hurricane standards' },
+    '75': { climate: 'Humid subtropical', season: 'Spring peak', buildingCodes: 'Wind resistance' }
+  };
+  
+  return context[twoDigitPrefix] || { 
+    climate: 'Variable', 
+    season: 'Seasonal variation', 
+    buildingCodes: 'Standard codes' 
   };
 }
