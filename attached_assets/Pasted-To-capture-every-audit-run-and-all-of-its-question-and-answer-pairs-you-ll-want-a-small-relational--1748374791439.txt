@@ -1,0 +1,211 @@
+To capture every audit run and all of its question‐and‐answer pairs, you’ll want a small relational schema plus a bit of server glue to persist form submissions. Here’s a step-by-step recipe using PostgreSQL (hosted anywhere—e.g. Supabase, ElephantSQL, Heroku Postgres) and Node.js with the `pg` client. You can swap in MySQL or SQLite with almost identical SQL.
+
+---
+
+## 1. Provision a Postgres instance
+
+1. **Supabase** (free tier)
+
+   * Sign up at supabase.com → New project → note the **Database URL**.
+2. **ElephantSQL** (free “Tiny Turtle”)
+
+   * Sign up at elephantsql.com → Create instance → grab the **URL**.
+3. Copy your connection string (looks like `postgres://USER:PASS@HOST:PORT/DBNAME`) and save it in Replit as a secret named `DATABASE_URL`.
+
+---
+
+## 2. Define your schema
+
+Create a file `migrations/001_create_audit_tables.sql` with:
+
+```sql
+-- audits: one per completed questionnaire run
+CREATE TABLE audits (
+  id          SERIAL PRIMARY KEY,
+  zip         VARCHAR(10) NOT NULL,
+  hazard      VARCHAR(50) NOT NULL,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- questions: your questionnaire master list
+CREATE TABLE questions (
+  id         SERIAL PRIMARY KEY,
+  text       TEXT    NOT NULL,
+  display_order INT  NOT NULL
+);
+
+-- answers: each answer linked to an audit + question
+CREATE TABLE answers (
+  id          SERIAL PRIMARY KEY,
+  audit_id    INT       NOT NULL REFERENCES audits(id) ON DELETE CASCADE,
+  question_id INT       NOT NULL REFERENCES questions(id),
+  answer_text TEXT      NOT NULL
+);
+
+-- Optional: store everything as JSON (if you prefer one table)
+-- CREATE TABLE audit_payloads (
+--   id   SERIAL PRIMARY KEY,
+--   data JSONB NOT NULL,
+--   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+-- );
+```
+
+Run this migration in psql (or Supabase SQL editor):
+
+```bash
+psql $DATABASE_URL -f migrations/001_create_audit_tables.sql
+```
+
+---
+
+## 3. Seed your questions
+
+You only need to do this once. In `migrations/002_seed_questions.sql`:
+
+```sql
+INSERT INTO questions (text, display_order)
+VALUES
+  ('Do you have a basement or crawl-space?', 1),
+  ('When was your roof last inspected?',    2),
+  -- …continue for all 78 items…
+  ('Do you have hurricane straps installed?', 78);
+```
+
+And run similarly:
+
+```bash
+psql $DATABASE_URL -f migrations/002_seed_questions.sql
+```
+
+---
+
+## 4. Install the Node/Postgres client
+
+In your Replit shell:
+
+```bash
+npm install pg
+```
+
+---
+
+## 5. Wire up your Express route
+
+In `src/server/audits.js` (or wherever you handle form submissions):
+
+```js
+import express from 'express';
+import { Pool } from 'pg';
+const router = express.Router();
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+// POST /api/audits
+// body: { zip, hazard, answers: [ { questionId, answer }, … ] }
+router.post('/', async (req, res) => {
+  const { zip, hazard, answers } = req.body;
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    const auditRes = await client.query(
+      `INSERT INTO audits(zip, hazard) VALUES($1, $2) RETURNING id`,
+      [zip, hazard]
+    );
+    const auditId = auditRes.rows[0].id;
+
+    const insertAnswerText =
+      'INSERT INTO answers(audit_id, question_id, answer_text) VALUES ($1, $2, $3)';
+    for (const { questionId, answer } of answers) {
+      await client.query(insertAnswerText, [auditId, questionId, answer]);
+    }
+
+    await client.query('COMMIT');
+    res.status(201).json({ auditId });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('Audit save failed:', err);
+    res.status(500).json({ error: 'Failed to save audit.' });
+  } finally {
+    client.release();
+  }
+});
+
+export default router;
+```
+
+And in your main server file (`src/index.js`):
+
+```js
+import express from 'express';
+import auditsRouter from './server/audits.js';
+
+const app = express();
+app.use(express.json());
+
+// mount the audits route
+app.use('/api/audits', auditsRouter);
+
+// … other middleware, static serving, PDF route, etc.
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Listening on ${PORT}`));
+```
+
+---
+
+## 6. Front-end: POSTing the submission
+
+In your React form handler, assemble:
+
+```js
+// Suppose you’ve loaded the “questions” list from /api/questions
+// and stored user answers in state as { [questionId]: answerText }.
+
+const payload = {
+  zip:    selectedZip,
+  hazard: selectedHazard,
+  answers: questionList.map(q => ({
+    questionId: q.id,
+    answer:     answersById[q.id] || ''
+  }))
+};
+
+await fetch('/api/audits', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(payload)
+})
+  .then(r => r.json())
+  .then(({ auditId }) => {
+    // Save auditId in state or URL, then allow “Download PDF” using /api/report
+  });
+```
+
+---
+
+## 7. Verify it all works
+
+1. **Run** your server in Replit.
+2. **Fill out** the questionnaire → submit.
+3. In the Replit console run:
+
+   ```bash
+   psql $DATABASE_URL -c "SELECT * FROM audits;"
+   psql $DATABASE_URL -c "SELECT * FROM answers WHERE audit_id=1;"
+   ```
+
+   You should see your new audit row (with `zip`/`hazard`) and a row per answer.
+
+---
+
+### Scaling & ORMs
+
+* If you prefer an ORM/migration tool, consider **Prisma**:
+
+  * `npx prisma init` → define the models in `schema.prisma` → `npx prisma migrate dev`.
+* Or **Knex.js** for migrations + query building.
+
+---
+
+With this in place, every completed questionnaire is safely persisted in a SQL database. From there you can fetch it back, feed it into your PDF generator, or run analytics on aggregate hazard profiles!

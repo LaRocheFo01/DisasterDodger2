@@ -52,17 +52,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create audit after successful payment
+  // Create audit with proper relational structure
   app.post("/api/audits", async (req, res) => {
     try {
       console.log("Creating audit with data:", req.body);
       
-      // Direct database insert to avoid schema validation issues
-      const [audit] = await db.insert(audits).values({
-        zipCode: req.body.zipCode,
-        primaryHazard: req.body.primaryHazard,
-        stripePaymentId: req.body.stripePaymentId || null,
-      }).returning();
+      // Use direct SQL with the new schema
+      const result = await sql`
+        INSERT INTO audits (zip, hazard) 
+        VALUES (${req.body.zipCode}, ${req.body.primaryHazard}) 
+        RETURNING id, zip, hazard, created_at
+      `;
+      
+      const audit = result[0];
       res.json(audit);
     } catch (error: any) {
       console.error("Error creating audit:", error);
@@ -72,69 +74,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update audit with wizard data
+  // Save questionnaire responses to the relational database
   app.patch("/api/audits/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
-      const updates = req.body;
+      const auditId = parseInt(req.params.id);
+      const { questionnaireResponses } = req.body;
       
-      // Log incoming data for debugging
-      console.log("Received audit update:", JSON.stringify(updates, null, 2));
+      console.log("Saving questionnaire responses for audit:", auditId);
       
-      // Validate and clean the updates object to match schema
-      const cleanUpdates: any = {};
-      
-      // Handle questionnaire responses properly
-      if (updates.questionnaireResponses) {
-        cleanUpdates.questionnaireResponses = updates.questionnaireResponses;
-        console.log("Saving questionnaire responses:", cleanUpdates.questionnaireResponses);
-      }
-      
-      // Handle other valid fields
-      if (updates.photosUploaded !== undefined) {
-        cleanUpdates.photosUploaded = updates.photosUploaded;
-      }
-      
-      if (updates.completed !== undefined) {
-        cleanUpdates.completed = updates.completed;
-      }
-      
-      // Allow specific audit fields that match our new schema
-      const allowedFields = ['homeType', 'yearBuilt', 'ownershipStatus', 'insuredValue', 'insurancePolicies', 'previousGrants', 'previousGrantsProgram'];
-      allowedFields.forEach(field => {
-        if (updates[field] !== undefined) {
-          cleanUpdates[field] = updates[field];
+      if (questionnaireResponses) {
+        // Save each question-answer pair to the answers table
+        for (const [questionKey, answer] of Object.entries(questionnaireResponses)) {
+          if (answer) {
+            await sql`
+              INSERT INTO answers (audit_id, question_id, answer_text) 
+              VALUES (${auditId}, ${questionKey}, ${answer as string})
+              ON CONFLICT DO NOTHING
+            `;
+          }
         }
-      });
-      
-      console.log("Clean updates to save:", JSON.stringify(cleanUpdates, null, 2));
-      
-      const audit = await storage.updateAudit(id, cleanUpdates);
-      if (!audit) {
-        return res.status(404).json({ message: "Audit not found" });
       }
       
-      res.json(audit);
+      // Return the audit data
+      const auditResult = await sql`
+        SELECT * FROM audits WHERE id = ${auditId}
+      `;
+      
+      res.json(auditResult[0]);
     } catch (error: any) {
-      console.error("Audit update error:", error);
+      console.error("Error saving responses:", error);
       res.status(500).json({ 
-        message: "Error updating audit: " + error.message 
+        message: "Error saving responses: " + error.message 
       });
     }
   });
 
-  // Get audit by ID
+  // Get audit by ID with responses
   app.get("/api/audits/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
-      const audit = await storage.getAudit(id);
+      const auditId = parseInt(req.params.id);
       
-      if (!audit) {
+      // Get audit data
+      const auditResult = await sql`
+        SELECT * FROM audits WHERE id = ${auditId}
+      `;
+      
+      if (auditResult.length === 0) {
         return res.status(404).json({ message: "Audit not found" });
       }
       
+      const audit = auditResult[0];
+      
+      // Get all responses for this audit
+      const responsesResult = await sql`
+        SELECT question_id, answer_text 
+        FROM answers 
+        WHERE audit_id = ${auditId}
+      `;
+      
+      // Add responses to audit object
+      audit.questionnaireResponses = {};
+      responsesResult.forEach(row => {
+        audit.questionnaireResponses[row.question_id] = row.answer_text;
+      });
+      
       res.json(audit);
     } catch (error: any) {
+      console.error("Error fetching audit:", error);
       res.status(500).json({ 
         message: "Error fetching audit: " + error.message 
       });
