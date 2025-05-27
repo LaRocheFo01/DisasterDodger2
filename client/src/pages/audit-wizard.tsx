@@ -164,8 +164,13 @@ export default function AuditWizard() {
   const nextStep = () => {
     if (!validateCurrentQuestion()) return;
 
-    // Save current answer
-    const updates = { [currentQuestion.id]: auditData[currentQuestion.id as keyof AuditData] };
+    // Save current answer to auditResponses
+    const updates = { 
+      auditResponses: {
+        ...auditData,
+        [currentQuestion.id]: auditData[currentQuestion.id as keyof AuditData]
+      }
+    };
     updateAuditMutation.mutate(updates);
 
     if (isLastQuestion) {
@@ -207,9 +212,9 @@ export default function AuditWizard() {
     try {
       // Update audit with final data and mark as completed
       await updateAuditMutation.mutateAsync({
-        ...auditData,
+        auditResponses: auditData,
         photosUploaded: uploadedPhotos.length,
-        status: 'completed'
+        completed: true
       });
 
       // Navigate to success page

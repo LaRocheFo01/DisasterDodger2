@@ -15,6 +15,7 @@ export const audits = pgTable("audits", {
   waterStorage: text("water_storage"),
   foodStorage: text("food_storage"),
   backupPower: text("backup_power"),
+  auditResponses: jsonb("audit_responses").$type<Record<string, any>>().default({}),
   photosUploaded: integer("photos_uploaded").default(0),
   stripePaymentId: text("stripe_payment_id"),
   completed: boolean("completed").default(false),

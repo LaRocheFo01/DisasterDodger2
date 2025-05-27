@@ -7,11 +7,11 @@ function calculateRiskScore(audit: Audit): number {
   // Simple risk calculation based on audit responses
   let score = 5; // Base score
   
-  // Add risk based on various factors in audit data
-  if (audit.auditData) {
-    const data = JSON.parse(audit.auditData);
-    Object.keys(data).forEach(key => {
-      if (typeof data[key] === 'string' && data[key].toLowerCase().includes('no')) {
+  // Add risk based on various factors in audit responses
+  if (audit.auditResponses) {
+    Object.keys(audit.auditResponses).forEach(key => {
+      const value = audit.auditResponses![key];
+      if (typeof value === 'string' && value.toLowerCase().includes('no')) {
         score += 1;
       }
     });
@@ -124,21 +124,15 @@ export async function generatePDFReport(req: Request, res: Response) {
        .text("Audit Response Summary");
 
     doc.moveDown(1);
-    if (audit.auditData) {
-      try {
-        const auditResponses = JSON.parse(audit.auditData);
-        doc.fontSize(12).fillColor(colors.text);
-        
-        Object.entries(auditResponses).forEach(([key, value]) => {
-          if (value && typeof value === 'string') {
-            doc.text(`${key}: ${value}`, { width: 495 });
-            doc.moveDown(0.3);
-          }
-        });
-      } catch (e) {
-        doc.fontSize(12).fillColor(colors.text)
-           .text("Audit responses are being processed. Please contact support for detailed breakdown.");
-      }
+    if (audit.auditResponses) {
+      doc.fontSize(12).fillColor(colors.text);
+      
+      Object.entries(audit.auditResponses).forEach(([key, value]) => {
+        if (value && typeof value === 'string') {
+          doc.text(`${key}: ${value}`, { width: 495 });
+          doc.moveDown(0.3);
+        }
+      });
     } else {
       doc.fontSize(12).fillColor(colors.text)
          .text("No detailed audit responses available for this assessment.");
