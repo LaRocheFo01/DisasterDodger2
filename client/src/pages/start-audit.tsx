@@ -111,7 +111,7 @@ export default function StartAudit() {
       }
 
       const audit = await response.json();
-      setLocation(`/payment/${audit.id}`);
+      setLocation(`/audit-wizard/${audit.id}`);
     } catch (error) {
       console.error('Error creating audit:', error);
       alert("Failed to create audit. Please try again.");
