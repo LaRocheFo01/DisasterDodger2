@@ -1,0 +1,170 @@
+// src/server/report.js
+import PDFDocument from "pdfkit";
+import path from "path";
+
+export default async function handler(req, res) {
+  // Destructure the full payload provided by the front-end
+  const {
+    metadata,
+    toc,
+    summary,
+    riskMatrix,
+    recommendations,
+    riskScore,
+    answers,
+    comments,
+    quotes,
+    priorityUpgrades,
+    costEstimates,
+    grantsRebates,
+  } = req.body;
+
+  // Set headers for PDF download
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename="${metadata.filename || 'DisasterAuditReport'}.pdf"`
+  );
+
+  // Create PDF document
+  const doc = new PDFDocument({ size: "A4", margin: 50 });
+  doc.pipe(res);
+
+  // Helper to load template page images
+  const tpl = (n) => path.join(process.cwd(), "templates", `page${n}.png`);
+
+  // --- Page 1: Cover ---
+  doc.image(tpl(1), 0, 0, { width: 595.28, height: 841.89 });
+  doc.fontSize(14).fillColor("#0F4C81");
+  doc.text(metadata.clientName, 150, 600);
+  doc.text(metadata.date, 150, 620);
+
+  // --- Page 2: Table of Contents ---
+  doc.addPage().image(tpl(2), 0, 0, { width: 595.28, height: 841.89 });
+  doc.fontSize(11).fillColor("#0F4C81");
+  toc.forEach((item, i) => {
+    const y = 200 + i * 20;
+    doc.text(item.title, 80, y);
+    doc.text(String(item.page), 520, y, { width: 40, align: "right" });
+  });
+
+  // --- Page 3: Executive Summary ---
+  doc.addPage().image(tpl(3), 0, 0, { width: 595.28, height: 841.89 });
+  doc.fontSize(12).fillColor("#000");
+  doc.text(summary, 80, 180, { width: 435, align: "justify" });
+
+  // --- Page 4: Risk Assessment Matrix ---
+  doc.addPage().image(tpl(4), 0, 0, { width: 595.28, height: 841.89 });
+  const startX = 80, startY = 200, cellW = 100, cellH = 40;
+  riskMatrix.rows.forEach((row, r) => {
+    doc.text(row, startX, startY + r * cellH + 10);
+    riskMatrix.cols.forEach((col, c) => {
+      const val = riskMatrix.data[r][c];
+      doc.text(val, startX + (c + 1) * cellW + 20, startY + r * cellH + 10);
+    });
+  });
+
+  // --- Page 5: Recommendations ---
+  doc.addPage().image(tpl(5), 0, 0, { width: 595.28, height: 841.89 });
+  doc.fontSize(11).fillColor("#0F4C81");
+  recommendations.forEach((rec, i) => {
+    const y = 180 + i * 50;
+    doc.circle(80, y + 5, 5).fill("#0F4C81");
+    doc.fillColor("#000").text(rec, 100, y, { width: 430 });
+  });
+
+  // --- Page 6: Risk Score ---
+  doc.addPage();
+  doc.fontSize(20).fillColor("#0F4C81").text("Risk Score", { align: "center" }).moveDown();
+  doc.fontSize(48).fillColor("#000").text(String(riskScore), { align: "center" });
+
+  // --- Page 7: Recap of Answers ---
+  doc.addPage();
+  doc.fontSize(16).fillColor("#0F4C81").text("Recap of Your Answers").moveDown(0.5);
+  doc.fontSize(12).fillColor("#000");
+  answers.forEach((qa, i) => {
+    doc.text(`${i + 1}. ${qa.question}`, { continued: true });
+    doc.fillColor("#0F4C81").text(` ${qa.answer}`);
+    doc.moveDown(0.5).fillColor("#000");
+  });
+
+  // --- Page 8: Comments on Answers ---
+  doc.addPage();
+  doc.fontSize(16).fillColor("#0F4C81").text("Comments on Your Answers").moveDown(0.5);
+  doc.fontSize(12).fillColor("#000");
+  comments.forEach((cmt) => {
+    doc.text(`• ${cmt}`).moveDown(0.3);
+  });
+
+  // --- Page 9: FEMA Quotes ---
+  doc.addPage();
+  doc.fontSize(16).fillColor("#0F4C81").text("Relevant FEMA Quotes").moveDown(0.5);
+  doc.fontSize(11).fillColor("#000");
+  quotes.forEach((qt) => {
+    doc.text(`“${qt}”`, { indent: 20 }).moveDown(0.5);
+  });
+
+  // --- Page 10: Priority Upgrades ---
+  doc.addPage();
+  doc.fontSize(16).fillColor("#0F4C81").text("Priority Upgrades").moveDown(0.5);
+  doc.fontSize(12).fillColor("#000");
+  priorityUpgrades.forEach((pu) => {
+    doc.text(`• ${pu}`).moveDown(0.3);
+  });
+
+  // --- Page 11: Cost Estimates ---
+  doc.addPage();
+  doc.fontSize(16).fillColor("#0F4C81").text("Estimated Costs").moveDown(0.5);
+  doc.fontSize(12).fillColor("#000");
+  costEstimates.forEach(({ item, estimate }) => {
+    doc.text(`${item}: $${estimate}`).moveDown(0.3);
+  });
+
+  // --- Page 12: Grants & Rebates ---
+  doc.addPage();
+  doc.fontSize(16).fillColor("#0F4C81").text("Available Grants & Rebates").moveDown(0.5);
+  doc.fontSize(12).fillColor("#000");
+  grantsRebates.forEach((gr) => {
+    doc.text(`• ${gr}`).moveDown(0.3);
+  });
+
+  // Finalize PDF
+  doc.end();
+}
+
+
+// src/components/DownloadReportButton.jsx
+import { useState } from "react";
+
+export function DownloadReportButton({ payload }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleDownload = async () => {
+    setLoading(true);
+    const res = await fetch("/api/report", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = payload.metadata.filename || "Report" + ".pdf";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    setLoading(false);
+  };
+
+  return (
+    <button
+      onClick={handleDownload}
+      disabled={loading}
+      className="mt-6 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded"
+    >
+      {loading ? "Generating PDF…" : "Download Report PDF"}
+    </button>
+  );
+}
