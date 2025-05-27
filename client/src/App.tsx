@@ -15,7 +15,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Landing} />
       <Route path="/start-audit" component={StartAudit} />
-      <Route path="/payment" component={Payment} />
+      <Route path="/payment/:auditId" component={Payment} />
       <Route path="/audit-wizard/:auditId" component={AuditWizard} />
       <Route path="/success/:auditId" component={Success} />
       <Route component={NotFound} />
