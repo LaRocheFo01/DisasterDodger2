@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
+import { generateReportHandler } from "./report";
 import { insertAuditSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -103,27 +104,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Generate PDF report (mock for now)
+  // Generate AI-powered PDF report
   app.post("/api/audits/:id/generate-pdf", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
-      const audit = await storage.getAudit(id);
       
-      if (!audit) {
-        return res.status(404).json({ message: "Audit not found" });
-      }
-
       // Mark audit as completed
       await storage.updateAudit(id, { completed: true });
 
-      // Mock PDF generation - in production, integrate with PDF service
-      const pdfData = {
-        filename: `Disaster_Dodger_Audit_${audit.zipCode}_${new Date().toISOString().split('T')[0]}.pdf`,
-        downloadUrl: `/api/audits/${id}/download-pdf`,
-        generated: true
-      };
-
-      res.json(pdfData);
+      // Generate the AI-powered PDF report directly
+      await generateReportHandler({ body: { auditId: id } } as any, res);
     } catch (error: any) {
       res.status(500).json({ 
         message: "Error generating PDF: " + error.message 
