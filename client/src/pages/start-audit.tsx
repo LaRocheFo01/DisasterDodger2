@@ -281,9 +281,10 @@ export default function StartAudit() {
           </div>
         )}
         
-        {/* ZIP Entry Card */}
-        <div className="bg-white shadow-md rounded-lg p-8 mb-8">
-          <form onSubmit={(e) => { e.preventDefault(); handleZipSubmit(); }} className="max-w-sm mx-auto">
+        {/* ZIP Entry Card - Only show when not loading and no analysis shown */}
+        {!isLoading && !showHazardAnalysis && (
+          <div className="bg-white shadow-md rounded-lg p-8 mb-8">
+            <form onSubmit={(e) => { e.preventDefault(); handleZipSubmit(); }} className="max-w-sm mx-auto">
             <Label htmlFor="zipCode" className="block text-sm font-medium text-gray-700 mb-2">
               ZIP Code
             </Label>
@@ -314,7 +315,8 @@ export default function StartAudit() {
               We'll identify the disaster risks specific to your area
             </p>
           </form>
-        </div>
+          </div>
+        )}
 
         {/* Hazard Map Display */}
         {zipCode.length === 5 && (
