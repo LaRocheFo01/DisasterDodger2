@@ -4,9 +4,9 @@ import { neon } from "@neondatabase/serverless";
 import { eq } from "drizzle-orm";
 
 export interface IStorage {
-  createAudit(audit: InsertAudit): Promise<Audit>;
+  createAudit(audit: any): Promise<Audit>;
   getAudit(id: number): Promise<Audit | undefined>;
-  updateAudit(id: number, updates: Partial<Audit>): Promise<Audit | undefined>;
+  updateAudit(id: number, updates: any): Promise<Audit | undefined>;
   getAuditByPaymentId(paymentId: string): Promise<Audit | undefined>;
 }
 

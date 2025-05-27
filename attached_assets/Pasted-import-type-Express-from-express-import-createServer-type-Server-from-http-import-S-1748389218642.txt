@@ -1,0 +1,124 @@
+import type { Express } from "express";
+import { createServer, type Server } from "http";
+import Stripe from "stripe";
+import { generatePDFReport } from "./report";
+import { insertAuditSchema } from "@shared/schema";
+import { z } from "zod";
+import { storage } from "./storage";
+
+// Stripe secret key from environment variables
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+if (!stripeSecretKey) {
+  console.error("STRIPE_SECRET_KEY environment variable is missing");
+  throw new Error("STRIPE_SECRET_KEY environment variable is required");
+}
+
+const stripe = new Stripe(stripeSecretKey, {
+  apiVersion: "2025-04-30.basil",
+});
+
+export async function registerRoutes(app: Express): Promise<Server> {
+
+  // 1️⃣ Create Audit and Payment Intent atomically
+  app.post("/api/create-payment-intent", async (req, res) => {
+    try {
+      // Validate incoming data
+      const validated = insertAuditSchema.parse(req.body);
+
+      // Create the audit record in DB
+      const audit = await storage.createAudit(validated);
+
+      // Create Stripe PaymentIntent with audit metadata
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: 2900, // $29.00 in cents
+        currency: "usd",
+        metadata: {
+          auditId: audit.id.toString(),
+          zipCode: validated.zipCode,
+          primaryHazard: validated.primaryHazard,
+        },
+      });
+
+      // Return audit and payment intent details
+      res.json({
+        audit,
+        clientSecret: paymentIntent.client_secret,
+        paymentIntentId: paymentIntent.id,
+      });
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      console.error("Error in create-payment-intent:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // 2️⃣ Update questionnaire responses
+  app.patch("/api/audits/:id", async (req, res) => {
+    try {
+      const auditId = parseInt(req.params.id, 10);
+      const updates = req.body;
+      const audit = await storage.updateAudit(auditId, updates);
+      if (!audit) {
+        return res.status(404).json({ message: "Audit not found" });
+      }
+      res.json(audit);
+    } catch (error: any) {
+      console.error("Error updating audit:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // 3️⃣ Fetch audit by ID
+  app.get("/api/audits/:id", async (req, res) => {
+    try {
+      const auditId = parseInt(req.params.id, 10);
+      const audit = await storage.getAudit(auditId);
+      if (!audit) {
+        return res.status(404).json({ message: "Audit not found" });
+      }
+      res.json(audit);
+    } catch (error: any) {
+      console.error("Error fetching audit:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // 4️⃣ Generate PDF report
+  app.post("/api/audits/:id/generate-pdf", generatePDFReport);
+
+  // 5️⃣ Hazard detection by ZIP code
+  app.get("/api/hazards/:zipCode", (req, res) => {
+    try {
+      const zipCode = req.params.zipCode;
+      const data = getEnhancedRegionalHazardData(zipCode);
+      res.json(data);
+    } catch (error: any) {
+      console.error("Hazard detection error:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  return createServer(app);
+}
+
+// Helper: ZIP-based hazard mapping
+function getEnhancedRegionalHazardData(zipCode: string) {
+  const regionalHazardMap: Record<string, any> = { /* ... */ };
+  const twoDigit = zipCode.slice(0, 2);
+  let hazardInfo = regionalHazardMap[twoDigit];
+  if (!hazardInfo) {
+    const broadMap: Record<string, any> = { /* ... */ };
+    hazardInfo = broadMap[zipCode[0]] || { primaryHazard: "Flood", risk: 2, state: "Unknown" };
+  }
+  return {
+    zipCode,
+    primaryHazard: hazardInfo.primaryHazard,
+    primaryRisk: hazardInfo.risk,
+    state: hazardInfo.state,
+    confidence: "high",
+    dataSource: "Regional Analysis",
+    lastUpdated: new Date().toISOString(),
+  };
+}

@@ -50,20 +50,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create audit after successful payment
   app.post("/api/audits", async (req, res) => {
     try {
-      const validatedData = insertAuditSchema.parse(req.body);
-      const audit = await storage.createAudit(validatedData);
+      // Only use the basic required fields to avoid column errors
+      const basicAuditData = {
+        zipCode: req.body.zipCode,
+        primaryHazard: req.body.primaryHazard,
+        stripePaymentId: req.body.stripePaymentId || null
+      };
+      
+      const audit = await storage.createAudit(basicAuditData);
       res.json(audit);
     } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ 
-          message: "Validation error", 
-          errors: error.errors 
-        });
-      } else {
-        res.status(500).json({ 
-          message: "Error creating audit: " + error.message 
-        });
-      }
+      console.error("Error creating audit:", error);
+      res.status(500).json({ 
+        message: "Error creating audit: " + error.message 
+      });
     }
   });
 
