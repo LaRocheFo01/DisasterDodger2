@@ -1,0 +1,162 @@
+````markdown
+You are building the SafeHaven homepage in Replit using Tailwind CSS & plain HTML (or JSX). I will attach the following assets to my project before you run this:
+
+- `/assets/hero.svg` → the 1024×768 hero background image  
+- `/icons/earthquake.svg`, `/icons/flood.svg`, `/icons/wildfire.svg`, `/icons/hurricane.svg` → filled hazard icons in #16A34A  
+
+Follow these specs exactly—same font, same colors, same layout, same icons:
+
+---
+
+## 1) Tailwind Config  
+Add or extend in `tailwind.config.js`:
+```js
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        primary:   '#16A34A',
+        secondary: '#10B981',
+        'text-dark':'#111827',
+        'bg-light':'#F3F4F6',
+        error:     '#DC2626',
+        success:   '#059669',
+      },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+      },
+    }
+  }
+}
+````
+
+Import Inter at the top of `index.css`:
+
+```css
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+```
+
+---
+
+## 2) Global Wrapper
+
+Wrap **all** page content in:
+
+```html
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+  <!-- everything below goes here -->
+</div>
+```
+
+---
+
+## 3) Header
+
+```html
+<header class="sticky top-0 bg-white shadow-sm z-10">
+  <div class="max-w-3xl mx-auto flex items-center justify-between h-16 px-4">
+    <a href="/" class="flex items-center space-x-2">
+      <img src="/logo.svg" alt="SafeHaven logo" class="h-8 w-8"/>
+      <span class="text-xl font-semibold text-text-dark">SafeHaven</span>
+    </a>
+    <nav class="space-x-6 text-text-dark font-medium">
+      <a href="#how-it-works">How it Works</a>
+      <a href="#support">Support</a>
+    </nav>
+  </div>
+</header>
+```
+
+---
+
+## 4) Hero + ZIP Card
+
+```html
+<main class="bg-bg-light pt-16 pb-24" style="background: url('/assets/hero.svg') center/cover no-repeat;">
+  <div class="text-center">
+    <h1 class="text-4xl font-semibold text-text-dark">
+      Dodge Disasters Before They Strike
+    </h1>
+    <p class="mt-2 text-lg text-gray-600">
+      Five-minute, FEMA-aligned home audit that pinpoints wildfire, flood, hurricane,
+      and earthquake risks—so you can act now and save on insurance.
+    </p>
+
+    <div class="mt-8 mx-auto bg-white shadow-lg rounded-xl p-8 max-w-md">
+      <label for="zip" class="block text-sm font-medium text-text-dark">
+        Your ZIP Code
+      </label>
+      <input
+        id="zip"
+        type="text"
+        placeholder="Enter ZIP code"
+        class="mt-1 block w-full rounded-md border-gray-300 text-text-dark
+               focus:ring-primary focus:border-primary"
+      />
+      <p class="mt-2 text-sm text-gray-500">
+        We’ll use this to load your local hazard data—no personal info stored.
+      </p>
+      <button
+        class="mt-4 w-full py-3 rounded-lg bg-primary text-white
+               hover:bg-secondary transition-shadow duration-150"
+      >
+        Analyze
+      </button>
+    </div>
+  </div>
+</main>
+```
+
+---
+
+## 5) Hazard Preview Cards
+
+```html
+<section class="mt-12 mb-24">
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+    <!-- Earthquake -->
+    <div class="bg-white shadow-md rounded-lg p-6 text-center">
+      <img src="/icons/earthquake.svg" alt="Earthquake icon" class="mx-auto h-12 w-12"/>
+      <h3 class="mt-4 text-lg font-medium text-text-dark">Earthquake</h3>
+    </div>
+    <!-- Flood -->
+    <div class="bg-white shadow-md rounded-lg p-6 text-center">
+      <img src="/icons/flood.svg" alt="Flood icon" class="mx-auto h-12 w-12"/>
+      <h3 class="mt-4 text-lg font-medium text-text-dark">Flood</h3>
+    </div>
+    <!-- Wildfire -->
+    <div class="bg-white shadow-md rounded-lg p-6 text-center">
+      <img src="/icons/wildfire.svg" alt="Wildfire icon" class="mx-auto h-12 w-12"/>
+      <h3 class="mt-4 text-lg font-medium text-text-dark">Wildfire</h3>
+    </div>
+    <!-- Hurricane -->
+    <div class="bg-white shadow-md rounded-lg p-6 text-center">
+      <img src="/icons/hurricane.svg" alt="Hurricane icon" class="mx-auto h-12 w-12"/>
+      <h3 class="mt-4 text-lg font-medium text-text-dark">Hurricane</h3>
+    </div>
+  </div>
+</section>
+```
+
+---
+
+## 6) Footer
+
+```html
+<footer class="bg-white py-6 mt-auto shadow-inner">
+  <div class="max-w-3xl mx-auto flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500">
+    <div class="space-x-4">
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/terms">Terms of Service</a>
+      <a href="/contact">Contact Us</a>
+    </div>
+    <p class="mt-4 sm:mt-0">&copy; 2025 SafeHaven</p>
+  </div>
+</footer>
+```
+
+---
+
+**Paste** this entire block into your Replit editor or AI assistant.
+**Then** upload `hero.svg` into `/assets/` and the four hazard SVGs into `/icons/`.
+**Result**: an exact replica of our polished SafeHaven homepage—right out of the box.

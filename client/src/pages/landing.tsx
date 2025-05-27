@@ -70,20 +70,26 @@ export default function Landing() {
       </header>
 
       {/* Hero Section */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center mb-16">
-          <div className="w-20 h-20 bg-disaster-green-600 rounded-full flex items-center justify-center mx-auto mb-8">
-            <Shield className="text-white h-10 w-10" />
+      <main 
+        className="bg-gray-50 pt-16 pb-24 relative"
+        style={{
+          backgroundImage: "url('/assets/hero.png')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h1 className="text-4xl md:text-5xl font-semibold text-gray-900 mb-4">
+              Dodge Disasters Before They Strike
+            </h1>
+            <p className="mt-2 text-lg text-gray-600 max-w-3xl mx-auto">
+              Five-minute, FEMA-aligned home audit that pinpoints wildfire, flood, hurricane, and earthquake risks—so you can act now and save on insurance.
+            </p>
           </div>
-          <h1 className="text-4xl md:text-5xl font-semibold text-gray-900 mb-4">
-            Dodge Disasters in 5 Minutes
-          </h1>
-          <p className="mt-2 text-lg text-gray-600 max-w-3xl mx-auto">
-            A FEMA-aligned home audit that spots wildfire, flood, hurricane & earthquake risks—so you can act fast and cut insurance costs.
-          </p>
-        </div>
 
-        {/* ZIP Entry Card */}
+          {/* ZIP Entry Card */}
         <div className="bg-white shadow-md rounded-lg p-8 mb-16 max-w-md mx-auto">
           <div className="text-center mb-6">
             <h2 className="text-xl font-medium text-gray-900 mb-2">Start Your Free Assessment</h2>
@@ -160,6 +166,7 @@ export default function Landing() {
               <span>FEMA-aligned</span>
             </div>
           </div>
+        </div>
         </div>
       </main>
 
