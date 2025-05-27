@@ -156,8 +156,8 @@ export default function HazardMap({ zipCode }: HazardMapProps) {
                   </p>
                 )}
               </div>
-              <Badge variant={getSeverityColor(hazardData.allHazards[0]?.severity || 'Low')}>
-                {hazardData.confidence.toUpperCase()} CONFIDENCE
+              <Badge variant={getSeverityColor(hazardData.allHazards?.[0]?.severity || 'Low')}>
+                {hazardData.confidence?.toUpperCase() || 'MEDIUM'} CONFIDENCE
               </Badge>
             </div>
 
@@ -189,7 +189,7 @@ export default function HazardMap({ zipCode }: HazardMapProps) {
         </CardHeader>
         <CardContent>
           <div className="grid gap-3">
-            {hazardData.allHazards.map((hazard, index) => (
+            {hazardData.allHazards?.map((hazard, index) => (
               <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
                 <div className="flex items-center">
                   {getHazardIcon(hazard.type)}
