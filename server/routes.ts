@@ -3,13 +3,9 @@ import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
 import { generatePDFReport } from "./report";
-import { insertAuditSchema, audits } from "@shared/schema";
-import { z } from "zod";
-import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
 
 const sql = neon(process.env.DATABASE_URL!);
-const db = drizzle(sql);
 
 // Stripe secret key from environment variables
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -52,20 +48,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Create audit with proper relational structure
+  // Create audit with pure SQL - bypassing old schema conflicts
   app.post("/api/audits", async (req, res) => {
     try {
       console.log("Creating audit with data:", req.body);
       
-      // Use direct SQL with the new schema
+      // Direct PostgreSQL insert with the correct column names
+      const client = await sql`SELECT 1`; // Test connection
+      
       const result = await sql`
         INSERT INTO audits (zip, hazard) 
         VALUES (${req.body.zipCode}, ${req.body.primaryHazard}) 
-        RETURNING id, zip, hazard, created_at
+        RETURNING id, zip as zipCode, hazard as primaryHazard, created_at
       `;
       
-      const audit = result[0];
-      res.json(audit);
+      console.log("Audit created successfully:", result[0]);
+      res.json(result[0]);
     } catch (error: any) {
       console.error("Error creating audit:", error);
       res.status(500).json({ 
