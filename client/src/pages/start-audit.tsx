@@ -49,8 +49,6 @@ function getHazardsForZip(zip: string) {
 export default function StartAudit() {
   const [, setLocation] = useLocation();
   const [zipCode, setZipCode] = useState("");
-  const [selectedHazard, setSelectedHazard] = useState<string | null>(null);
-  const [showHazardSelection, setShowHazardSelection] = useState(false);
   const [availableHazards, setAvailableHazards] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
@@ -104,16 +102,12 @@ export default function StartAudit() {
       setIsLoading(false);
       setShowHazardAnalysis(true);
       
-      // Then show hazard selection after viewing analysis
-      setTimeout(() => {
-        if (hazards.length === 1) {
-          // Single hazard - create audit and go directly to questionnaire
+      // For single hazard, auto-proceed after showing analysis
+      if (hazards.length === 1) {
+        setTimeout(() => {
           createAuditAndProceed(targetZip, hazards[0]);
-        } else {
-          // Multiple hazards - show selection
-          setShowHazardSelection(true);
-        }
-      }, 2000);
+        }, 2500);
+      }
     } catch (error) {
       console.error('Error processing ZIP code:', error);
       alert("An error occurred. Please try again.");
@@ -243,30 +237,34 @@ export default function StartAudit() {
               </h3>
               <div className="grid gap-4">
                 {availableHazards.map((hazard, index) => (
-                  <div key={index} className="flex items-center justify-center p-4 bg-gray-50 rounded-lg">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${
-                      hazard === 'Earthquake' ? 'bg-red-100' :
-                      hazard === 'Flood' ? 'bg-blue-100' :
-                      hazard === 'Wildfire' ? 'bg-orange-100' :
-                      'bg-purple-100'
+                  <button
+                    key={index} 
+                    onClick={() => createAuditAndProceed(zipCode, hazard)}
+                    className="flex items-center justify-center p-4 bg-gray-50 hover:bg-disaster-green-50 hover:border-disaster-green-200 border border-transparent rounded-lg transition-all cursor-pointer group"
+                  >
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 group-hover:scale-110 transition-transform ${
+                      hazard === 'Earthquake' ? 'bg-red-100 group-hover:bg-red-200' :
+                      hazard === 'Flood' ? 'bg-blue-100 group-hover:bg-blue-200' :
+                      hazard === 'Wildfire' ? 'bg-orange-100 group-hover:bg-orange-200' :
+                      'bg-purple-100 group-hover:bg-purple-200'
                     }`}>
                       {hazard === 'Earthquake' && <Zap className="h-5 w-5 text-red-600" />}
                       {hazard === 'Flood' && <Droplets className="h-5 w-5 text-blue-600" />}
                       {hazard === 'Wildfire' && <Flame className="h-5 w-5 text-orange-600" />}
                       {hazard === 'Hurricane' && <Wind className="h-5 w-5 text-purple-600" />}
                     </div>
-                    <span className="font-medium text-gray-900">{hazard}</span>
-                  </div>
+                    <span className="font-medium text-gray-900 group-hover:text-disaster-green-700">
+                      Start {hazard} Assessment
+                    </span>
+                  </button>
                 ))}
               </div>
             </div>
-            {!showHazardSelection && (
-              <p className="text-gray-600">
-                {availableHazards.length === 1 
-                  ? "Preparing your personalized questionnaire..." 
-                  : "Choose your focus area below..."}
-              </p>
-            )}
+            <p className="text-gray-600">
+              {availableHazards.length === 1 
+                ? "Preparing your personalized questionnaire..." 
+                : "Click on a disaster type above to start your assessment"}
+            </p>
           </div>
         )}
 
