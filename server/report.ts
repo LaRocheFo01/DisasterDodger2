@@ -124,10 +124,10 @@ export async function generatePDFReport(req: Request, res: Response) {
        .text("Audit Response Summary");
 
     doc.moveDown(1);
-    if (audit.auditResponses) {
+    if (audit.questionnaireResponses) {
       doc.fontSize(12).fillColor(colors.text);
       
-      Object.entries(audit.auditResponses).forEach(([key, value]) => {
+      Object.entries(audit.questionnaireResponses).forEach(([key, value]) => {
         if (value && typeof value === 'string') {
           doc.text(`${key}: ${value}`, { width: 495 });
           doc.moveDown(0.3);
@@ -135,7 +135,7 @@ export async function generatePDFReport(req: Request, res: Response) {
       });
     } else {
       doc.fontSize(12).fillColor(colors.text)
-         .text("No detailed audit responses available for this assessment.");
+         .text("No detailed questionnaire responses available for this assessment.");
     }
 
     // --- Footer ---
