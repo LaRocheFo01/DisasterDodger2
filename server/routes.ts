@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import { generatePDFReport } from "./report";
 import { insertAuditSchema } from "@shared/schema";
 import { z } from "zod";
+import { dbManager } from "./db-manager";
 
 // Stripe secret key from environment variables
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -131,6 +132,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Generate comprehensive PDF report
   app.post("/api/audits/:id/generate-pdf", generatePDFReport);
+
+  // Database management endpoint
+  app.post("/api/admin/cleanup-database", async (req, res) => {
+    try {
+      console.log("Database cleanup requested");
+      const result = await dbManager.performFullCleanup();
+      res.json({
+        message: "Database cleanup completed successfully",
+        statistics: result
+      });
+    } catch (error: any) {
+      console.error("Database cleanup error:", error);
+      res.status(500).json({
+        message: "Error cleaning database: " + error.message
+      });
+    }
+  });
 
   // Enhanced ZIP code based hazard detection
   app.get("/api/hazards/:zipCode", async (req, res) => {
