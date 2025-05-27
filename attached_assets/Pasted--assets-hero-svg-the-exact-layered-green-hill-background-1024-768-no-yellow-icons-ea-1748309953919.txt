@@ -1,0 +1,121 @@
+- `/assets/hero.svg` → the exact layered-green hill background (1024×768, no yellow)  
+- `/icons/earthquake.svg`, `/icons/flood.svg`, `/icons/wildfire.svg`, `/icons/hurricane.svg` → filled hazard icons (#16A34A)  
+
+Here’s a “copy-and-paste” prompt you can feed into Replit’s AI assistant (or drop into your editor) to scaffold the page **exactly** like the screenshot I just shared—same layout, same paddings, same rounded cards, same green palette, same font:
+
+---
+
+You are generating the SafeHaven homepage using Tailwind CSS + HTML (or JSX). Replicate the attached screenshot to the pixel:
+
+1. **Tailwind config & font**  
+   - Extend `tailwind.config.js` with:
+     ```js
+     theme: {
+       extend: {
+         colors: {
+           primary:   '#16A34A',
+           secondary: '#10B981',
+           'text-dark':'#111827',
+           'bg-light':'#F3F4F6',
+         },
+         fontFamily: { sans: ['Inter','sans-serif'] },
+       }
+     }
+     ```
+   - Add `@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');` to `index.css`.
+
+2. **Global wrapper**  
+   ```html
+   <div class="min-h-screen bg-primary flex items-center justify-center">
+     <div class="max-w-3xl w-full mx-auto px-4 sm:px-6 lg:px-8 bg-white rounded-2xl shadow-xl overflow-hidden">
+       <!-- content here -->
+     </div>
+   </div>
+Header
+
+html
+Copy
+Edit
+<header class="flex items-center justify-between h-16 px-6 bg-white">
+  <a href="/" class="flex items-center space-x-2">
+    <img src="/logo.svg" alt="SafeHaven" class="h-8 w-8"/>
+    <span class="text-xl font-semibold text-text-dark">SafeHaven</span>
+  </a>
+  <nav class="space-x-6 text-text-dark font-medium">
+    <a href="#how-it-works">How it Works</a>
+    <a href="#support">Support</a>
+  </nav>
+</header>
+Hero
+
+html
+Copy
+Edit
+<div class="relative">
+  <div class="h-64 sm:h-80 md:h-96 bg-center bg-cover" style="background-image:url('/assets/hero.svg')"></div>
+  <div class="absolute inset-0 flex flex-col items-center justify-center px-4">
+    <h1 class="text-4xl sm:text-5xl font-semibold text-text-dark text-center">
+      Dodge Disasters Before They Strike
+    </h1>
+    <p class="mt-2 text-lg text-gray-600 text-center max-w-lg">
+      Five-minute, FEMA-aligned home audit that pinpoints wildfire, flood, hurricane, and earthquake risks—so you can act now and save on insurance.
+    </p>
+  </div>
+</div>
+ZIP Card
+
+html
+Copy
+Edit
+<div class="relative -mt-16 mb-12 flex justify-center">
+  <div class="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
+    <label for="zip" class="block text-sm font-medium text-text-dark">Your ZIP Code</label>
+    <input id="zip" type="text" placeholder="Enter ZIP code"
+           class="mt-1 w-full rounded-md border border-gray-300 p-3 focus:ring-primary focus:border-primary"/>
+    <p class="mt-2 text-sm text-gray-500">We’ll use this to load your local hazard data—no personal info stored.</p>
+    <button class="mt-4 w-full py-3 rounded-lg bg-primary text-white hover:bg-secondary transition">
+      Analyze
+    </button>
+  </div>
+</div>
+Hazard Grid
+
+html
+Copy
+Edit
+<section class="pb-12">
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 px-4 sm:px-6 lg:px-8">
+    <!-- loop these cards -->
+    <div class="bg-white rounded-xl shadow p-6 text-center">
+      <img src="/icons/earthquake.svg" alt="Earthquake" class="mx-auto h-12 w-12"/>
+      <h3 class="mt-4 text-lg font-medium text-text-dark">Earthquake</h3>
+    </div>
+    <div class="bg-white rounded-xl shadow p-6 text-center">
+      <img src="/icons/flood.svg" alt="Flood" class="mx-auto h-12 w-12"/>
+      <h3 class="mt-4 text-lg font-medium text-text-dark">Flood</h3>
+    </div>
+    <div class="bg-white rounded-xl shadow p-6 text-center">
+      <img src="/icons/wildfire.svg" alt="Wildfire" class="mx-auto h-12 w-12"/>
+      <h3 class="mt-4 text-lg font-medium text-text-dark">Wildfire</h3>
+    </div>
+    <div class="bg-white rounded-xl shadow p-6 text-center">
+      <img src="/icons/hurricane.svg" alt="Hurricane" class="mx-auto h-12 w-12"/>
+      <h3 class="mt-4 text-lg font-medium text-text-dark">Hurricane</h3>
+    </div>
+  </div>
+</section>
+Footer
+
+html
+Copy
+Edit
+<footer class="bg-white py-6">
+  <div class="max-w-3xl mx-auto flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500 px-4 sm:px-6 lg:px-8">
+    <div class="space-x-4">
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/terms">Terms of Service</a>
+      <a href="/contact">Contact Us</a>
+    </div>
+    <p class="mt-4 sm:mt-0">&copy; 2025 SafeHaven</p>
+  </div>
+</footer>
