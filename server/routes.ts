@@ -73,13 +73,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       const updates = req.body;
       
-      const audit = await storage.updateAudit(id, updates);
+      // Validate and clean the updates object to match schema
+      const cleanUpdates: any = {};
+      
+      // Handle audit responses properly
+      if (updates.auditResponses) {
+        cleanUpdates.auditResponses = updates.auditResponses;
+      }
+      
+      // Handle other valid fields
+      if (updates.photosUploaded !== undefined) {
+        cleanUpdates.photosUploaded = updates.photosUploaded;
+      }
+      
+      if (updates.completed !== undefined) {
+        cleanUpdates.completed = updates.completed;
+      }
+      
+      // Allow specific audit fields
+      const allowedFields = ['homeType', 'yearBuilt', 'foundationType', 'stories', 'roofMaterial', 'waterStorage', 'foodStorage', 'backupPower', 'safetySystems'];
+      allowedFields.forEach(field => {
+        if (updates[field] !== undefined) {
+          cleanUpdates[field] = updates[field];
+        }
+      });
+      
+      const audit = await storage.updateAudit(id, cleanUpdates);
       if (!audit) {
         return res.status(404).json({ message: "Audit not found" });
       }
       
       res.json(audit);
     } catch (error: any) {
+      console.error("Audit update error:", error);
       res.status(500).json({ 
         message: "Error updating audit: " + error.message 
       });
