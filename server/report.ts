@@ -168,24 +168,83 @@ export async function generatePDFReport(req: Request, res: Response) {
       doc.moveDown(0.5);
     });
 
-    // --- Page 4: Audit Details ---
+    // --- Page 4: Audit Details by Section ---
     doc.addPage();
     doc.fontSize(24).fillColor(colors.primary)
-       .text("Audit Response Summary");
+       .text("Detailed Assessment Results");
 
     doc.moveDown(1);
-    if (audit.auditResponses) {
-      doc.fontSize(12).fillColor(colors.text);
+
+    // Section A: General Home Information
+    if (audit.sectionAResponses && Object.keys(audit.sectionAResponses).length > 0) {
+      doc.fontSize(16).fillColor(colors.secondary)
+         .text("🏡 General Home Information");
+      doc.moveDown(0.5);
+      
+      Object.entries(audit.sectionAResponses).forEach(([key, value]) => {
+        if (value && typeof value === 'string') {
+          doc.fontSize(11).fillColor(colors.text)
+             .text(`${key}: ${value}`, { width: 495 });
+          doc.moveDown(0.2);
+        }
+      });
+      doc.moveDown(0.5);
+    }
+
+    // Primary Hazard Section
+    const hazardSections: Record<string, { emoji: string; title: string; data: any }> = {
+      'Earthquake': { 
+        emoji: '🌐', 
+        title: 'Earthquake Readiness Assessment', 
+        data: audit.sectionBEarthquake 
+      },
+      'Hurricane': { 
+        emoji: '💨', 
+        title: 'Hurricane & High-Wind Protection', 
+        data: audit.sectionCHurricane 
+      },
+      'Wildfire': { 
+        emoji: '🔥', 
+        title: 'Wildfire Hardening Assessment', 
+        data: audit.sectionDWildfire 
+      },
+      'Flood': { 
+        emoji: '🌊', 
+        title: 'Flood Mitigation Assessment', 
+        data: audit.sectionEFlood 
+      }
+    };
+
+    // Display the primary hazard section
+    const primarySection = hazardSections[audit.primaryHazard];
+    if (primarySection && audit.auditResponses && Object.keys(audit.auditResponses).length > 0) {
+      doc.fontSize(16).fillColor(colors.secondary)
+         .text(`${primarySection.emoji} ${primarySection.title}`);
+      doc.moveDown(0.5);
       
       Object.entries(audit.auditResponses).forEach(([key, value]) => {
         if (value && typeof value === 'string') {
-          doc.text(`${key}: ${value}`, { width: 495 });
-          doc.moveDown(0.3);
+          doc.fontSize(11).fillColor(colors.text)
+             .text(`${key}: ${value}`, { width: 495 });
+          doc.moveDown(0.2);
+        }
+      });
+    } else if (audit.auditResponses && Object.keys(audit.auditResponses).length > 0) {
+      // Fallback for legacy data
+      doc.fontSize(16).fillColor(colors.secondary)
+         .text("Assessment Responses");
+      doc.moveDown(0.5);
+      
+      Object.entries(audit.auditResponses).forEach(([key, value]) => {
+        if (value && typeof value === 'string') {
+          doc.fontSize(11).fillColor(colors.text)
+             .text(`${key}: ${value}`, { width: 495 });
+          doc.moveDown(0.2);
         }
       });
     } else {
       doc.fontSize(12).fillColor(colors.text)
-         .text("No detailed audit responses available for this assessment.");
+         .text("Assessment in progress. Complete responses will appear in your final report.");
     }
 
     // --- Footer ---

@@ -16,7 +16,14 @@ export const audits = pgTable("audits", {
   previousGrants: text("previous_grants"),
   previousGrantsProgram: text("previous_grants_program"),
   
-  // Comprehensive audit responses for all hazard types
+  // Comprehensive questionnaire responses by section
+  sectionAResponses: jsonb("section_a_responses").$type<Record<string, any>>().default({}),
+  sectionBEarthquake: jsonb("section_b_earthquake").$type<Record<string, any>>().default({}),
+  sectionCHurricane: jsonb("section_c_hurricane").$type<Record<string, any>>().default({}),
+  sectionDWildfire: jsonb("section_d_wildfire").$type<Record<string, any>>().default({}),
+  sectionEFlood: jsonb("section_e_flood").$type<Record<string, any>>().default({}),
+  
+  // Legacy comprehensive responses (for backward compatibility)
   auditResponses: jsonb("audit_responses").$type<Record<string, any>>().default({}),
   
   // Metadata

@@ -164,13 +164,24 @@ export default function AuditWizard() {
   const nextStep = () => {
     if (!validateCurrentQuestion()) return;
 
-    // Save current answer to auditResponses
-    const updates = { 
-      auditResponses: {
+    // Organize responses by section for better data structure
+    const currentAnswer = auditData[currentQuestion.id as keyof AuditData];
+    let updates: any = {};
+
+    // Determine which section this question belongs to
+    if (currentQuestion.section === 'General Information') {
+      updates.sectionAResponses = {
         ...auditData,
-        [currentQuestion.id]: auditData[currentQuestion.id as keyof AuditData]
-      }
-    };
+        [currentQuestion.id]: currentAnswer
+      };
+    } else {
+      // Store in the comprehensive audit responses for compatibility
+      updates.auditResponses = {
+        ...auditData,
+        [currentQuestion.id]: currentAnswer
+      };
+    }
+
     updateAuditMutation.mutate(updates);
 
     if (isLastQuestion) {
