@@ -73,12 +73,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       const updates = req.body;
       
+      // Log incoming data for debugging
+      console.log("Received audit update:", JSON.stringify(updates, null, 2));
+      
       // Validate and clean the updates object to match schema
       const cleanUpdates: any = {};
       
       // Handle audit responses properly
       if (updates.auditResponses) {
         cleanUpdates.auditResponses = updates.auditResponses;
+        console.log("Saving audit responses:", cleanUpdates.auditResponses);
       }
       
       // Handle other valid fields
@@ -97,6 +101,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           cleanUpdates[field] = updates[field];
         }
       });
+      
+      console.log("Clean updates to save:", JSON.stringify(cleanUpdates, null, 2));
       
       const audit = await storage.updateAudit(id, cleanUpdates);
       if (!audit) {
