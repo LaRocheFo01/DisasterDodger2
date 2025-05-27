@@ -11,6 +11,20 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {
+        // Disaster Dodger Green Design System
+        'disaster-green': {
+          50: '#f0fdf4',
+          100: '#dcfce7', 
+          500: '#16A34A', // Primary accent
+          600: '#16A34A', // Primary accent
+          700: '#15803d',
+          800: '#166534',
+          900: '#14532d',
+        },
+        'disaster-mint': {
+          500: '#10B981', // Secondary accent for hovers
+          600: '#059669', // Success color
+        },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
@@ -61,6 +75,9 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       keyframes: {
         "accordion-down": {

@@ -1,0 +1,179 @@
+**Design-Revamp Prompt for SafeHaven Audit App**
+
+> You are a front-end/UI designer tasked with polishing the SafeHaven (formerly Disaster Dodger) web app. Use Tailwind CSS and a green-centric palette. Your goals are to introduce a clear design system, tighten layout, improve visual hierarchy, and enhance usability across desktop and mobile. Below is everything that needs attention:
+
+---
+
+### 1. Establish a Green-First Design System
+
+* **Primary Accent**: `#16A34A` (deep “SafeHaven Green”)
+* **Secondary Accent**: `#10B981` (lighter mint-green for hover states)
+* **Neutrals**:
+
+  * Dark text: `#111827`
+  * Light backgrounds: `#F3F4F6`
+  * Borders / disabled: `#E5E7EB`
+* **Feedback**:
+
+  * Error: `#DC2626`
+  * Success: `#059669`
+
+> *Update your `tailwind.config.js` color palette accordingly.*
+
+---
+
+### 2. Global Layout & Containers
+
+* **Max-Width Centering**
+
+  ```html
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    …all page content…
+  </div>
+  ```
+
+  Keeps content readable on large screens and padded on mobile.
+* **Sticky Header**
+
+  * White background, subtle bottom shadow.
+  * Left: SafeHaven logo (linking home).
+  * Right: minimal nav (“How It Works”, “Support”).
+* **Footer**
+
+  * Light gray background.
+  * Links: “Privacy Policy”, “Terms of Service”, “Contact Us”.
+  * Social icons in accent color.
+
+---
+
+### 3. Hero & ZIP Entry (Step 1)
+
+* **Typography**
+
+  * H1: `text-4xl font-semibold text-gray-900`
+  * Subtitle: `mt-2 text-lg text-gray-600`
+* **Background**
+
+  * Optional very-light green gradient or a soft home-silhouette SVG with `bg-opacity-5`.
+* **ZIP Input Card**
+
+  ```html
+  <div class="bg-white shadow-md rounded-lg p-6 mt-8">
+    <label for="zip" class="block text-sm font-medium text-gray-700">Your ZIP Code</label>
+    <input id="zip" name="zip"
+           class="mt-1 block w-full rounded-md border-gray-300 focus:ring-green-500 focus:border-green-500"
+           placeholder="e.g. 90210" />
+    <p class="mt-2 text-sm text-gray-500">We’ll use this to load your local hazard data—no personal info stored.</p>
+    <button class="mt-4 w-full py-3 rounded-lg bg-green-600 text-white hover:bg-green-700 transition">
+      Analyze
+    </button>
+  </div>
+  ```
+* **Inline Validation**
+
+  * Immediately flag invalid ZIP codes with red text and border: “Please enter a valid 5-digit ZIP code.”
+
+---
+
+### 4. Progress & Loading States
+
+* **Stepper** at top of every multi-step page:
+
+  ```html
+  <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+    <div class="bg-green-600 h-2 rounded-full" style="width: 20%;"></div>
+  </div>
+  <p class="text-sm text-gray-600">Step 1 of 5: Enter Location</p>
+  ```
+* **Skeleton Loaders** for async fetches:
+
+  ```html
+  <div class="animate-pulse space-y-4">
+    <div class="h-6 bg-gray-300 rounded"></div>
+    <div class="h-4 bg-gray-300 rounded"></div>
+  </div>
+  ```
+
+---
+
+### 5. Hazard Selection (Step 2)
+
+* **Card-Style Checkboxes**
+
+  ```html
+  <label class="block bg-white shadow-lg rounded-xl p-4 mb-4 cursor-pointer hover:shadow-2xl">
+    <input type="checkbox" class="sr-only" />
+    <div class="flex items-center space-x-4">
+      <img src="/icons/earthquake.svg" alt="Earthquake" class="w-8 h-8" />
+      <div>
+        <h3 class="text-lg font-medium text-gray-800">Earthquake</h3>
+        <p class="text-sm text-gray-600">High risk in your area</p>
+      </div>
+    </div>
+  </label>
+  ```
+* **Grid Layout** on desktop: `grid grid-cols-1 sm:grid-cols-2 gap-6`.
+
+---
+
+### 6. Questionnaire Steps (3–X)
+
+* **Field Cards**: Each question in its own `bg-white shadow-md rounded-lg p-6 mb-6`.
+* **Back & Next**:
+
+  * “Back” text link in gray.
+  * “Next” primary button in green, sticky on mobile (`fixed bottom-0 left-0 right-0 p-4 bg-white`).
+* **Helper Text & Tooltips** for complex questions.
+
+---
+
+### 7. Results & Recommendations (Final Step)
+
+* **Responsive Grid** of recommendation cards:
+
+  ```html
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- card -->
+  </div>
+  ```
+* **Risk Meters**: small horizontal bars under each hazard label showing Low/Med/High in green accent.
+* **Export CTAs**:
+
+  * “Download PDF” and “Email My Report” in a sticky top bar or fixed footer.
+  * Buttons: `bg-green-600 hover:bg-green-700 text-white rounded-lg py-2 px-4`.
+
+---
+
+### 8. Typography & Spacing
+
+* **Font**: Inter or Open Sans.
+* **Scale**:
+
+  * H1: 32px
+  * H2: 24px
+  * H3: 18px
+  * Body: 16px
+  * Caption: 14px
+* **Spacing**: Use multiples of 4px (`p-4`, `mt-6`, `space-y-8`).
+
+---
+
+### 9. Accessibility & Performance
+
+* **Semantic HTML**: `<main>`, `<section>`, `<header>`, `<footer>`.
+* **ARIA**: `aria-live="polite"` on loading containers, proper `aria-label` on icons.
+* **Focus States**: `focus:outline-none focus:ring-2 focus:ring-green-500`.
+* **Image alt text** or `aria-hidden="true"`.
+* **Lazy-load** large images/maps for performance.
+
+---
+
+### 10. Polishing Touches
+
+* **Micro-animations**: button presses (`active:scale-95`), card hovers (`hover:shadow-xl`).
+* **Map Preview** after ZIP entry: embed a small map thumbnail to reassure location fetch.
+* **Onboarding Tooltip**: a one-time “How It Works” overlay for first-time visitors.
+
+---
+
+⏩ *Implement these refinements to transform your bare-bones audit flow into a cohesive, trustworthy, and delightful SafeHaven experience—centered around a vibrant green palette and clean, user-friendly components.*
