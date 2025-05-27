@@ -50,20 +50,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create audit after successful payment
   app.post("/api/audits", async (req, res) => {
     try {
-      const validatedData = insertAuditSchema.parse(req.body);
-      const audit = await storage.createAudit(validatedData);
+      console.log("Creating audit with data:", req.body);
+      
+      // Create minimal audit data that matches our new schema
+      const auditData = {
+        zipCode: req.body.zipCode,
+        primaryHazard: req.body.primaryHazard,
+        stripePaymentId: req.body.stripePaymentId || null,
+      };
+      
+      const audit = await storage.createAudit(auditData);
       res.json(audit);
     } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ 
-          message: "Validation error", 
-          errors: error.errors 
-        });
-      } else {
-        res.status(500).json({ 
-          message: "Error creating audit: " + error.message 
-        });
-      }
+      console.error("Error creating audit:", error);
+      res.status(500).json({ 
+        message: "Error creating audit: " + error.message 
+      });
     }
   });
 
@@ -94,8 +96,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         cleanUpdates.completed = updates.completed;
       }
       
-      // Allow specific audit fields
-      const allowedFields = ['homeType', 'yearBuilt', 'foundationType', 'stories', 'roofMaterial', 'waterStorage', 'foodStorage', 'backupPower', 'safetySystems'];
+      // Allow specific audit fields that match our new schema
+      const allowedFields = ['homeType', 'yearBuilt', 'ownershipStatus', 'insuredValue', 'insurancePolicies', 'previousGrants', 'previousGrantsProgram'];
       allowedFields.forEach(field => {
         if (updates[field] !== undefined) {
           cleanUpdates[field] = updates[field];
