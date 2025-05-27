@@ -76,10 +76,10 @@ export default function Landing() {
             <Shield className="text-white h-10 w-10" />
           </div>
           <h1 className="text-4xl md:text-5xl font-semibold text-gray-900 mb-4">
-            Protect Your Home with Smart Disaster Preparedness
+            Dodge Disasters in 5 Minutes
           </h1>
           <p className="mt-2 text-lg text-gray-600 max-w-3xl mx-auto">
-            Get personalized, FEMA-aligned safety recommendations based on your location's specific hazard risks. Complete your audit in under 5 minutes.
+            A FEMA-aligned home audit that spots wildfire, flood, hurricane & earthquake risks—so you can act fast and cut insurance costs.
           </p>
         </div>
 
