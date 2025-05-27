@@ -21,17 +21,67 @@ function calculateRiskScore(audit: Audit): number {
 }
 
 function generateRecommendations(audit: Audit): string[] {
-  const recommendations = [
-    "Install smoke detectors on every level of your home",
-    "Create an emergency evacuation plan and practice it regularly",
-    "Maintain an emergency supply kit with 3 days of supplies",
-    "Secure heavy furniture and appliances to walls",
-    "Clear defensible space around your property",
-    "Install surge protectors for electronics",
-    "Check and maintain home insurance coverage"
+  const recommendations: string[] = [];
+  const responses = audit.auditResponses || {};
+  
+  // Generate recommendations based on hazard type and responses
+  if (audit.primaryHazard === 'Earthquake') {
+    if (responses.waterHeaterSecurity === 'Not secured at all') {
+      recommendations.push("Secure your water heater with straps and flexible connectors to prevent damage during earthquakes");
+    }
+    if (responses.gasShutoffPlan === 'No wrench or plan') {
+      recommendations.push("Install a gas shutoff wrench and train all family members on its location and use");
+    }
+    if (responses.emergencyKit?.includes('None')) {
+      recommendations.push("Assemble a 72-hour emergency kit with water, food, first-aid supplies, and flashlights");
+    }
+  } else if (audit.primaryHazard === 'Wildfire') {
+    if (responses.defensibleSpaceWidth === '< 10 ft') {
+      recommendations.push("Expand defensible space to at least 30 feet around your home for wildfire protection");
+    }
+    if (responses.roofMaterial === 'Standard shingles') {
+      recommendations.push("Consider upgrading to Class A fire-rated roofing materials");
+    }
+    if (responses.ventProtection === 'None') {
+      recommendations.push("Install mesh screens and shutters on all vents to prevent ember intrusion");
+    }
+  } else if (audit.primaryHazard === 'Flood') {
+    if (responses.equipmentElevation === 'Below flood level') {
+      recommendations.push("Elevate utilities and equipment above the base flood elevation");
+    }
+    if (responses.backflowPrevention === 'None') {
+      recommendations.push("Install backflow prevention valves to protect against sewer backup");
+    }
+    if (responses.floodBarriers === 'None') {
+      recommendations.push("Consider installing flood shields or barriers for doors and windows");
+    }
+  } else if (audit.primaryHazard === 'Hurricane') {
+    if (responses.windowDoorProtection === 'None') {
+      recommendations.push("Install storm shutters or impact-resistant windows for hurricane protection");
+    }
+    if (responses.roofInspection === 'Never checked') {
+      recommendations.push("Have your roof professionally inspected and secure loose shingles or tiles");
+    }
+    if (responses.garageDoorUpgrade === 'None') {
+      recommendations.push("Upgrade garage doors with reinforced panels and stronger tracks");
+    }
+  }
+  
+  // Add general recommendations if specific ones are limited
+  const generalRecs = [
+    "Review and update your homeowner's insurance coverage annually",
+    "Create a family emergency communication plan",
+    "Keep important documents in a waterproof, fireproof safe",
+    "Install battery-powered or hand-crank emergency radio",
+    "Maintain emergency supply of cash in small bills"
   ];
   
-  return recommendations.slice(0, 5); // Return top 5 recommendations
+  // Fill remaining slots with general recommendations
+  while (recommendations.length < 5 && generalRecs.length > 0) {
+    recommendations.push(generalRecs.shift()!);
+  }
+  
+  return recommendations.slice(0, 5);
 }
 
 export async function generatePDFReport(req: Request, res: Response) {

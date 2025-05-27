@@ -122,7 +122,7 @@ export default function AuditWizard() {
 
   // Update audit mutation with autosave
   const updateAuditMutation = useMutation({
-    mutationFn: async (updates: Partial<AuditData>) => {
+    mutationFn: async (updates: any) => {
       const response = await fetch(`/api/audits/${auditId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
