@@ -1,0 +1,165 @@
+# Audit Flow Documentation
+
+This document outlines the updated end-to-end user flow for the SafeHaven audit process, including the payment step and corrected routing.
+
+---
+
+## 1. Flow Overview
+
+1. **Enter ZIP Code**
+
+   * User inputs ZIP code.
+   * Front-end calls `GET /api/hazards/:zipCode` to retrieve hazards.
+
+2. **Select Hazard**
+
+   * User chooses from the hazards returned.
+   * Front-end calls `POST /api/audits` with `{ zipCode, hazard }`.
+   * Server returns `{ id: auditId }`.
+
+3. **Payment**
+
+   * User is directed to a payment screen at `/payment/:auditId`.
+   * Front-end integrates with Stripe (or chosen gateway) to process payment.
+   * On success, navigate to questionnaire.
+
+4. **Complete Questionnaire**
+
+   * User moves through the multi-step form at `/questionnaire/:auditId`.
+   * Each step PATCHes answers to `/api/audits/:auditId`.
+
+5. **Audit Complete Page**
+
+   * Final submit calls `POST /api/audits/:auditId/generate-pdf`.
+   * Server marks audit completed and returns PDF URL.
+   * User lands on `/complete/:auditId`, sees download link.
+
+---
+
+## 2. Back-End API Endpoints
+
+| Method | Endpoint                       | Description                                                         |
+| ------ | ------------------------------ | ------------------------------------------------------------------- |
+| GET    | `/api/hazards/:zipCode`        | Returns hazards for the given ZIP code.                             |
+| POST   | `/api/audits`                  | Creates a new audit. Body: `{ zipCode, hazard }`. Returns `{ id }`. |
+| PATCH  | `/api/audits/:id`              | Updates audit with questionnaire answers.                           |
+| POST   | `/api/audits/:id/generate-pdf` | Generates PDF, marks audit complete, returns download URL.          |
+
+---
+
+## 3. Client-Side Routes (React Router)
+
+```jsx
+<Routes>
+  <Route path="/" element={<ZIPEntry />} />
+  <Route path="/hazard-selection/:zipCode" element={<HazardSelection />} />
+  <Route path="/payment/:auditId" element={<Payment />} />
+  <Route path="/questionnaire/:auditId" element={<QuestionnaireWizard />} />
+  <Route path="/complete/:auditId" element={<AuditComplete />} />
+</Routes>
+```
+
+* **ZIPEntry**: calls hazard API, navigates to `/hazard-selection/${zip}`.
+* **HazardSelection**: calls `POST /api/audits`, navigates to `/payment/${auditId}`.
+* **Payment**: processes Stripe; on success, navigate to `/questionnaire/${auditId}`.
+* **QuestionnaireWizard**: PATCH answers; on final, generate PDF and navigate to `/complete/${auditId}`.
+* **AuditComplete**: displays PDF link.
+
+---
+
+## 4. Component Responsibilities
+
+1. **ZIPEntry**
+
+   * Renders ZIP entry form.
+   * On submit, `GET /api/hazards/${zip}` → `/hazard-selection/${zip}`.
+
+2. **HazardSelection**
+
+   * Displays hazards list.
+   * On select, `POST /api/audits({ zipCode, hazard })` → store `auditId` → `/payment/${auditId}`.
+
+3. **Payment**
+
+   * Renders payment UI (Stripe).
+   * On success, navigates to `/questionnaire/${auditId}`.
+
+4. **QuestionnaireWizard**
+
+   * Renders wizard steps.
+   * On each next, `PATCH /api/audits/${auditId}` with current answers.
+   * On finish, `POST /api/audits/${auditId}/generate-pdf` → `/complete/${auditId}`.
+
+5. **AuditComplete**
+
+   * Shows completion confirmation and PDF download link.
+
+---
+
+## 5. State & Navigation
+
+* **Audit ID Propagation**: pass via URL params; no duplicate ZIP segments.
+* **Error Handling**: show appropriate user messages on API or payment failures.
+* **Loading States**: display spinners during network and payment operations.
+
+---
+
+*Document updated to remove duplicate ZIP segments and reintroduce the payment step.*
+
+---
+
+## 6. Debugging Duplicate ZIP Parameters
+
+If your browser URL shows the ZIP code twice (e.g., `/12345/hazard-selection/12345`), follow these steps:
+
+1. **Check Route Definitions**
+   Ensure your React Router paths don’t repeat `:zipCode`.  For example, in `App.tsx`:
+
+   ```jsx
+   <Routes>
+     <Route path="/" element={<ZIPEntry />} />
+     <Route path="hazard-selection/:zipCode" element={<HazardSelection />} />  // no leading slash in nested path
+     <Route path="payment/:auditId" element={<Payment />} />
+     <Route path="questionnaire/:auditId" element={<QuestionnaireWizard />} />
+     <Route path="complete/:auditId" element={<AuditComplete />} />
+   </Routes>
+   ```
+
+2. **Fix Navigation Calls**
+   When navigating, use the exact route you’ve defined:
+
+   ```ts
+   // After ZIP entry
+   navigate(`hazard-selection/${zipCode}`);
+
+   // After hazard selection & audit creation
+   navigate(`payment/${audit.id}`);
+
+   // After payment success
+   navigate(`questionnaire/${auditId}`);
+   ```
+
+   Avoid including the ZIP code twice (e.g., don't do `navigate(`/\${zipCode}/hazard-selection/\${zipCode}`)`).
+
+3. **Relative vs. Absolute Paths**
+
+   * **Relative** (within nested `<Route>`s) drops leading slash: `navigate('hazard-selection/${zip}')`.
+   * **Absolute** always starts with `/`: `navigate(`/hazard-selection/\${zip}`)`.  Choose one style consistently.
+
+4. **Verify Payment Component Mount**
+   If payment isn’t rendering at `/payment/:auditId`, ensure you have:
+
+   ```jsx
+   <Route path="payment/:auditId" element={<Payment />} />
+   ```
+
+   and that your `HazardSelection` component navigates to exactly that route after creating the audit.
+
+5. **Test the Flow Manually**
+
+   * Enter ZIP code → URL should be `/hazard-selection/12345`.
+   * Select hazard → URL should be `/payment/6789`.
+   * Complete payment → URL `/questionnaire/6789`.
+   * Submit questionnaire → URL `/complete/6789`.
+
+If you correct both your `<Route>` paths and `navigate()` calls as above, the duplicate ZIP and missing payment step will be resolved.\*

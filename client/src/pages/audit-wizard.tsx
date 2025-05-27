@@ -108,7 +108,7 @@ export default function AuditWizard() {
 
   // Fetch audit data
   const { data: audit, isLoading: auditLoading } = useQuery({
-    queryKey: ['/api/audits', auditId],
+    queryKey: [`/api/audits/${auditId}`],
     enabled: !!auditId
   });
 
