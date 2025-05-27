@@ -101,6 +101,9 @@ export default function AuditWizard() {
   const [uploadedPhotos, setUploadedPhotos] = useState<File[]>([]);
   const [photoUploadError, setPhotoUploadError] = useState<string>("");
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [currentStep, setCurrentStep] = useState(1);
+  const [totalSteps] = useState(4);
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
   const queryClient = useQueryClient();
 
   // Get audit ID from URL params
@@ -117,7 +120,7 @@ export default function AuditWizard() {
   const currentQuestion = questions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === questions.length - 1;
 
-  // Update audit mutation
+  // Update audit mutation with autosave
   const updateAuditMutation = useMutation({
     mutationFn: async (updates: Partial<AuditData>) => {
       const response = await fetch(`/api/audits/${auditId}`, {
@@ -130,8 +133,33 @@ export default function AuditWizard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/audits', auditId] });
+      setLastSavedAt(new Date());
     }
   });
+
+  // Autosave functionality - save progress automatically
+  useEffect(() => {
+    const saveProgress = () => {
+      if (Object.keys(auditData).length > 0) {
+        updateAuditMutation.mutate(auditData);
+      }
+    };
+
+    // Save every 30 seconds
+    const autosaveInterval = setInterval(saveProgress, 30000);
+
+    return () => clearInterval(autosaveInterval);
+  }, [auditData, auditId]);
+
+  // Calculate progress percentage
+  const progressPercentage = Math.round((currentQuestionIndex / Math.max(questions.length - 1, 1)) * 100);
+  
+  // Calculate current step based on question index
+  useEffect(() => {
+    const questionsPerStep = Math.ceil(questions.length / totalSteps);
+    const calculatedStep = Math.min(Math.floor(currentQuestionIndex / questionsPerStep) + 1, totalSteps);
+    setCurrentStep(calculatedStep);
+  }, [currentQuestionIndex, questions.length, totalSteps]);
 
   const nextStep = () => {
     if (!validateCurrentQuestion()) return;
@@ -354,17 +382,48 @@ export default function AuditWizard() {
         </div>
       </header>
 
-      {/* Progress Indicator */}
+      {/* Enhanced Progress Indicator */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+        {/* Step Progress */}
+        <div className="flex justify-between items-center mb-4">
+          {[1, 2, 3, 4].map((step) => (
+            <div key={step} className="flex items-center">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                step <= currentStep 
+                  ? 'bg-disaster-green-600 text-white' 
+                  : 'bg-gray-200 text-gray-600'
+              }`}>
+                {step}
+              </div>
+              {step < 4 && (
+                <div className={`w-16 h-1 mx-2 ${
+                  step < currentStep ? 'bg-disaster-green-600' : 'bg-gray-200'
+                }`}></div>
+              )}
+            </div>
+          ))}
+        </div>
+        
+        {/* Question Progress Bar */}
+        <div className="w-full bg-gray-200 rounded-full h-3 mb-3">
           <div 
-            className="bg-disaster-green-600 h-2 rounded-full transition-all duration-300" 
-            style={{width: `${((currentQuestionIndex + 1) / questions.length) * 100}%`}}
+            className="bg-disaster-green-600 h-3 rounded-full transition-all duration-300" 
+            style={{width: `${progressPercentage}%`}}
           ></div>
         </div>
-        <p className="text-sm text-gray-600 mb-8">
-          Step 2 of 3: {audit?.primaryHazard} Assessment
-        </p>
+        
+        {/* Progress Text with Autosave Status */}
+        <div className="flex justify-between items-center text-sm text-gray-600 mb-8">
+          <span>Question {currentQuestionIndex + 1} of {questions.length} • Step {currentStep} of {totalSteps}</span>
+          <span className="flex items-center">
+            {lastSavedAt && (
+              <>
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                Saved {new Date(lastSavedAt).toLocaleTimeString()}
+              </>
+            )}
+          </span>
+        </div>
       </div>
 
       {/* Main Content */}

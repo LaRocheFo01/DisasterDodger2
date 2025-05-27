@@ -9,41 +9,130 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import HazardMap from "@/components/hazard-map";
 
-// Multi-hazard ZIP code mapping based on Hazard Combo Matrix
+// Comprehensive nationwide ZIP code hazard mapping
 const hazardMap = {
   ranges: [
-    // California - Wildfire + Earthquake
+    // California - Wildfire + Earthquake (comprehensive coverage)
     { start: 900, end: 961, hazards: ['Wildfire', 'Earthquake'] },
     
     // Florida - Flood + Hurricane
     { start: 320, end: 349, hazards: ['Flood', 'Hurricane'] },
     
-    // Texas - Flood + Hurricane
+    // Texas - Flood + Hurricane (expanded coverage)
     { start: 750, end: 799, hazards: ['Flood', 'Hurricane'] },
+    { start: 773, end: 779, hazards: ['Flood', 'Hurricane'] },
     
-    // Colorado - Wildfire only
-    { start: 800, end: 816, hazards: ['Wildfire'] },
+    // Colorado - Wildfire + Earthquake
+    { start: 800, end: 816, hazards: ['Wildfire', 'Earthquake'] },
     
-    // Oregon - Wildfire only
-    { start: 970, end: 979, hazards: ['Wildfire'] },
+    // Oregon - Wildfire + Earthquake
+    { start: 970, end: 979, hazards: ['Wildfire', 'Earthquake'] },
     
-    // Louisiana - Flood only
-    { start: 700, end: 714, hazards: ['Flood'] },
+    // Washington - Earthquake + Flood
+    { start: 980, end: 994, hazards: ['Earthquake', 'Flood'] },
     
-    // North Carolina - Hurricane only
-    { start: 270, end: 289, hazards: ['Hurricane'] },
+    // Louisiana - Flood + Hurricane
+    { start: 700, end: 714, hazards: ['Flood', 'Hurricane'] },
     
-    // Washington - Earthquake only
-    { start: 980, end: 994, hazards: ['Earthquake'] },
+    // North Carolina - Hurricane + Flood
+    { start: 270, end: 289, hazards: ['Hurricane', 'Flood'] },
+    
+    // Alaska - Earthquake + Wildfire
+    { start: 995, end: 999, hazards: ['Earthquake', 'Wildfire'] },
+    
+    // Hawaii - Hurricane + Earthquake
+    { start: 967, end: 968, hazards: ['Hurricane', 'Earthquake'] },
+    
+    // Arizona - Wildfire + Earthquake
+    { start: 850, end: 865, hazards: ['Wildfire', 'Earthquake'] },
+    
+    // Nevada - Earthquake + Wildfire
+    { start: 890, end: 898, hazards: ['Earthquake', 'Wildfire'] },
+    
+    // New Mexico - Wildfire + Flood
+    { start: 870, end: 884, hazards: ['Wildfire', 'Flood'] },
+    
+    // Utah - Earthquake + Wildfire
+    { start: 840, end: 847, hazards: ['Earthquake', 'Wildfire'] },
+    
+    // Idaho - Wildfire + Earthquake
+    { start: 832, end: 838, hazards: ['Wildfire', 'Earthquake'] },
+    
+    // Montana - Wildfire + Flood
+    { start: 590, end: 599, hazards: ['Wildfire', 'Flood'] },
+    
+    // Wyoming - Wildfire + Earthquake
+    { start: 820, end: 831, hazards: ['Wildfire', 'Earthquake'] },
+    
+    // Northeast Coastal - Hurricane + Flood
+    { start: 10, end: 69, hazards: ['Hurricane', 'Flood'] },    // NY, NJ, CT
+    { start: 70, end: 89, hazards: ['Hurricane', 'Flood'] },    // NJ, PA
+    { start: 1, end: 5, hazards: ['Hurricane', 'Flood'] },      // MA
+    { start: 6, end: 9, hazards: ['Hurricane', 'Flood'] },      // CT, RI
+    
+    // Southeast Coastal - Hurricane + Flood
+    { start: 290, end: 319, hazards: ['Hurricane', 'Flood'] },  // SC
+    { start: 350, end: 399, hazards: ['Hurricane', 'Flood'] },  // AL, GA
+    
+    // Midwest Tornado/Flood States
+    { start: 460, end: 479, hazards: ['Flood', 'Hurricane'] },  // IN, OH
+    { start: 480, end: 499, hazards: ['Flood', 'Hurricane'] },  // MI
+    { start: 500, end: 599, hazards: ['Flood', 'Hurricane'] },  // IA, MN, MT, ND, SD
+    { start: 600, end: 699, hazards: ['Flood', 'Hurricane'] },  // IL, KS, MO, NE
+    
+    // Great Lakes Region - Flood + Hurricane
+    { start: 530, end: 549, hazards: ['Flood', 'Hurricane'] },  // WI
+    
+    // Mid-Atlantic - Hurricane + Flood
+    { start: 200, end: 269, hazards: ['Hurricane', 'Flood'] },  // DC, MD, VA, WV
+    
+    // Tennessee Valley - Flood + Hurricane
+    { start: 370, end: 389, hazards: ['Flood', 'Hurricane'] },  // TN
+    { start: 400, end: 459, hazards: ['Flood', 'Hurricane'] },  // KY
   ],
+  
+  // Default fallback for unmapped areas
+  getDefaultHazards(zip: string): string[] {
+    const prefix = parseInt(zip.slice(0, 3), 10);
+    
+    // Coastal areas default to Hurricane + Flood
+    if ((prefix >= 1 && prefix <= 99) || 
+        (prefix >= 200 && prefix <= 349) ||
+        (prefix >= 700 && prefix <= 799)) {
+      return ['Hurricane', 'Flood'];
+    }
+    
+    // Mountain/Western areas default to Wildfire + Earthquake
+    if (prefix >= 800 && prefix <= 999) {
+      return ['Wildfire', 'Earthquake'];
+    }
+    
+    // Midwest/Central areas default to Flood + Hurricane
+    if (prefix >= 400 && prefix <= 699) {
+      return ['Flood', 'Hurricane'];
+    }
+    
+    // Default for any unmapped area
+    return ['Flood', 'Earthquake'];
+  }
 };
 
 function getHazardsForZip(zip: string) {
-  const prefix = parseInt(zip.slice(0, 3), 10);
+  // Clean and validate ZIP code
+  const cleanZip = zip.trim().replace(/\s+/g, '');
+  if (!/^\d{5}$/.test(cleanZip)) {
+    return [];
+  }
+  
+  const prefix = parseInt(cleanZip.slice(0, 3), 10);
+  
+  // Check specific ranges first
   for (let { start, end, hazards } of hazardMap.ranges) {
     if (prefix >= start && prefix <= end) return hazards;
   }
-  return [];
+  
+  // Use fallback system for comprehensive coverage
+  return hazardMap.getDefaultHazards(cleanZip);
 }
 
 export default function StartAudit() {

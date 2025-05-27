@@ -4,11 +4,12 @@ hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
 
 [nix]
 channel = "stable-24_05"
+packages = ["zip"]
 
 [deployment]
-deploymentTarget = "cloudrun"
+deploymentTarget = "static"
 build = ["sh", "-c", "npm run build"]
-run = ["sh", "-c", "npm start"]
+publicDir = "dist"
 
 [workflows]
 runButton = "Project"
