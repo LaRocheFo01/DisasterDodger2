@@ -370,10 +370,16 @@ export async function generatePDFReport(req: Request, res: Response) {
 
     for (const section of enabledSections) {
       if (section.type === 'cover') {
-        generateCoverPage(doc, audit, template, colors);
+        generateCoverPage(doc, audit, template, colors, riskAssessment);
       } else if (section.type === 'summary') {
         doc.addPage();
         generateExecutiveSummary(doc, audit, riskAssessment, template, colors);
+      } else if (section.type === 'hazardOverview') {
+        doc.addPage();
+        generateHazardOverview(doc, audit, template, colors);
+      } else if (section.type === 'methodology') {
+        doc.addPage();
+        generateMethodology(doc, template, colors);
       } else if (section.type === 'analysis') {
         doc.addPage();
         generateDetailedAnalysis(doc, audit, userAnalysis, template, colors);
@@ -383,6 +389,12 @@ export async function generatePDFReport(req: Request, res: Response) {
       } else if (section.type === 'costs') {
         doc.addPage();
         generateCostEstimates(doc, audit, upgradePriorities, grantOpportunities, template, colors);
+      } else if (section.type === 'grants') {
+        doc.addPage();
+        generateGrantsSection(doc, grantOpportunities, template, colors);
+      } else if (section.type === 'appendix') {
+        doc.addPage();
+        generateAppendix(doc, template, colors);
       }
     }
 
@@ -401,9 +413,9 @@ export async function generatePDFReport(req: Request, res: Response) {
   }
 }
 
-function generateCoverPage(doc: any, audit: Audit, template: ReportTemplate, colors: any) {
+function generateCoverPage(doc: any, audit: Audit, template: ReportTemplate, colors: any, riskAssessment: RiskAssessment) {
   doc.font(template.styling.fonts.secondary)
-     .fontSize(template.styling.fonts.size.title)
+     .fontSize(template.styling.fonts.sizes.title)
      .fillColor(colors.primary)
      .text("Disaster Dodger™", { align: "center" });
     
@@ -602,14 +614,14 @@ function generateCoverPage(doc: any, audit: Audit, template: ReportTemplate, col
 function generateExecutiveSummary(doc: any, audit: Audit, riskAssessment: RiskAssessment, template: ReportTemplate, colors: any) {
   let currentY = 50;
   
-  doc.fontSize(template.styling.fonts.size.header)
+  doc.fontSize(template.styling.fonts.sizes.header)
      .fillColor(colors.primary)
      .font(template.styling.fonts.secondary)
      .text("Executive Summary", template.styling.layout.margins, currentY);
   
   currentY += 40;
   
-  doc.fontSize(template.styling.fonts.size.body)
+  doc.fontSize(template.styling.fonts.sizes.body)
      .fillColor(colors.text)
      .font(template.styling.fonts.primary)
      .text(`This comprehensive safety assessment was conducted for the property in ZIP code ${audit.zipCode}. Your property received an overall risk score of ${riskAssessment.overallScore} out of 10, indicating ${riskAssessment.riskLevel.toLowerCase()} risk levels.`, template.styling.layout.margins, currentY, {
@@ -621,7 +633,7 @@ function generateExecutiveSummary(doc: any, audit: Audit, riskAssessment: RiskAs
 function generateDetailedAnalysis(doc: any, audit: Audit, userAnalysis: any[], template: ReportTemplate, colors: any) {
   let currentY = 50;
   
-  doc.fontSize(template.styling.fonts.size.header)
+  doc.fontSize(template.styling.fonts.sizes.header)
      .fillColor(colors.primary)
      .font(template.styling.fonts.secondary)
      .text("Detailed Answer Analysis", template.styling.layout.margins, currentY);
@@ -634,14 +646,14 @@ function generateDetailedAnalysis(doc: any, audit: Audit, userAnalysis: any[], t
       currentY = 50;
     }
 
-    doc.fontSize(template.styling.fonts.size.body)
+    doc.fontSize(template.styling.fonts.sizes.body)
        .fillColor(colors.primary)
        .font(template.styling.fonts.secondary)
        .text(`${item.question}:`, template.styling.layout.margins, currentY);
     
     currentY += 25;
     
-    doc.fontSize(template.styling.fonts.size.body)
+    doc.fontSize(template.styling.fonts.sizes.body)
        .fillColor(colors.text)
        .font(template.styling.fonts.primary)
        .text(item.analysis, template.styling.layout.margins, currentY, { width: 515 });
@@ -653,7 +665,7 @@ function generateDetailedAnalysis(doc: any, audit: Audit, userAnalysis: any[], t
 function generateRecommendations(doc: any, audit: Audit, upgradePriorities: UpgradePriority[], template: ReportTemplate, colors: any) {
   let currentY = 50;
   
-  doc.fontSize(template.styling.fonts.size.header)
+  doc.fontSize(template.styling.fonts.sizes.header)
      .fillColor(colors.primary)
      .font(template.styling.fonts.secondary)
      .text("Priority Upgrades & Recommendations", template.styling.layout.margins, currentY);
@@ -670,14 +682,14 @@ function generateRecommendations(doc: any, audit: Audit, upgradePriorities: Upgr
     if (upgrade.priority === 'High') priorityColor = colors.danger;
     else if (upgrade.priority === 'Medium') priorityColor = colors.warning;
 
-    doc.fontSize(template.styling.fonts.size.body)
+    doc.fontSize(template.styling.fonts.sizes.body)
        .fillColor(colors.text)
        .font(template.styling.fonts.secondary)
        .text(`${upgrade.category}: ${upgrade.description}`, template.styling.layout.margins, currentY);
     
     currentY += 30;
     
-    doc.fontSize(template.styling.fonts.size.small)
+    doc.fontSize(template.styling.fonts.sizes.caption)
        .fillColor(colors.text)
        .font(template.styling.fonts.primary)
        .text(`Cost: ${upgrade.costEstimate} | Savings: ${upgrade.potentialSavings}`, template.styling.layout.margins, currentY);
@@ -689,7 +701,7 @@ function generateRecommendations(doc: any, audit: Audit, upgradePriorities: Upgr
 function generateCostEstimates(doc: any, audit: Audit, upgradePriorities: UpgradePriority[], grantOpportunities: GrantOpportunity[], template: ReportTemplate, colors: any) {
   let currentY = 50;
   
-  doc.fontSize(template.styling.fonts.size.header)
+  doc.fontSize(template.styling.fonts.sizes.header)
      .fillColor(colors.primary)
      .font(template.styling.fonts.secondary)
      .text("Cost Estimates & Financial Assistance", template.styling.layout.margins, currentY);
@@ -701,7 +713,7 @@ function generateCostEstimates(doc: any, audit: Audit, upgradePriorities: Upgrad
     return sum + (range ? parseInt(range[1].replace(',', '')) : 0);
   }, 0);
   
-  doc.fontSize(template.styling.fonts.size.body)
+  doc.fontSize(template.styling.fonts.sizes.body)
      .fillColor(colors.text)
      .font(template.styling.fonts.primary)
      .text(`Total Estimated Investment: $${totalLowCost.toLocaleString()} - $${(totalLowCost * 2).toLocaleString()}`, template.styling.layout.margins, currentY);
@@ -709,14 +721,14 @@ function generateCostEstimates(doc: any, audit: Audit, upgradePriorities: Upgrad
   currentY += 60;
   
   grantOpportunities.forEach((grant) => {
-    doc.fontSize(template.styling.fonts.size.body)
+    doc.fontSize(template.styling.fonts.sizes.body)
        .fillColor(colors.primary)
        .font(template.styling.fonts.secondary)
        .text(grant.program, template.styling.layout.margins, currentY);
     
     currentY += 20;
     
-    doc.fontSize(template.styling.fonts.size.small)
+    doc.fontSize(template.styling.fonts.sizes.caption)
        .fillColor(colors.text)
        .font(template.styling.fonts.primary)
        .text(`${grant.agency} | Max: ${grant.maxAmount}`, template.styling.layout.margins, currentY);
@@ -725,13 +737,116 @@ function generateCostEstimates(doc: any, audit: Audit, upgradePriorities: Upgrad
   });
 }
 
+function generateHazardOverview(doc: any, audit: Audit, template: ReportTemplate, colors: any) {
+  let currentY = 50;
+  
+  doc.fontSize(template.styling.fonts.sizes.header)
+     .fillColor(colors.primary)
+     .font(template.styling.fonts.secondary)
+     .text("Hazard Overview", template.styling.layout.margins, currentY);
+  
+  currentY += 40;
+  
+  doc.fontSize(template.styling.fonts.sizes.body)
+     .fillColor(colors.text)
+     .font(template.styling.fonts.primary)
+     .text(`This section provides an overview of the primary natural hazards affecting properties in ZIP code ${audit.zipCode}. The analysis considers regional risk factors, historical data, and current FEMA guidelines.`, template.styling.layout.margins, currentY, {
+       width: 515,
+       align: "justify"
+     });
+}
+
+function generateMethodology(doc: any, template: ReportTemplate, colors: any) {
+  let currentY = 50;
+  
+  doc.fontSize(template.styling.fonts.sizes.header)
+     .fillColor(colors.primary)
+     .font(template.styling.fonts.secondary)
+     .text("Methodology & Data Sources", template.styling.layout.margins, currentY);
+  
+  currentY += 40;
+  
+  doc.fontSize(template.styling.fonts.sizes.body)
+     .fillColor(colors.text)
+     .font(template.styling.fonts.primary)
+     .text("This assessment methodology is based on FEMA guidelines, National Institute of Standards and Technology (NIST) recommendations, and peer-reviewed research in disaster mitigation. Data sources include FEMA hazard maps, local building codes, and insurance industry best practices.", template.styling.layout.margins, currentY, {
+       width: 515,
+       align: "justify"
+     });
+}
+
+function generateGrantsSection(doc: any, grantOpportunities: GrantOpportunity[], template: ReportTemplate, colors: any) {
+  let currentY = 50;
+  
+  doc.fontSize(template.styling.fonts.sizes.header)
+     .fillColor(colors.primary)
+     .font(template.styling.fonts.secondary)
+     .text("Available Grants & Assistance", template.styling.layout.margins, currentY);
+  
+  currentY += 40;
+  
+  grantOpportunities.forEach((grant) => {
+    if (currentY > 650) {
+      doc.addPage();
+      currentY = 50;
+    }
+
+    doc.fontSize(template.styling.fonts.sizes.body)
+       .fillColor(colors.primary)
+       .font(template.styling.fonts.secondary)
+       .text(grant.program, template.styling.layout.margins, currentY);
+    
+    currentY += 20;
+    
+    doc.fontSize(template.styling.fonts.sizes.caption)
+       .fillColor(colors.text)
+       .font(template.styling.fonts.primary)
+       .text(`Agency: ${grant.agency} | Max: ${grant.maxAmount}`, template.styling.layout.margins, currentY);
+    
+    currentY += 15;
+    
+    doc.text(`Eligibility: ${grant.eligibility}`, template.styling.layout.margins, currentY);
+    currentY += 15;
+    
+    doc.text(`Application Period: ${grant.applicationPeriod}`, template.styling.layout.margins, currentY);
+    currentY += 30;
+  });
+}
+
+function generateAppendix(doc: any, template: ReportTemplate, colors: any) {
+  let currentY = 50;
+  
+  doc.fontSize(template.styling.fonts.sizes.header)
+     .fillColor(colors.primary)
+     .font(template.styling.fonts.secondary)
+     .text("Appendix & References", template.styling.layout.margins, currentY);
+  
+  currentY += 40;
+  
+  const references = [
+    "FEMA P-530: Earthquake Safety at Home",
+    "FEMA P-737: Home Builder's Guide to Construction in Wildfire Zones",
+    "FEMA P-804: Technical Advisory on Flood Insurance",
+    "FEMA P-499: Home Builder's Guide to Coastal Construction",
+    "National Institute of Standards and Technology (NIST) Guidelines"
+  ];
+  
+  references.forEach((ref) => {
+    doc.fontSize(template.styling.fonts.sizes.caption)
+       .fillColor(colors.text)
+       .font(template.styling.fonts.primary)
+       .text(`• ${ref}`, template.styling.layout.margins, currentY);
+    currentY += 20;
+  });
+}
+
 function addFootersToAllPages(doc: any, template: ReportTemplate, colors: any) {
   const range = doc.bufferedPageRange();
   for (let i = range.start; i < range.start + range.count; i++) {
     doc.switchToPage(i);
     
-    doc.fontSize(8)
-       .fillColor(colors.lightGray)
+    doc.fontSize(template.styling.fonts.sizes.caption)
+       .fillColor(colors.mute)
        .font(template.styling.fonts.primary)
        .text(`Generated by Disaster Dodger™ - Professional Home Safety Assessment`, template.styling.layout.margins, 770, {
          width: 515,
@@ -741,93 +856,5 @@ function addFootersToAllPages(doc: any, template: ReportTemplate, colors: any) {
          width: 515,
          align: "center"
        });
-  }
-}
-
-         .fillColor(colors.lightGray)
-         .font('Helvetica-Oblique')
-         .text(`Reference: ${upgrade.femaReference}`, 40, currentY);
-      
-      currentY += 35;
-    });
-
-    // --- PAGE 5: COST ESTIMATES & GRANTS ---
-    doc.addPage();
-    currentY = 50;
-    
-    currentY = addSectionHeader("Cost Estimates & Financial Assistance", currentY);
-    
-    // Total cost summary
-    const totalLowCost = upgradePriorities.reduce((sum, upgrade) => {
-      const range = upgrade.costEstimate.match(/\$?([\d,]+)/);
-      return sum + (range ? parseInt(range[1].replace(',', '')) : 0);
-    }, 0);
-    
-    doc.fontSize(12)
-       .fillColor(colors.text)
-       .font('Helvetica')
-       .text(`Total Estimated Investment: $${totalLowCost.toLocaleString()} - $${(totalLowCost * 2).toLocaleString()}`, 40, currentY);
-    
-    currentY += 40;
-    currentY = addDivider(currentY);
-    
-    // Grant opportunities
-    currentY = addSectionHeader("Available Grants & Rebates", currentY);
-    
-    grantOpportunities.forEach((grant, index) => {
-      if (currentY > 650) {
-        doc.addPage();
-        currentY = 50;
-      }
-
-      doc.fontSize(12)
-         .fillColor(colors.primary)
-         .font('Helvetica-Bold')
-         .text(grant.program, 40, currentY);
-      
-      currentY += 20;
-      
-      doc.fontSize(10)
-         .fillColor(colors.text)
-         .font('Helvetica')
-         .text(`Agency: ${grant.agency}`, 40, currentY)
-         .text(`Maximum Amount: ${grant.maxAmount}`, 300, currentY);
-      
-      currentY += 15;
-      
-      doc.text(`Eligibility: ${grant.eligibility}`, 40, currentY);
-      currentY += 15;
-      
-      doc.text(`Application Period: ${grant.applicationPeriod}`, 40, currentY);
-      currentY += 30;
-    });
-
-    // --- FOOTER ON EACH PAGE ---
-    const range = doc.bufferedPageRange();
-    for (let i = range.start; i < range.start + range.count; i++) {
-      doc.switchToPage(i);
-      
-      doc.fontSize(8)
-         .fillColor(colors.lightGray)
-         .font('Helvetica')
-         .text(`Generated by Disaster Dodger™ - Professional Home Safety Assessment`, 40, 770, {
-           width: 515,
-           align: "center"
-         })
-         .text(`Page ${i + 1} of ${range.count}`, 40, 785, {
-           width: 515,
-           align: "center"
-         });
-    }
-
-    // Mark audit as completed
-    await storage.updateAudit(auditId, { completed: true });
-
-    // Finalize PDF
-    doc.end();
-
-  } catch (error) {
-    console.error("PDF generation error:", error);
-    res.status(500).json({ error: "Failed to generate comprehensive PDF report" });
   }
 }

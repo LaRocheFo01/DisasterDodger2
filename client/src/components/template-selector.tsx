@@ -7,7 +7,11 @@ interface ReportTemplate {
   id: string;
   name: string;
   description: string;
-  sections: number;
+  sections: Array<{
+    id: string;
+    title: string;
+    enabled: boolean;
+  }>;
 }
 
 interface TemplateSelectorProps {
@@ -63,7 +67,7 @@ export function TemplateSelector({ selectedTemplate, onTemplateChange, className
                 <div className="flex flex-col">
                   <span className="font-medium">{template.name}</span>
                   <span className="text-sm text-gray-500">
-                    {template.sections} sections
+                    {template.sections.filter(s => s.enabled).length} sections
                   </span>
                 </div>
               </SelectItem>
