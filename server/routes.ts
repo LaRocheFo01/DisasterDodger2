@@ -147,24 +147,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({
         message: "Error cleaning database: " + error.message
       });
-
-
-// Get available report templates
-app.get("/api/report-templates", (req, res) => {
-  try {
-    const { AVAILABLE_TEMPLATES } = require("./report-templates");
-    res.json(AVAILABLE_TEMPLATES.map(template => ({
-      id: template.id,
-      name: template.name,
-      description: template.description,
-      sections: template.sections.length
-    })));
-  } catch (error) {
-    console.error("Error fetching templates:", error);
-    res.status(500).json({ error: "Failed to fetch report templates" });
-  }
-});
-
     }
   });
 
