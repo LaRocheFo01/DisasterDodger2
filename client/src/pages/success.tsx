@@ -116,22 +116,15 @@ export default function Success() {
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         {/* Success Hero */}
         <div className="text-center mb-12">
-          <div className="relative">
-            <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
-              <CheckCircle className="text-white h-12 w-12" />
-            </div>
-            <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full animate-pulse"></div>
+          <div className="w-20 h-20 bg-disaster-mint-600 rounded-full flex items-center justify-center mx-auto mb-6">
+            <CheckCircle className="text-white h-10 w-10" />
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            🎉 Assessment Complete!
+          <h1 className="text-3xl font-semibold text-gray-900 mb-4">
+            Assessment Complete!
           </h1>
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 max-w-2xl mx-auto mb-4">
-            <p className="text-lg text-green-800 font-medium">
-              Congratulations! You've completed your <span className="font-bold">{audit.primaryHazard}</span> preparedness assessment.
-            </p>
-          </div>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Your personalized recommendations are ready for download. Take action now to protect your home and family.
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Congratulations! You've completed your {audit.primaryHazard} preparedness assessment. 
+            Your personalized recommendations are ready.
           </p>
         </div>
 

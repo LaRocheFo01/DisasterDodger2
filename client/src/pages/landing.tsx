@@ -65,68 +65,41 @@ export default function Landing() {
               backgroundPosition: 'center center'
             }}
           ></div>
-          <div className="absolute inset-0 bg-black bg-opacity-20"></div>
           <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
-            <div className="bg-white bg-opacity-95 backdrop-blur-sm rounded-xl p-8 max-w-2xl mx-auto shadow-2xl">
-              <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 text-center mb-4 leading-tight">
-                Dodge Disasters Before They Strike
-              </h1>
-              <p className="text-lg text-gray-700 text-center mb-6 leading-relaxed">
-                Five-minute, FEMA-aligned home audit that pinpoints wildfire, flood, hurricane, and earthquake risks—so you can act now and save on insurance.
-              </p>
-              <div className="flex justify-center space-x-4 text-sm text-gray-600">
-                <div className="flex items-center">
-                  <CheckCircle className="h-4 w-4 text-disaster-green-600 mr-1" />
-                  <span>5-min assessment</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="h-4 w-4 text-disaster-green-600 mr-1" />
-                  <span>FEMA-aligned</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="h-4 w-4 text-disaster-green-600 mr-1" />
-                  <span>Insurance savings</span>
-                </div>
-              </div>
-            </div>
+            <h1 className="text-4xl sm:text-5xl font-semibold text-gray-900 text-center mb-4">
+              Dodge Disasters Before They Strike
+            </h1>
+            <p className="text-lg text-gray-600 text-center max-w-lg">
+              Five-minute, FEMA-aligned home audit that pinpoints wildfire, flood, hurricane, and earthquake risks—so you can act now and save on insurance.
+            </p>
           </div>
         </div>
 
         {/* ZIP Entry Card */}
         <div className="relative -mt-16 mb-12 flex justify-center px-4">
-          <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-md border border-gray-100">
+          <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
             <form onSubmit={handleZipSubmit}>
-              <div className="text-center mb-6">
-                <MapPin className="h-8 w-8 text-disaster-green-600 mx-auto mb-2" />
-                <h3 className="text-lg font-semibold text-gray-900">Start Your Assessment</h3>
-              </div>
-              <label htmlFor="zip" className="block text-sm font-medium text-gray-900 mb-3">
+              <label htmlFor="zip" className="block text-sm font-medium text-gray-900 mb-2">
                 Your ZIP Code
               </label>
-              <div className="relative">
-                <input 
-                  id="zip" 
-                  type="text" 
-                  placeholder="12345"
-                  value={zipCode}
-                  onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
-                  maxLength={5}
-                  className="w-full rounded-lg border-2 border-gray-200 p-4 text-lg font-medium text-center focus:ring-2 focus:ring-disaster-green-600 focus:border-disaster-green-600 transition-all"
-                  required
-                />
-                {zipCode.length === 5 && (
-                  <CheckCircle className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-green-500" />
-                )}
-              </div>
-              <p className="mt-3 text-sm text-gray-500 text-center">
-                🔒 We'll use this to load your local hazard data—no personal info stored.
+              <input 
+                id="zip" 
+                type="text" 
+                placeholder="Enter ZIP code"
+                value={zipCode}
+                onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
+                maxLength={5}
+                className="w-full rounded-md border border-gray-300 p-3 focus:ring-disaster-green-600 focus:border-disaster-green-600"
+                required
+              />
+              <p className="mt-2 text-sm text-gray-500">
+                We'll use this to load your local hazard data—no personal info stored.
               </p>
               <button 
                 type="submit"
-                disabled={zipCode.length !== 5}
-                className="mt-6 w-full py-4 rounded-lg bg-disaster-green-600 text-white hover:bg-disaster-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all font-semibold text-lg shadow-lg hover:shadow-xl active:scale-95"
+                className="mt-4 w-full py-3 rounded-lg bg-disaster-green-600 text-white hover:bg-disaster-mint-500 transition-colors font-medium"
               >
-                {zipCode.length === 5 ? '🚀 Start Analysis' : 'Enter ZIP Code'}
+                Analyze
               </button>
             </form>
           </div>
@@ -134,38 +107,30 @@ export default function Landing() {
 
         {/* Hazard Grid */}
         <section className="pb-12">
-          <div className="text-center mb-8 px-4">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Assess Your Risk</h2>
-            <p className="text-gray-600">We analyze the most common natural disasters in your area</p>
-          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4 sm:px-6 lg:px-8">
-            <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer border border-gray-100">
-              <div className="w-16 h-16 bg-gradient-to-br from-disaster-green-600 to-disaster-green-700 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <Zap className="h-8 w-8 text-white" />
+            <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-disaster-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Zap className="h-6 w-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Earthquake</h3>
-              <p className="text-sm text-gray-600">Ground shaking & structural damage assessment</p>
+              <h3 className="text-lg font-medium text-gray-900">Earthquake</h3>
             </div>
-            <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer border border-gray-100">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <Waves className="h-8 w-8 text-white" />
+            <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-disaster-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Waves className="h-6 w-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Flood</h3>
-              <p className="text-sm text-gray-600">Water damage & drainage vulnerability</p>
+              <h3 className="text-lg font-medium text-gray-900">Flood</h3>
             </div>
-            <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer border border-gray-100">
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <Flame className="h-8 w-8 text-white" />
+            <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-disaster-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Flame className="h-6 w-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Wildfire</h3>
-              <p className="text-sm text-gray-600">Fire risk & defensible space analysis</p>
+              <h3 className="text-lg font-medium text-gray-900">Wildfire</h3>
             </div>
-            <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group cursor-pointer border border-gray-100">
-              <div className="w-16 h-16 bg-gradient-to-br from-gray-600 to-gray-700 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                <Wind className="h-8 w-8 text-white" />
+            <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-disaster-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Wind className="h-6 w-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Hurricane</h3>
-              <p className="text-sm text-gray-600">Wind damage & storm surge protection</p>
+              <h3 className="text-lg font-medium text-gray-900">Hurricane</h3>
             </div>
           </div>
         </section>
