@@ -1,0 +1,39 @@
+Here’s a single, self-contained “prompt” you can feed into Replit’s AI (or paste into your project’s README) to get it to wire up OpenAI, generate the JSON report, turn it into a PDF, and return it for download:
+
+````
+🚀 Replit AI, please update our Node.js Express app so that:
+
+1.  **Install & import**  
+    - Dependencies: `express`, `multer`, `openai`, `dotenv`, `pdfkit`  
+    - Load `OPENAI_API_KEY` from `.env`
+
+2.  **Endpoint**  
+    - Create a POST endpoint `/api/generate-report-pdf`  
+    - No file upload here—assume the user’s answers are in our database under `req.body.userId`.  
+    - Fetch the user’s answers JSON from your database layer (e.g. `const userAnswers = await db.getAnswers(req.body.userId)`).
+
+3.  **OpenAI call**  
+    - Build the same mega-prompt we drafted earlier, injecting `userAnswers` into it.  
+    - Use `openai.createChatCompletion({ model: 'gpt-3.5-turbo', messages: [{ role:'user', content: prompt }], temperature:0 })`  
+    - Parse the returned content as JSON into an object `report`.
+
+4.  **PDF generation (using PDFKit)**  
+    - `const PDFDocument = require('pdfkit')`  
+    - Create a new `PDFDocument({ bufferPages: true })`  
+    - Add a title page with the user’s name and date.  
+    - For each top-level key in `report` (`risk_score`, `recap`, `comments`, etc.), render a heading, then the content—bullets for arrays, tables for `cost_estimates`, etc.  
+    - Pipe the PDF into a `Buffer` so you can send it in memory.
+
+5.  **Return the PDF**  
+    - Set headers:  
+      ```js
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename=home-resilience-report.pdf');
+      ```  
+    - Send the PDF buffer in `res.send(buffer)`.
+
+6.  **Error handling**  
+    - Catch and log any errors from your DB, the OpenAI call, or PDF generation, and return a 500 with a JSON error.
+
+After you paste this prompt into Replit’s AI assistant, it should generate the complete `server.js` (or update your existing one) with all the code wiring OpenAI → JSON report → PDFKit → downloadable PDF.
+````
