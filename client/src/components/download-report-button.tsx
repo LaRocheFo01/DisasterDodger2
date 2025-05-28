@@ -7,9 +7,10 @@ interface DownloadReportButtonProps {
   auditId: number;
   zipCode?: string;
   className?: string;
+  template?: string;
 }
 
-export function DownloadReportButton({ auditId, zipCode, className }: DownloadReportButtonProps) {
+export function DownloadReportButton({ auditId, zipCode, className, template = 'comprehensive' }: DownloadReportButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
@@ -17,7 +18,8 @@ export function DownloadReportButton({ auditId, zipCode, className }: DownloadRe
     setIsGenerating(true);
     
     try {
-      const response = await fetch(`/api/audits/${auditId}/generate-pdf`, {
+      const templateParam = template ? `?template=${template}` : '';
+      const response = await fetch(`/api/audits/${auditId}/generate-pdf${templateParam}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
