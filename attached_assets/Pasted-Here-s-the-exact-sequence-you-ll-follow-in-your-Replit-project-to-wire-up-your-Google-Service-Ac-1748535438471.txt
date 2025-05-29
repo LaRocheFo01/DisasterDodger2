@@ -1,0 +1,109 @@
+Here’s the **exact sequence** you’ll follow in your Replit project to wire up your Google Service Account and prove it can talk to the Slides API. Treat each top-level bullet as one “step” to do in your Replit IDE.
+
+---
+
+### 1️⃣ Add your Service-Account JSON as a Replit Secret
+
+1. In Replit, open your sidebar and click the **🔑 Secrets** tab.
+2. Click **Add new secret**.
+3. Under **Key**, enter `GOOGLE_SERVICE_ACCOUNT`
+4. Under **Value**, paste **the entire contents** of the JSON you downloaded (including all `{ … }`).
+5. Hit **Add secret**.
+
+---
+
+### 2️⃣ Write that JSON to disk & set Google’s creds ENV
+
+In your server start-up file (for example `index.js` or `server.js`), **at the very top** (before any `import { google } from 'googleapis'`), paste:
+
+```js
+import fs from 'fs';
+import path from 'path';
+
+// 1) Grab your SA JSON from the Replit secret
+const saJson = process.env.GOOGLE_SERVICE_ACCOUNT;
+if (!saJson) {
+  console.error('⛔️ Missing GOOGLE_SERVICE_ACCOUNT env var!');
+  process.exit(1);
+}
+
+// 2) Write it to a local file
+const credsPath = path.join(process.cwd(), 'gcp-sa.json');
+fs.writeFileSync(credsPath, saJson);
+
+// 3) Tell Google libs to use it
+process.env.GOOGLE_APPLICATION_CREDENTIALS = credsPath;
+```
+
+Save the file.
+
+---
+
+### 3️⃣ Enable & install the Google APIs client
+
+1. In your Replit Shell (bottom pane), run:
+
+   ```bash
+   npm install googleapis
+   ```
+2. In the Google Cloud Console, make sure **Google Slides API** is **Enabled** on your project.
+
+---
+
+### 4️⃣ Quick “ping” test to fetch your slide’s title
+
+Create a file called `ping-slides.js` in your project root with:
+
+```js
+// ping-slides.js
+import { google } from 'googleapis';
+
+async function main() {
+  // Auth with the env var we just set
+  const auth = new google.auth.GoogleAuth({
+    scopes: ['https://www.googleapis.com/auth/presentations.readonly']
+  });
+
+  const slides = google.slides({ version: 'v1', auth });
+  const res = await slides.presentations.get({
+    presentationId: 'YOUR_PRESENTATION_ID',  // ← paste your Slides ID here
+  });
+  console.log('✅ Slide deck title is:', res.data.title);
+}
+
+main().catch(err => {
+  console.error('❌ Auth/test failed:', err.message);
+  process.exit(1);
+});
+```
+
+Replace `YOUR_PRESENTATION_ID` with one of your Google Slides’ IDs (the long string in its URL).
+
+---
+
+### 5️⃣ Run the test
+
+In the Replit Shell run:
+
+```bash
+node ping-slides.js
+```
+
+* **If you see**
+
+  ```
+  ✅ Slide deck title is: My Awesome Template
+  ```
+
+  you’re done: your Replit app is successfully authenticating as
+  `audit-generator-bot@my-free-slides-api.iam.gserviceaccount.com`.
+
+* **If you see an error**, double-check:
+
+  * That your secret’s value is valid JSON.
+  * That you enabled the Slides API in the Cloud Console.
+  * That your service-account has the “Editor” (or at least “Slides API User”) role.
+
+---
+
+Once this passes, you can move on to calling `slides.presentations.batchUpdate()` to fill in your template with the audit data. Let me know if any step fails or needs more detail!
