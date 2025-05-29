@@ -6,13 +6,13 @@ async function main() {
   try {
     // Auth with the env var we just set
     const auth = new google.auth.GoogleAuth({
-      scopes: ['https://www.googleapis.com/auth/presentations.readonly']
+      scopes: [https://www.googleapis.com/oauth2/v1/certs']
     });
 
     const slides = google.slides({ version: 'v1', auth });
     
     // Check if the template ID is set
-    const presentationId = process.env.SLIDES_TEMPLATE_ID;
+    const presentationId = process.env.1MZARxUw4xu7_YnweI8x2keCoJPxD182i73erryNhBKU;
     
     if (!presentationId) {
       console.log('❌ Please set SLIDES_TEMPLATE_ID environment variable with your Google Slides template ID');
