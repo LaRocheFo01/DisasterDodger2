@@ -1,0 +1,76 @@
+Below is a drop-in Express route that:
+
+1. Parses the questionnaire answers from `req.body`.
+2. Calls your `generateAudit({ answers, riskModel, pdfDocs })`.
+3. Receives back the structured JSON.
+4. Stores it in a simple in-memory Map (you can swap this for your DB).
+5. Returns an `auditId` to the client so they can fetch the PDF later.
+
+```js
+// server.js (or wherever your Express app is set up)
+import express from 'express';
+import bodyParser from 'body-parser';
+import { v4 as uuidv4 } from 'uuid';
+import { generateAudit } from './openai.js';  // your module from earlier
+
+const app = express();
+app.use(bodyParser.json());
+
+// In-memory store for demo purposes
+const auditStore = new Map();
+
+app.post('/api/audit', async (req, res) => {
+  try {
+    // 1) Parse the user's answers
+    const answers = req.body;  
+    // answers should mirror your Questionnaire JSON:
+    // { zipCode, homeType, yearBuilt, … sectionE: { equipmentElevation, … } }
+
+    // 2) Define your risk model & PDF docs to feed OpenAI
+    const riskModel = 'disaster-proof-home-v1';    // or whatever you use internally
+    const pdfDocs = [ /* URLs or Base64 strings of your FEMA PDFs */ ];
+
+    // 3) Call the OpenAI wrapper you wrote
+    const auditResult = await generateAudit({ answers, riskModel, pdfDocs });
+    // auditResult should look like:
+    // {
+    //   riskScore: 72,
+    //   responses: { /* question/response map */ },
+    //   comments: "...",
+    //   quotes: ["FEMA P-530…", …],
+    //   priorities: [ "Secure water heater", … ],
+    //   costs: [ { item: "Water heater strap", cost: 15 }, … ],
+    //   grants: [ "Earthquake Brace & Bolt (CA)", … ]
+    // }
+
+    // 4) Store it by a generated ID
+    const auditId = uuidv4();
+    auditStore.set(auditId, auditResult);
+
+    // 5) Return the ID so the client can pull the PDF later
+    res.status(201).json({ auditId });
+  } catch (err) {
+    console.error('Audit generation failed:', err);
+    res.status(500).json({ error: 'Failed to generate audit' });
+  }
+});
+
+// Optional: endpoint to retrieve the JSON (or kick off the PDF export)
+app.get('/api/audit/:id', (req, res) => {
+  const audit = auditStore.get(req.params.id);
+  if (!audit) return res.status(404).json({ error: 'Not found' });
+  res.json(audit);
+});
+
+// Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Listening on ${PORT}`));
+```
+
+### Next steps
+
+* Swap out `auditStore` for your real database (e.g. Drizzle/Neon).
+* After `POST /api/audit`, kick off your Slides-and-Drive export and stream the PDF back.
+* On the frontend, POST the form JSON to `/api/audit`, get `auditId`, then download or display the PDF.
+
+Let me know if you need help wiring up the database or the PDF-export endpoint next!
