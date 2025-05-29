@@ -7,9 +7,10 @@ interface DownloadReportButtonProps {
   auditId: number;
   zipCode?: string;
   className?: string;
+  useAI?: boolean;
 }
 
-export function DownloadReportButton({ auditId, zipCode, className }: DownloadReportButtonProps) {
+export function DownloadReportButton({ auditId, zipCode, className, useAI = false }: DownloadReportButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
@@ -17,7 +18,8 @@ export function DownloadReportButton({ auditId, zipCode, className }: DownloadRe
     setIsGenerating(true);
     
     try {
-      const response = await fetch(`/api/audits/${auditId}/generate-pdf`, {
+      const endpoint = useAI ? `/api/audits/${auditId}/generate-ai-report` : `/api/audits/${auditId}/generate-pdf`;
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -37,7 +39,8 @@ export function DownloadReportButton({ auditId, zipCode, className }: DownloadRe
       // Create temporary download link
       const link = document.createElement('a');
       link.href = url;
-      link.download = `Disaster_Dodger_Audit_${zipCode || auditId}_${new Date().toISOString().split('T')[0]}.pdf`;
+      const reportType = useAI ? 'AI_Report' : 'Audit';
+      link.download = `Disaster_Dodger_${reportType}_${zipCode || auditId}_${new Date().toISOString().split('T')[0]}.pdf`;
       
       // Trigger download
       document.body.appendChild(link);
@@ -49,7 +52,7 @@ export function DownloadReportButton({ auditId, zipCode, className }: DownloadRe
       
       toast({
         title: "Report Downloaded",
-        description: "Your comprehensive home safety audit report has been downloaded successfully.",
+        description: useAI ? "Your AI-powered disaster preparedness report has been downloaded successfully." : "Your comprehensive home safety audit report has been downloaded successfully.",
       });
       
     } catch (error) {
@@ -73,12 +76,12 @@ export function DownloadReportButton({ auditId, zipCode, className }: DownloadRe
       {isGenerating ? (
         <>
           <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          Generating PDF...
+          {useAI ? "Generating AI Report..." : "Generating PDF..."}
         </>
       ) : (
         <>
           <FileText className="h-4 w-4 mr-2" />
-          Download Report PDF
+          {useAI ? "Download AI Report" : "Download Report PDF"}
         </>
       )}
     </Button>

@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
 import { generatePDFReport } from "./report";
+import { generateAIReport } from "./ai-report";
 import { insertAuditSchema } from "@shared/schema";
 import { z } from "zod";
 import { dbManager } from "./db-manager";
@@ -132,6 +133,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Generate comprehensive PDF report
   app.post("/api/audits/:id/generate-pdf", generatePDFReport);
+
+  // Generate AI-powered report with Google Slides
+  app.post("/api/audits/:id/generate-ai-report", generateAIReport);
 
   // Database management endpoint
   app.post("/api/admin/cleanup-database", async (req, res) => {

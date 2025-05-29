@@ -2,9 +2,22 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import dotenv from "dotenv";
+import fs from "fs";
+import path from "path";
 
 // Load environment variables from .env file
 dotenv.config();
+
+// Setup Google Service Account credentials
+const saJson = process.env.GOOGLE_SERVICE_ACCOUNT;
+if (saJson) {
+  const credsPath = path.join(process.cwd(), 'gcp-sa.json');
+  fs.writeFileSync(credsPath, saJson);
+  process.env.GOOGLE_APPLICATION_CREDENTIALS = credsPath;
+  console.log("Google Service Account credentials configured");
+} else {
+  console.warn("GOOGLE_SERVICE_ACCOUNT not found - Google Slides integration disabled");
+}
 
 const app = express();
 app.use(express.json());
