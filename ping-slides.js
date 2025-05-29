@@ -12,9 +12,9 @@ async function main() {
     const slides = google.slides({ version: 'v1', auth });
     
     // Replace with your actual Google Slides template ID
-    const presentationId = process.env.SLIDES_TEMPLATE_ID || 'YOUR_PRESENTATION_ID';
+    const presentationId = process.env.SLIDES_TEMPLATE_ID || '1MZARxUw4xu7_YnweI8x2keCoJPxD182i73erryNhBKU';
     
-    if (presentationId === 'YOUR_PRESENTATION_ID') {
+    if (presentationId === '1MZARxUw4xu7_YnweI8x2keCoJPxD182i73erryNhBKU') {
       console.log('❌ Please set SLIDES_TEMPLATE_ID environment variable with your Google Slides template ID');
       process.exit(1);
     }
