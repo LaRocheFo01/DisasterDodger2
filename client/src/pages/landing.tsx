@@ -31,24 +31,24 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-disaster-green-600 flex items-center justify-center p-4">
-      <div className="max-w-3xl w-full mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl w-full mx-auto bg-white shadow-lg overflow-hidden">
         {/* Header */}
-        <header className="flex items-center justify-between h-16 px-6 bg-white">
+        <header className="flex items-center justify-between h-16 px-4 sm:px-6 bg-white border-b border-gray-100">
           <a href="/" className="flex items-center space-x-2">
-            <Shield className="h-8 w-8 text-disaster-green-600" />
-            <span className="text-xl font-semibold text-gray-900">Disaster Dodger™</span>
+            <Shield className="h-6 w-6 sm:h-8 sm:w-8 text-disaster-green-600" />
+            <span className="text-lg sm:text-xl font-semibold text-gray-900">Disaster Dodger™</span>
           </a>
           <nav className="hidden md:flex space-x-6 text-gray-900 font-medium">
             <button 
               onClick={() => scrollToSection('how-it-works')}
-              className="hover:text-disaster-green-600"
+              className="hover:text-disaster-green-600 transition-colors"
             >
               How it Works
             </button>
             <button 
               onClick={() => scrollToSection('faq')}
-              className="hover:text-disaster-green-600"
+              className="hover:text-disaster-green-600 transition-colors"
             >
               Support
             </button>
@@ -56,28 +56,28 @@ export default function Landing() {
         </header>
 
         {/* Hero Section with Background */}
-        <div className="relative">
+        <div className="relative bg-gradient-to-br from-disaster-green-50 to-disaster-green-100">
           <div 
-            className="h-64 sm:h-80 md:h-96 bg-center bg-cover bg-no-repeat"
+            className="h-48 sm:h-64 md:h-80 bg-center bg-cover bg-no-repeat opacity-30"
             style={{
               backgroundImage: "url('/assets/hero-house-landscape.svg')",
-              backgroundSize: 'cover',
+              backgroundSize: 'contain',
               backgroundPosition: 'center center'
             }}
           ></div>
-          <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
-            <h1 className="text-4xl sm:text-5xl font-semibold text-gray-900 text-center mb-4">
+          <div className="absolute inset-0 flex flex-col items-center justify-center px-4 sm:px-6">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold text-gray-900 text-center mb-3 sm:mb-4 leading-tight">
               Dodge Disasters Before They Strike
             </h1>
-            <p className="text-lg text-gray-600 text-center max-w-lg">
+            <p className="text-base sm:text-lg text-gray-600 text-center max-w-2xl leading-relaxed">
               Five-minute, FEMA-aligned home audit that pinpoints wildfire, flood, hurricane, and earthquake risks—so you can act now and save on insurance.
             </p>
           </div>
         </div>
 
         {/* ZIP Entry Card */}
-        <div className="relative -mt-16 mb-12 flex justify-center px-4">
-          <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md">
+        <div className="relative -mt-8 sm:-mt-12 mb-8 sm:mb-12 flex justify-center px-4 sm:px-6">
+          <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8 w-full max-w-md mx-auto">
             <form onSubmit={handleZipSubmit}>
               <label htmlFor="zip" className="block text-sm font-medium text-gray-900 mb-2">
                 Your ZIP Code
@@ -89,7 +89,7 @@ export default function Landing() {
                 value={zipCode}
                 onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
                 maxLength={5}
-                className="w-full rounded-md border border-gray-300 p-3 focus:ring-disaster-green-600 focus:border-disaster-green-600"
+                className="w-full rounded-md border border-gray-300 p-3 text-base focus:ring-2 focus:ring-disaster-green-600 focus:border-disaster-green-600 transition-colors"
                 required
               />
               <p className="mt-2 text-sm text-gray-500">
@@ -97,46 +97,49 @@ export default function Landing() {
               </p>
               <button 
                 type="submit"
-                className="mt-4 w-full py-3 rounded-lg bg-disaster-green-600 text-white hover:bg-disaster-mint-500 transition-colors font-medium"
+                className="mt-4 w-full py-3 rounded-lg bg-disaster-green-600 text-white hover:bg-disaster-green-700 transition-colors font-medium text-base"
               >
-                Analyze
+                Start Your Assessment
               </button>
             </form>
           </div>
         </div>
 
         {/* Hazard Grid */}
-        <section className="pb-12">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4 sm:px-6 lg:px-8">
-            <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-disaster-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap className="h-6 w-6 text-white" />
+        <section className="pb-8 sm:pb-12 px-4 sm:px-6">
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 text-center mb-6 sm:mb-8">
+            Protected Against All Major Disasters
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6 text-center hover:shadow-md hover:border-disaster-green-200 transition-all">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-disaster-green-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900">Earthquake</h3>
+              <h3 className="text-sm sm:text-base font-medium text-gray-900">Earthquake</h3>
             </div>
-            <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-disaster-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Waves className="h-6 w-6 text-white" />
+            <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6 text-center hover:shadow-md hover:border-disaster-green-200 transition-all">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-disaster-green-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <Waves className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900">Flood</h3>
+              <h3 className="text-sm sm:text-base font-medium text-gray-900">Flood</h3>
             </div>
-            <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-disaster-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Flame className="h-6 w-6 text-white" />
+            <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6 text-center hover:shadow-md hover:border-disaster-green-200 transition-all">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-disaster-green-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <Flame className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900">Wildfire</h3>
+              <h3 className="text-sm sm:text-base font-medium text-gray-900">Wildfire</h3>
             </div>
-            <div className="bg-white rounded-xl shadow-md p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-disaster-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Wind className="h-6 w-6 text-white" />
+            <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6 text-center hover:shadow-md hover:border-disaster-green-200 transition-all">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-disaster-green-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <Wind className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900">Hurricane</h3>
+              <h3 className="text-sm sm:text-base font-medium text-gray-900">Hurricane</h3>
             </div>
           </div>
         </section>
 
         {/* How It Works Section */}
-        <section id="how-it-works" className="px-4 sm:px-6 lg:px-8 py-12 bg-gray-50">
+        <section id="how-it-works" className="px-4 sm:px-6 py-8 sm:py-12 bg-gray-50">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-semibold text-gray-900 mb-4">How It Works</h2>
             <p className="text-lg text-gray-600">
@@ -176,7 +179,7 @@ export default function Landing() {
         </section>
 
         {/* FAQ Section */}
-        <section id="faq" className="px-4 sm:px-6 lg:px-8 py-12">
+        <section id="faq" className="px-4 sm:px-6 py-8 sm:py-12">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-semibold text-gray-900 mb-4">Frequently Asked Questions</h2>
             <p className="text-lg text-gray-600">Everything you need to know about our disaster preparedness audits</p>
@@ -219,7 +222,7 @@ export default function Landing() {
         </section>
 
         {/* Pricing Section */}
-        <section className="px-4 sm:px-6 lg:px-8 py-12 bg-gray-50">
+        <section className="px-4 sm:px-6 py-8 sm:py-12 bg-gray-50">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-semibold text-gray-900 mb-4">Get Started Today</h2>
             <p className="text-lg text-gray-600">Get your comprehensive disaster preparedness audit completely free</p>
@@ -273,7 +276,7 @@ export default function Landing() {
 
         {/* Footer */}
         <footer className="bg-white py-6 border-t border-gray-200">
-          <div className="max-w-3xl mx-auto flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500 px-4 sm:px-6">
             <div className="space-x-4">
               <a href="#privacy" className="hover:text-disaster-green-600">Privacy Policy</a>
               <a href="#terms" className="hover:text-disaster-green-600">Terms of Service</a>
