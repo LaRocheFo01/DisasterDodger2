@@ -26,11 +26,10 @@ export async function generatePDFReport(req: Request, res: Response) {
 
     // Colors
     const colors = {
-      primary: '#16A34A',
-      secondary: '#10B981',
-      accent: '#0F4C81',
-      text: '#1F2937',
-      lightGray: '#6B7280'
+      primary: '#2563eb',
+      secondary: '#64748b',
+      text: '#0f172a',
+      lightGray: '#e2e8f0'
     };
 
     // Cover Page
@@ -80,7 +79,7 @@ export async function generatePDFReport(req: Request, res: Response) {
       }
       
       doc.fontSize(10)
-         .fillColor(colors.lightGray)
+         .fillColor(colors.secondary)
          .text(`${response.label}:`, 50, currentY)
          .fillColor(colors.text)
          .text(response.value, 200, currentY);
