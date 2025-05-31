@@ -4,6 +4,7 @@ import { google } from "googleapis";
 import { Request, Response } from "express";
 import { storage } from "./storage";
 import type { Audit } from "@shared/schema";
+import { PDFReportGenerator, type AIAnalysis } from "./pdf-report-generator";
 
 // Initialize OpenAI
 const openai = new OpenAI({
@@ -38,6 +39,17 @@ interface OpenAIReportResponse {
     eligibility: string;
   }>;
   femaQuotes: string[];
+  vulnerabilityAnalysis: {
+    structural: string;
+    preparedness: string;
+    recovery: string;
+  };
+  actionPlan: {
+    immediate: string[];
+    shortTerm: string[];
+    longTerm: string[];
+  };
+  customInsights: string[];
 }
 
 async function analyzeAuditWithOpenAI(audit: Audit): Promise<OpenAIReportResponse> {
@@ -69,7 +81,7 @@ Please analyze this data and provide a comprehensive assessment in the following
 
 {
   "executiveSummary": "2-3 sentences summarizing the property's overall risk and key findings",
-  "overallRiskScore": number from 1-10,
+  "overallRiskScore": number from 1-100,
   "riskLevel": "Low|Moderate|High|Very High",
   "primaryConcerns": ["array of main vulnerability areas"],
   "categoryScores": {
@@ -81,7 +93,7 @@ Please analyze this data and provide a comprehensive assessment in the following
   "priorityUpgrades": [
     {
       "category": "hazard type",
-      "priority": "High|Medium|Low",
+      "priority": "high|medium|low",
       "description": "specific upgrade recommendation",
       "costEstimate": "dollar range",
       "potentialSavings": "insurance savings description"
@@ -95,7 +107,18 @@ Please analyze this data and provide a comprehensive assessment in the following
       "eligibility": "eligibility criteria"
     }
   ],
-  "femaQuotes": ["array of relevant FEMA guidance quotes with citations"]
+  "femaQuotes": ["array of relevant FEMA guidance quotes with citations"],
+  "vulnerabilityAnalysis": {
+    "structural": "assessment of structural vulnerabilities",
+    "preparedness": "assessment of current preparedness level",
+    "recovery": "assessment of recovery capabilities"
+  },
+  "actionPlan": {
+    "immediate": ["actions to take this week"],
+    "shortTerm": ["actions for 1-3 months"],
+    "longTerm": ["actions for 6-12 months"]
+  },
+  "customInsights": ["array of specific insights for this property"]
 }
 
 Base your analysis on FEMA standards and provide actionable recommendations.
@@ -309,6 +332,80 @@ async function generateSlidesReport(audit: Audit, aiAnalysis: OpenAIReportRespon
   } catch (error) {
     console.error("Google Slides generation error:", error);
     throw new Error("Failed to generate slides report");
+  }
+}
+
+export async function generateAdvancedPDFReport(req: Request, res: Response) {
+  try {
+    const auditId = parseInt(req.params.id);
+    const audit = await storage.getAudit(auditId);
+    
+    if (!audit) {
+      return res.status(404).json({ message: "Audit not found" });
+    }
+
+    // Check if required environment variables are present
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(500).json({ 
+        message: "OpenAI API key not configured" 
+      });
+    }
+
+    // Step 1: Analyze audit with OpenAI
+    console.log(`Analyzing audit ${auditId} with OpenAI for advanced PDF...`);
+    const aiAnalysis = await analyzeAuditWithOpenAI(audit);
+
+    // Transform OpenAI response to match PDF generator format
+    const reportData = {
+      ...aiAnalysis,
+      riskScore: aiAnalysis.overallRiskScore,
+      priorityRecommendations: aiAnalysis.priorityUpgrades.map(upgrade => ({
+        category: upgrade.category,
+        priority: upgrade.priority as 'high' | 'medium' | 'low',
+        recommendation: upgrade.description,
+        reasoning: `Based on ${upgrade.category} assessment and FEMA guidelines`,
+        estimatedCost: upgrade.costEstimate,
+        potentialSavings: upgrade.potentialSavings,
+        femaReference: undefined
+      })),
+      homeInfo: {
+        zipCode: audit.zipCode,
+        primaryHazard: audit.primaryHazard || 'Multiple Hazards',
+        homeType: audit.homeType,
+        yearBuilt: audit.yearBuilt,
+        address: undefined
+      },
+      generatedDate: new Date().toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      }),
+      reportId: `DD-${auditId}-${Date.now()}`
+    };
+
+    // Step 2: Generate PDF using advanced PDF generator
+    console.log(`Generating advanced PDF report for audit ${auditId}...`);
+    const pdfGenerator = new PDFReportGenerator();
+    const pdfBuffer = await pdfGenerator.generateReport(reportData);
+
+    // Step 3: Set headers and stream PDF back
+    const filename = `Disaster_Dodger_Advanced_Report_${audit.zipCode}_${new Date().toISOString().split('T')[0]}.pdf`;
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.setHeader("Content-Length", pdfBuffer.length);
+
+    // Mark audit as completed
+    await storage.updateAudit(auditId, { completed: true });
+
+    // Stream the PDF buffer
+    res.end(pdfBuffer);
+
+  } catch (error) {
+    console.error("Advanced PDF report generation error:", error);
+    res.status(500).json({ 
+      error: "Failed to generate advanced PDF report",
+      details: error.message 
+    });
   }
 }
 
