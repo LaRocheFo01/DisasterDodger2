@@ -2,8 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
-import { generatePDFReport } from "./report";
-import { generateAIReport } from "./ai-report";
+import { generateAutomatedReport } from "./automated-report";
 import { insertAuditSchema } from "@shared/schema";
 import { z } from "zod";
 import { dbManager } from "./db-manager";
@@ -63,14 +62,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create audit after successful payment
   app.post("/api/audits", async (req, res) => {
     try {
-      // Only use the basic required fields to avoid column errors
-      const basicAuditData = {
-        zipCode: req.body.zipCode,
-        primaryHazard: req.body.primaryHazard,
-        stripePaymentId: req.body.stripePaymentId || null
-      };
-      
-      const audit = await storage.createAudit(basicAuditData);
+      // Create audit with all provided data
+      const audit = await storage.createAudit(req.body);
       res.json(audit);
     } catch (error: any) {
       console.error("Error creating audit:", {
@@ -131,11 +124,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Generate comprehensive PDF report
-  app.post("/api/audits/:id/generate-pdf", generatePDFReport);
-
-  // Generate AI-powered report with Google Slides
-  app.post("/api/audits/:id/generate-ai-report", generateAIReport);
+  // Generate automated report (no external APIs required)
+  app.post("/api/audits/:id/generate-pdf", generateAutomatedReport);
+  
+  // Also support the generate-report endpoint for backwards compatibility
+  app.post("/api/audits/:id/generate-report", generateAutomatedReport);
+  
+  // Download PDF endpoint (returns the HTML report that can be saved as PDF)
+  app.get("/api/audits/:id/download-pdf", generateAutomatedReport);
 
   // Database management endpoint
   app.post("/api/admin/cleanup-database", async (req, res) => {
@@ -214,7 +210,15 @@ function getEnhancedRegionalHazardData(zipCode: string) {
     '34': { primaryHazard: 'Hurricane', risk: 4, state: 'Florida' },
     
     // Texas ZIP codes (75000-79999)
-    '75': { primaryHazard: 'Tornado', risk: 4, state: 'Texas' },
+    '75': { climate: 'Humid subtropical', season: 'Spring peak', buildingCodes: 'Wind resistance' }
+  };
+  
+  return context[twoDigitPrefix] || { 
+    climate: 'Variable', 
+    season: 'Seasonal variation', 
+    buildingCodes: 'Standard codes' 
+  };
+} { primaryHazard: 'Tornado', risk: 4, state: 'Texas' },
     '76': { primaryHazard: 'Tornado', risk: 4, state: 'Texas' },
     '77': { primaryHazard: 'Flood', risk: 4, state: 'Texas' },
     '78': { primaryHazard: 'Tornado', risk: 4, state: 'Texas' },
@@ -300,12 +304,4 @@ function getRegionalContext(zipCode: string) {
   const context: { [key: string]: any } = {
     '90': { climate: 'Mediterranean', season: 'Year-round risk', buildingCodes: 'Strict seismic' },
     '32': { climate: 'Subtropical', season: 'June-November peak', buildingCodes: 'Hurricane standards' },
-    '75': { climate: 'Humid subtropical', season: 'Spring peak', buildingCodes: 'Wind resistance' }
-  };
-  
-  return context[twoDigitPrefix] || { 
-    climate: 'Variable', 
-    season: 'Seasonal variation', 
-    buildingCodes: 'Standard codes' 
-  };
-}
+    '75':
