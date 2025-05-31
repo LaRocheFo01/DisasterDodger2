@@ -22,18 +22,18 @@ const stripe = new Stripe(stripeSecretKey, {
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
-
+  
   // Create payment intent for audit
   app.post("/api/create-payment-intent", async (req, res) => {
     try {
       const { zipCode, primaryHazard } = req.body;
-
+      
       if (!zipCode || !primaryHazard) {
         return res.status(400).json({ 
           message: "ZIP code and primary hazard are required" 
         });
       }
-
+      
       const paymentIntent = await stripe.paymentIntents.create({
         amount: 2900, // $29.00 in cents
         currency: "usd",
@@ -69,7 +69,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         primaryHazard: req.body.primaryHazard,
         stripePaymentId: req.body.stripePaymentId || null
       };
-
+      
       const audit = await storage.createAudit(basicAuditData);
       res.json(audit);
     } catch (error: any) {
@@ -90,16 +90,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const updates = req.body;
-
+      
       if (isNaN(id)) {
         return res.status(400).json({ message: "Invalid audit ID" });
       }
-
+      
       const audit = await storage.updateAudit(id, updates);
       if (!audit) {
         return res.status(404).json({ message: "Audit not found" });
       }
-
+      
       res.json(audit);
     } catch (error: any) {
       console.error("Error updating audit:", {
@@ -118,11 +118,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const audit = await storage.getAudit(id);
-
+      
       if (!audit) {
         return res.status(404).json({ message: "Audit not found" });
       }
-
+      
       res.json(audit);
     } catch (error: any) {
       res.status(500).json({ 
@@ -173,7 +173,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const zipCode = req.params.zipCode;
       const hazardData = getEnhancedRegionalHazardData(zipCode);
-
+      
       // Enhanced analysis with additional details
       const analysisData = {
         ...hazardData,
@@ -181,7 +181,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         mitigationPriorities: getMitigationPriorities(hazardData.primaryHazard),
         regionalContext: getRegionalContext(zipCode)
       };
-
+      
       res.json(analysisData);
     } catch (error: any) {
       console.error("Location analysis error:", error);
@@ -207,34 +207,34 @@ function getEnhancedRegionalHazardData(zipCode: string) {
     '94': { primaryHazard: 'Earthquake', risk: 5, state: 'California' },
     '95': { primaryHazard: 'Wildfire', risk: 4, state: 'California' },
     '96': { primaryHazard: 'Earthquake', risk: 4, state: 'California' },
-
+    
     // Florida ZIP codes (32000-34999)
     '32': { primaryHazard: 'Hurricane', risk: 5, state: 'Florida' },
     '33': { primaryHazard: 'Hurricane', risk: 5, state: 'Florida' },
     '34': { primaryHazard: 'Hurricane', risk: 4, state: 'Florida' },
-
+    
     // Texas ZIP codes (75000-79999)
     '75': { primaryHazard: 'Tornado', risk: 4, state: 'Texas' },
     '76': { primaryHazard: 'Tornado', risk: 4, state: 'Texas' },
     '77': { primaryHazard: 'Flood', risk: 4, state: 'Texas' },
     '78': { primaryHazard: 'Tornado', risk: 4, state: 'Texas' },
     '79': { primaryHazard: 'Tornado', risk: 3, state: 'Texas' },
-
+    
     // New York ZIP codes
     '10': { primaryHazard: 'Winter Storm', risk: 3, state: 'New York' },
     '11': { primaryHazard: 'Winter Storm', risk: 3, state: 'New York' },
     '12': { primaryHazard: 'Winter Storm', risk: 3, state: 'New York' },
-
+    
     // Illinois ZIP codes
     '60': { primaryHazard: 'Tornado', risk: 3, state: 'Illinois' },
     '61': { primaryHazard: 'Tornado', risk: 3, state: 'Illinois' },
     '62': { primaryHazard: 'Flood', risk: 3, state: 'Illinois' }
   };
-
+  
   // Try ZIP code prefix matching (first 2 digits)
   const twoDigitPrefix = zipCode.substring(0, 2);
   let hazardInfo = regionalHazardMap[twoDigitPrefix];
-
+  
   // If no match, try first digit for broader regional mapping
   if (!hazardInfo) {
     const oneDigitPrefix = zipCode.substring(0, 1);
@@ -252,7 +252,7 @@ function getEnhancedRegionalHazardData(zipCode: string) {
     };
     hazardInfo = broadRegionalMap[oneDigitPrefix] || { primaryHazard: 'Flood', risk: 2, state: 'Unknown' };
   }
-
+  
   return {
     zipCode,
     primaryHazard: hazardInfo.primaryHazard,
@@ -266,7 +266,7 @@ function getEnhancedRegionalHazardData(zipCode: string) {
 
 function getDetailedRiskFactors(zipCode: string) {
   const twoDigitPrefix = zipCode.substring(0, 2);
-
+  
   // Risk factor mapping by region
   const riskFactors: { [key: string]: string[] } = {
     '90': ['High seismic activity', 'Fault line proximity', 'Wildfire-prone vegetation'],
@@ -277,7 +277,7 @@ function getDetailedRiskFactors(zipCode: string) {
     '77': ['Flood plains', 'Heavy rainfall', 'Hurricane remnants'],
     '10': ['Nor\'easter storms', 'Heavy snow', 'Ice storms']
   };
-
+  
   return riskFactors[twoDigitPrefix] || ['Variable weather patterns', 'Regional climate risks'];
 }
 
@@ -290,19 +290,19 @@ function getMitigationPriorities(primaryHazard: string) {
     'Tornado': ['Safe room', 'Impact windows', 'Structural reinforcement'],
     'Winter Storm': ['Insulation', 'Heating backup', 'Pipe protection']
   };
-
+  
   return priorities[primaryHazard] || ['General preparedness', 'Emergency planning'];
 }
 
 function getRegionalContext(zipCode: string) {
   const twoDigitPrefix = zipCode.substring(0, 2);
-
+  
   const context: { [key: string]: any } = {
     '90': { climate: 'Mediterranean', season: 'Year-round risk', buildingCodes: 'Strict seismic' },
     '32': { climate: 'Subtropical', season: 'June-November peak', buildingCodes: 'Hurricane standards' },
     '75': { climate: 'Humid subtropical', season: 'Spring peak', buildingCodes: 'Wind resistance' }
   };
-
+  
   return context[twoDigitPrefix] || { 
     climate: 'Variable', 
     season: 'Seasonal variation', 

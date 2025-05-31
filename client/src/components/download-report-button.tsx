@@ -1,127 +1,89 @@
-import { Button } from "./ui/button";
-import { Download, FileText, Sparkles } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Download, FileText, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface DownloadReportButtonProps {
   auditId: number;
-  disabled?: boolean;
+  zipCode?: string;
+  className?: string;
+  useAI?: boolean;
 }
 
-export default function DownloadReportButton({ auditId, disabled }: DownloadReportButtonProps) {
-const downloadBasicMutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch(`/api/audit/${auditId}/report`);
+export function DownloadReportButton({ auditId, zipCode, className, useAI = false }: DownloadReportButtonProps) {
+  const [isGenerating, setIsGenerating] = useState(false);
+  const { toast } = useToast();
+
+  const handleDownload = async () => {
+    setIsGenerating(true);
+    
+    try {
+      const endpoint = useAI ? `/api/audits/${auditId}/generate-ai-report` : `/api/audits/${auditId}/generate-pdf`;
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to generate basic report');
+        throw new Error('Failed to generate PDF report');
       }
 
+      // Create blob from response
       const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = `disaster_dodger_basic_report_${auditId}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    },
-    onError: (error) => {
-      console.error('Basic download failed:', error);
+      
+      // Create download URL
+      const url = URL.createObjectURL(blob);
+      
+      // Create temporary download link
+      const link = document.createElement('a');
+      link.href = url;
+      const reportType = useAI ? 'AI_Report' : 'Audit';
+      link.download = `Disaster_Dodger_${reportType}_${zipCode || auditId}_${new Date().toISOString().split('T')[0]}.pdf`;
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Report Downloaded",
+        description: useAI ? "Your AI-powered disaster preparedness report has been downloaded successfully." : "Your comprehensive home safety audit report has been downloaded successfully.",
+      });
+      
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      toast({
+        title: "Download Failed",
+        description: "There was an error generating your report. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
     }
-  });
-
-  const downloadAIMutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch(`/api/audit/${auditId}/ai-report`);
-
-      if (!response.ok) {
-        throw new Error('Failed to generate AI report');
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = `disaster_dodger_ai_report_${auditId}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    },
-    onError: (error) => {
-      console.error('AI download failed:', error);
-    }
-  });
-
-  const downloadAdvancedMutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch(`/api/audit/${auditId}/advanced-report`);
-
-      if (!response.ok) {
-        throw new Error('Failed to generate advanced report');
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.style.display = 'none';
-      a.href = url;
-      a.download = `disaster_dodger_advanced_report_${auditId}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    },
-    onError: (error) => {
-      console.error('Advanced download failed:', error);
-    }
-  });
-
-  const isLoading = downloadBasicMutation.isPending || downloadAIMutation.isPending || downloadAdvancedMutation.isPending;
+  };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button 
-          disabled={disabled || isLoading}
-          className="w-full"
-        >
-          <Download className="w-4 h-4 mr-2" />
-          {isLoading ? 'Generating Report...' : 'Download Report'}
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuItem 
-          onClick={() => downloadBasicMutation.mutate()}
-          disabled={downloadBasicMutation.isPending}
-        >
-          <FileText className="w-4 h-4 mr-2" />
-          Basic PDF Report
-        </DropdownMenuItem>
-        <DropdownMenuItem 
-          onClick={() => downloadAIMutation.mutate()}
-          disabled={downloadAIMutation.isPending}
-        >
-          <Sparkles className="w-4 h-4 mr-2" />
-          AI Slides Report
-        </DropdownMenuItem>
-        <DropdownMenuItem 
-          onClick={() => downloadAdvancedMutation.mutate()}
-          disabled={downloadAdvancedMutation.isPending}
-        >
-          <Sparkles className="w-4 h-4 mr-2" />
-          Advanced AI Report
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Button
+      onClick={handleDownload}
+      disabled={isGenerating}
+      className={`bg-disaster-green-600 hover:bg-disaster-green-700 text-white ${className}`}
+    >
+      {isGenerating ? (
+        <>
+          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          {useAI ? "Generating AI Report..." : "Generating PDF..."}
+        </>
+      ) : (
+        <>
+          <FileText className="h-4 w-4 mr-2" />
+          {useAI ? "Download AI Report" : "Download Report PDF"}
+        </>
+      )}
+    </Button>
   );
 }
