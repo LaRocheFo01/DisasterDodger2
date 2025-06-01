@@ -6,6 +6,7 @@ import { generatePDFReport } from "./report";
 import { insertAuditSchema } from "@shared/schema";
 import { z } from "zod";
 import { dbManager } from "./db-manager";
+import { generateAutomatedReport, type Hazard } from "./automated-report-generator";
 
 // Stripe secret key from environment variables
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -149,11 +150,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
 
+// Get automated recommendations for an audit
+app.get("/api/audit/:id/recommendations", async (req, res) => {
+  try {
+    const auditId = parseInt(req.params.id);
+    const audit = await storage.getAudit(auditId);
+    
+    if (!audit) {
+      return res.status(404).json({ message: "Audit not found" });
+    }
+
+    const primaryHazard = audit.primaryHazard as Hazard;
+    const auditData = { ...audit };
+    const automatedReport = generateAutomatedReport(auditData, primaryHazard);
+    automatedReport.auditId = auditId;
+
+    res.json(automatedReport);
+  } catch (error) {
+    console.error("Error generating recommendations:", error);
+    res.status(500).json({ error: "Failed to generate recommendations" });
+  }
+});
+
 // Get available report templates
 app.get("/api/report-templates", (req, res) => {
   try {
     const { AVAILABLE_TEMPLATES } = require("./report-templates");
-    res.json(AVAILABLE_TEMPLATES.map(template => ({
+    res.json(AVAILABLE_TEMPLATES.map((template: any) => ({
       id: template.id,
       name: template.name,
       description: template.description,
@@ -164,9 +187,6 @@ app.get("/api/report-templates", (req, res) => {
     res.status(500).json({ error: "Failed to fetch report templates" });
   }
 });
-
-    }
-  });
 
   // Enhanced ZIP code based hazard detection
   app.get("/api/hazards/:zipCode", async (req, res) => {
@@ -322,4 +342,9 @@ function getRegionalContext(zipCode: string) {
     season: 'Seasonal variation', 
     buildingCodes: 'Standard codes' 
   };
+}
+
+  // Create HTTP server
+  const httpServer = createServer(app);
+  return httpServer;
 }
