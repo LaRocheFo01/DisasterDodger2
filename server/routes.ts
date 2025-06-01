@@ -118,6 +118,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Generate PDF report
   app.get("/api/audits/:id/report", generatePDFReport);
+  app.post("/api/audits/:id/generate-pdf", generatePDFReport);
 
   // Stripe webhook for payment confirmation
   app.post("/api/webhook", async (req, res) => {
