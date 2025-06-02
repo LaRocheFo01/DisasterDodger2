@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
-import { generatePDFReport } from "./report";
+import { generatePDFReport } from "./report-deepseek";
 import { insertAuditSchema } from "@shared/schema";
 import { z } from "zod";
 import { dbManager } from "./db-manager";
@@ -290,7 +290,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           zipCode,
           primaryHazard,
           paymentId: paymentIntent.id,
-          paymentStatus: 'completed'
+          paymentStatus: 'completed',
+          completed: false
         };
 
         const audit = await storage.createAudit(auditData);
