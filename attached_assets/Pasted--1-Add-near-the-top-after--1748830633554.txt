@@ -1,0 +1,57 @@
+/******************************************************************
+ * 1.  Add near the top, after HAZARD_IDS declaration
+ ******************************************************************/
+const HAZARD_ALIAS: Record<string, HazardId> = {
+  hurricane: 'wind',
+  cyclone:   'wind',
+  typhoon:   'wind',
+  tornado:   'wind',
+  // keep adding as needed …
+};
+
+/******************************************************************
+ * 2.  Patch the function that normalises user input
+ ******************************************************************/
+function normaliseHazard(input: string): HazardId {
+  const key = input.toLowerCase().trim();
+  return (HAZARD_IDS.includes(key as HazardId)
+            ? key
+            : HAZARD_ALIAS[key] || 'unknown') as HazardId;
+}
+
+/******************************************************************
+ * 3.  In computeRiskScores() – guarantee an object for every hazard
+ ******************************************************************/
+export function computeRiskScores(ans: AuditAnswers): RiskSummary {
+  const summary: RiskSummary = {
+    earthquake: 0, wind: 0, flood: 0, wildfire: 0   // <-- new safe defaults
+  };
+
+  /* existing scoring logic … just be sure to:
+        const h = normaliseHazard(answer.primaryHazard);
+  */
+
+  return summary;
+}
+
+/******************************************************************
+ * 4.  In buildRecommendations() – fall back to alias
+ ******************************************************************/
+function buildRecommendations(audit: Audit): RecommendationBlock[] {
+  const hazard = normaliseHazard(audit.primaryHazard);
+  const hazardRecs = DETAILED_RETROFITS[hazard] || [];
+  // (existing priority-sort & map logic …)
+  return hazardRecs;
+}
+
+/******************************************************************
+ * 5.  Make cost/savings block more robust
+ ******************************************************************/
+function appendCostBenefit(report: Report): void {
+  if (report.recommendations.length === 0) {
+    // still show an empty cost table instead of skipping entire section
+    report.costBenefit = { totalCost: 0, potentialSavings: 0, roiMonths: 0 };
+    return;
+  }
+  // existing cost calculator …
+}
