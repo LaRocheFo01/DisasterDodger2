@@ -26,11 +26,11 @@ export interface DeepseekAuditResult {
   nextSteps: string[];
 }
 
-const DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions';
+const DEEPSEEK_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 export async function callDeepseek(
   answers: Record<string, any>, 
-  model: string = 'deepseek-chat',
+  model: string = 'deepseek/deepseek-chat',
   pdfUrls?: string[]
 ): Promise<DeepseekAuditResult> {
   const apiKey = process.env.DEEPSEEK_API_KEY;
@@ -98,7 +98,9 @@ Provide specific recommendations based on the responses, including cost estimate
       {
         headers: {
           'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://disaster-dodger.replit.app',
+          'X-Title': 'Disaster Dodger Safety Audit'
         }
       }
     );
