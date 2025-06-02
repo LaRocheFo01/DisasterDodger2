@@ -105,37 +105,3 @@ export function getMissingDataFields(audit: any, hazard: Hazard): string[] {
     .filter(({ field }) => !audit[field] || audit[field] === 'Unsure')
     .map(({ label }) => label);
 }
-import type { HazardId } from './automated-report-generator';
-
-// Hazard alias mapping for normalizing user input
-const HAZARD_ALIAS: Record<string, HazardId> = {
-  hurricane: 'wind',
-  cyclone: 'wind',
-  typhoon: 'wind',
-  tornado: 'wind',
-  // Add more aliases as needed
-};
-
-// Valid hazard IDs
-const HAZARD_IDS: HazardId[] = ['earthquake', 'wind', 'flood', 'wildfire'];
-
-/**
- * Normalizes hazard input to a valid HazardId
- */
-export function normalizeHazard(input: string): HazardId {
-  const key = input.toLowerCase().trim();
-  
-  // Check if it's already a valid hazard ID
-  if (HAZARD_IDS.includes(key as HazardId)) {
-    return key as HazardId;
-  }
-  
-  // Check if it's an alias
-  const aliased = HAZARD_ALIAS[key];
-  if (aliased) {
-    return aliased;
-  }
-  
-  // Default fallback
-  return 'earthquake';
-}

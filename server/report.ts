@@ -20,7 +20,7 @@ export async function generatePDFReport(req: Request, res: Response) {
     }
 
     // Import the normalization function
-    const { normalizeHazard } = await import('./hazard-utils.js');
+    const { normalizeHazard } = require('./hazard-utils');
     
     // Normalize primary hazard using the utility function
     const primaryHazard = normalizeHazard(audit.primaryHazard || 'earthquake');
