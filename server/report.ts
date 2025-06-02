@@ -19,13 +19,11 @@ export async function generatePDFReport(req: Request, res: Response) {
       return res.status(404).json({ message: "Audit not found" });
     }
 
-    // Validate primary hazard
-    const validHazards: Hazard[] = ['earthquake', 'wind', 'flood', 'wildfire'];
-    const primaryHazard = (audit.primaryHazard?.toLowerCase() || 'earthquake') as Hazard;
-
-    if (!validHazards.includes(primaryHazard)) {
-      console.warn(`Invalid primary hazard: ${audit.primaryHazard}, defaulting to earthquake`);
-    }
+    // Import the normalization function
+    const { normalizeHazard } = require('./hazard-utils');
+    
+    // Normalize primary hazard using the utility function
+    const primaryHazard = normalizeHazard(audit.primaryHazard || 'earthquake');
 
     // Generate automated report using the new system
     const auditData = { ...audit };

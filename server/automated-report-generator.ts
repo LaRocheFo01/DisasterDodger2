@@ -22,6 +22,41 @@
 
 export type Hazard = 'earthquake' | 'wind' | 'flood' | 'wildfire';
 
+// Hazard alias mapping to handle different input formats
+const HAZARD_ALIAS: Record<string, Hazard> = {
+  'hurricane': 'wind',
+  'cyclone': 'wind',
+  'typhoon': 'wind',
+  'tornado': 'wind',
+  'windstorm': 'wind',
+  'storm': 'wind',
+  'wind storm': 'wind',
+  'seismic': 'earthquake',
+  'quake': 'earthquake',
+  'flooding': 'flood',
+  'water': 'flood',
+  'storm surge': 'flood',
+  'fire': 'wildfire',
+  'bushfire': 'wildfire',
+  'forest fire': 'wildfire',
+  'wild fire': 'wildfire'
+};
+
+// Normalize hazard input to standard types
+function normalizeHazardInput(input: string | null | undefined): Hazard {
+  if (!input) return 'earthquake'; // default fallback
+  
+  const key = input.toLowerCase().trim();
+  
+  // Check if it's already a valid hazard type
+  if (['earthquake', 'wind', 'flood', 'wildfire'].includes(key)) {
+    return key as Hazard;
+  }
+  
+  // Check aliases
+  return HAZARD_ALIAS[key] || 'earthquake'; // default fallback
+}
+
 export interface Recommendation {
   id: string;                // unique key (e.g. EQ_HIGH_CRIPPLE_WALL)
   hazard: Hazard;
@@ -481,30 +516,42 @@ export function calculateRiskScore(hazard: Hazard, auditData: AuditData): RiskSc
 
     case 'wind':
       // Roof vulnerabilities - CRITICAL for wind resistance
-      if (auditData.roofInspection === 'No' || auditData.roofInspection === 'Unsure') {
+      if (auditData.roofInspection === 'Never checked' || auditData.roofInspection === 'No' || auditData.roofInspection === 'Unsure') {
         score += 35;
         riskFactors.push('Roof deck not properly sealed or fastened');
         priorityRecommendations.push('WIND_BASIC_ROOF_SEAL');
       }
       
       // Window/door protection - HIGH RISK without shutters
-      if (auditData.windowDoorProtection === 'No' || auditData.windowDoorProtection === 'Unsure') {
+      if (auditData.windowDoorProtection === 'None' || auditData.windowDoorProtection === 'No' || auditData.windowDoorProtection === 'Unsure') {
         score += 30;
         riskFactors.push('No impact-rated windows or shutters');
         priorityRecommendations.push('WIND_INTERMEDIATE_SHUTTERS');
       }
       
       // Continuous load path - STRUCTURAL INTEGRITY
-      if (auditData.continuousLoadPath === 'No' || auditData.continuousLoadPath === 'Unsure') {
+      if (auditData.continuousLoadPath === 'None' || auditData.continuousLoadPath === 'Partial' || auditData.continuousLoadPath === 'No' || auditData.continuousLoadPath === 'Unsure') {
         score += 25;
         riskFactors.push('Missing hurricane straps or continuous load path');
         priorityRecommendations.push('WIND_ADV_CONT_LOAD_PATH');
       }
 
       // Garage door - common failure point
-      if (auditData.garageDoorUpgrade === 'No' || auditData.garageDoorUpgrade === 'Unsure') {
+      if (auditData.garageDoorUpgrade === 'None' || auditData.garageDoorUpgrade === 'No' || auditData.garageDoorUpgrade === 'Unsure') {
         score += 15;
         riskFactors.push('Non-reinforced garage door');
+      }
+
+      // Gable end bracing - structural weakness
+      if (auditData.gableEndBracing === 'None' || auditData.gableEndBracing === 'No') {
+        score += 10;
+        riskFactors.push('Unbraced gable ends vulnerable to wind pressure');
+      }
+
+      // Attached structures - failure points
+      if (auditData.attachedStructures === 'Not tied in' || auditData.attachedStructures === 'No') {
+        score += 10;
+        riskFactors.push('Attached structures not properly connected');
       }
       break;
 
@@ -619,16 +666,19 @@ export interface GeneratedReport {
 export function generateAutomatedReport(auditData: AuditData, primaryHazard: Hazard): GeneratedReport {
   const hazards: Hazard[] = ['earthquake', 'wind', 'flood', 'wildfire'];
   
+  // Normalize the primary hazard to ensure it matches our standard types
+  const normalizedPrimaryHazard = normalizeHazardInput(primaryHazard);
+  
   // Calculate risk scores for all hazards
   const riskScores = hazards.map(hazard => calculateRiskScore(hazard, auditData));
   
   // Get the PRIMARY hazard risk score for focused recommendations
-  const primaryRiskScore = riskScores.find(score => score.hazard === primaryHazard);
+  const primaryRiskScore = riskScores.find(score => score.hazard === normalizedPrimaryHazard);
   
   // FIXED: Filter recommendations to ONLY show primary hazard recommendations
   const primaryRecommendationIds = primaryRiskScore?.priorityRecommendations || [];
   const recommendations = RECOMMENDATION_LIBRARY.filter(rec => 
-    rec.hazard === primaryHazard && primaryRecommendationIds.includes(rec.id)
+    rec.hazard === normalizedPrimaryHazard && primaryRecommendationIds.includes(rec.id)
   );
   
   // Sort by tier priority (high > medium > low > basic)
@@ -676,7 +726,7 @@ export function generateAutomatedReport(auditData: AuditData, primaryHazard: Haz
     .map(score => score.hazard);
   
   // Always include primary hazard in insurance programs
-  const relevantHazards = [primaryHazard, ...highRiskHazards.filter(h => h !== primaryHazard)];
+  const relevantHazards = [normalizedPrimaryHazard, ...highRiskHazards.filter(h => h !== normalizedPrimaryHazard)];
   const insurancePrograms = INSURANCE_PDF_LIBRARY.filter(pdf => 
     relevantHazards.includes(pdf.hazard)
   );
@@ -684,7 +734,7 @@ export function generateAutomatedReport(auditData: AuditData, primaryHazard: Haz
   return {
     auditId: 0, // Will be set by caller
     zipCode: auditData.zipCode || '',
-    primaryHazard,
+    primaryHazard: normalizedPrimaryHazard,
     riskScores,
     recommendations,
     totalEstimatedCost,
