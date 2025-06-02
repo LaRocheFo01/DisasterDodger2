@@ -60,6 +60,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+
   // Create audit after successful payment
   app.post("/api/audits", async (req, res) => {
     try {
@@ -86,7 +87,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update audit with wizard data
-  app.patch("/api/audits/:id", async (req, res) => {
+  app.get("/api/audits/:id/recommendations", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
       const updates = req.body;

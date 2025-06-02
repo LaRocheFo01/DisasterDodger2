@@ -7,6 +7,8 @@ import { insertAuditSchema } from "@shared/schema";
 import { z } from "zod";
 import { dbManager } from "./db-manager";
 import { generateAutomatedReport, type Hazard } from "./automated-report-generator";
+import { callDeepseek, type DeepseekAuditResult } from "./deepseek-service";
+import { generatePDFFromHTML } from "./pdf-generator";
 import { normalizeHazard } from "./hazard-utils";
 
 // Stripe secret key from environment variables
@@ -228,9 +230,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Generate PDF report
+  // Generate PDF report (existing automated system)
   app.get("/api/audits/:id/report", generatePDFReport);
   app.post("/api/audits/:id/generate-pdf", generatePDFReport);
+
+  // New Deepseek AI workflow endpoint
+  app.post("/api/audit", async (req, res) => {
+    try {
+      const { answers } = req.body;
+      
+      if (!answers || typeof answers !== 'object') {
+        return res.status(400).json({ 
+          message: "Questionnaire answers are required" 
+        });
+      }
+
+      console.log("Processing audit with Deepseek AI...");
+      
+      // Step 1: Call Deepseek with questionnaire answers
+      const auditResult = await callDeepseek(answers, 'deepseek-chat');
+      
+      // Step 2: Generate HTML from audit result
+      const auditData = {
+        zipCode: answers.zipCode || 'Not specified',
+        ...answers
+      };
+      
+      // Step 3: Generate PDF using Puppeteer
+      const pdfBuffer = await generatePDFFromHTML(auditResult, auditData);
+      
+      // Step 4: Send PDF to browser
+      const filename = `Disaster_Dodger_AI_Report_${auditData.zipCode}_${new Date().toISOString().split('T')[0]}.pdf`;
+      
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+      res.setHeader("Content-Length", pdfBuffer.length.toString());
+      
+      res.send(pdfBuffer);
+      
+    } catch (error: any) {
+      console.error("Deepseek audit workflow error:", error);
+      res.status(500).json({ 
+        message: "Error generating AI audit report: " + error.message 
+      });
+    }
+  });
 
   // Stripe webhook for payment confirmation
   app.post("/api/webhook", async (req, res) => {
