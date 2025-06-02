@@ -8,14 +8,26 @@ import { generateAutomatedReport, RECOMMENDATION_LIBRARY, type Hazard } from './
 export async function generatePDFReport(req: Request, res: Response) {
   try {
     const auditId = parseInt(req.params.id);
+
+    if (isNaN(auditId)) {
+      return res.status(400).json({ message: "Invalid audit ID" });
+    }
+
     const audit = await storage.getAudit(auditId);
-    
+
     if (!audit) {
       return res.status(404).json({ message: "Audit not found" });
     }
 
+    // Validate primary hazard
+    const validHazards: Hazard[] = ['earthquake', 'wind', 'flood', 'wildfire'];
+    const primaryHazard = (audit.primaryHazard?.toLowerCase() || 'earthquake') as Hazard;
+
+    if (!validHazards.includes(primaryHazard)) {
+      console.warn(`Invalid primary hazard: ${audit.primaryHazard}, defaulting to earthquake`);
+    }
+
     // Generate automated report using the new system
-    const primaryHazard = audit.primaryHazard as Hazard;
     const auditData = { ...audit };
     const automatedReport = generateAutomatedReport(auditData, primaryHazard);
     automatedReport.auditId = auditId;
@@ -53,26 +65,37 @@ export async function generatePDFReport(req: Request, res: Response) {
       return colors.success;
     };
 
+    // Helper function to format hazard name
+    const formatHazardName = (hazard: string) => {
+      const hazardNames: { [key: string]: string } = {
+        'earthquake': 'Earthquake',
+        'wind': 'Wind/Hurricane',
+        'flood': 'Flood',
+        'wildfire': 'Wildfire'
+      };
+      return hazardNames[hazard.toLowerCase()] || hazard.charAt(0).toUpperCase() + hazard.slice(1);
+    };
+
     // Cover Page
     doc.fontSize(28)
        .fillColor(colors.primary)
        .text('Disaster Dodger™', 50, 100, { width: 500, align: 'center' });
-    
+
     doc.fontSize(20)
        .fillColor(colors.text)
        .text('Comprehensive Safety Assessment Report', 50, 140, { width: 500, align: 'center' });
 
     doc.fontSize(14)
        .fillColor(colors.text)
-       .text(`Property: ${audit.zipCode}`, 50, 200)
-       .text(`Primary Hazard: ${primaryHazard.charAt(0).toUpperCase() + primaryHazard.slice(1)}`, 50, 220)
+       .text(`Property: ${audit.zipCode || 'N/A'}`, 50, 200)
+       .text(`Primary Hazard: ${formatHazardName(primaryHazard)}`, 50, 220)
        .text(`Assessment Date: ${new Date().toLocaleDateString()}`, 50, 240)
        .text(`Report ID: ${auditId}`, 50, 260);
 
     // Risk Summary Box
     doc.rect(50, 320, 500, 120)
        .fillAndStroke(colors.background, colors.lightGray);
-    
+
     doc.fontSize(16)
        .fillColor(colors.primary)
        .text('Risk Summary', 70, 340);
@@ -81,12 +104,16 @@ export async function generatePDFReport(req: Request, res: Response) {
     if (primaryRisk) {
       doc.fontSize(12)
          .fillColor(getRiskColor(primaryRisk.overallScore))
-         .text(`${primaryHazard.charAt(0).toUpperCase() + primaryHazard.slice(1)} Risk Score: ${primaryRisk.overallScore}/100`, 70, 365);
-      
+         .text(`${formatHazardName(primaryHazard)} Risk Score: ${primaryRisk.overallScore}/100`, 70, 365);
+
       doc.fillColor(colors.text)
          .text(`Total Estimated Investment: $${automatedReport.totalEstimatedCost.toLocaleString()}`, 70, 385)
          .text(`Estimated Annual Savings: $${automatedReport.totalAnnualSavings.toLocaleString()}`, 70, 405)
-         .text(`Payback Period: ${automatedReport.paybackPeriod} years`, 70, 425);
+         .text(`Payback Period: ${automatedReport.paybackPeriod > 0 ? automatedReport.paybackPeriod + ' years' : 'N/A'}`, 70, 425);
+    } else {
+      doc.fontSize(12)
+         .fillColor(colors.text)
+         .text('Risk assessment data not available', 70, 365);
     }
 
     // Executive Summary
@@ -104,26 +131,33 @@ export async function generatePDFReport(req: Request, res: Response) {
     doc.fontSize(14)
        .fillColor(colors.primary)
        .text('Risk Assessment by Hazard Type', 50, currentY);
-    
+
     currentY += 30;
-    automatedReport.riskScores.forEach(riskScore => {
-      if (riskScore.overallScore > 0) {
-        doc.fontSize(12)
-           .fillColor(colors.text)
-           .text(`${riskScore.hazard.charAt(0).toUpperCase() + riskScore.hazard.slice(1)}:`, 70, currentY)
-           .fillColor(getRiskColor(riskScore.overallScore))
-           .text(`${riskScore.overallScore}/100`, 200, currentY);
-        
-        currentY += 20;
-        riskScore.riskFactors.forEach(factor => {
-          doc.fontSize(10)
-             .fillColor(colors.secondary)
-             .text(`• ${factor}`, 90, currentY);
-          currentY += 15;
-        });
-        currentY += 10;
-      }
-    });
+    if (automatedReport.riskScores.length > 0) {
+      automatedReport.riskScores.forEach(riskScore => {
+        if (riskScore.overallScore > 0) {
+          doc.fontSize(12)
+             .fillColor(colors.text)
+             .text(`${formatHazardName(riskScore.hazard)}:`, 70, currentY)
+             .fillColor(getRiskColor(riskScore.overallScore))
+             .text(`${riskScore.overallScore}/100`, 200, currentY);
+
+          currentY += 20;
+          riskScore.riskFactors.forEach(factor => {
+            doc.fontSize(10)
+               .fillColor(colors.secondary)
+               .text(`• ${factor}`, 90, currentY);
+            currentY += 15;
+          });
+          currentY += 10;
+        }
+      });
+    } else {
+      doc.fontSize(10)
+         .fillColor(colors.lightGray)
+         .text('No risk assessment data available', 70, currentY);
+      currentY += 20;
+    }
 
     // Priority Recommendations
     doc.addPage();
@@ -132,43 +166,49 @@ export async function generatePDFReport(req: Request, res: Response) {
        .text('Priority Recommendations', 50, 50);
 
     currentY = 90;
-    automatedReport.recommendations.slice(0, 8).forEach((rec, index) => {
-      if (currentY > 650) {
-        doc.addPage();
-        currentY = 50;
-      }
+    if (automatedReport.recommendations.length > 0) {
+      automatedReport.recommendations.slice(0, 8).forEach((rec, index) => {
+        if (currentY > 650) {
+          doc.addPage();
+          currentY = 50;
+        }
 
-      // Priority number and title
-      doc.fontSize(14)
-         .fillColor(colors.primary)
-         .text(`${index + 1}. ${rec.title}`, 50, currentY);
-      
-      currentY += 20;
-      
-      // Description
-      doc.fontSize(10)
-         .fillColor(colors.text)
-         .text(rec.description, 70, currentY, { width: 450 });
-      
-      currentY += Math.ceil(rec.description.length / 80) * 12 + 10;
-      
-      // Cost and FEMA reference
-      doc.fontSize(9)
-         .fillColor(colors.secondary)
-         .text(`Cost: $${rec.costRangeUsd[0].toLocaleString()} - $${rec.costRangeUsd[1].toLocaleString()}`, 70, currentY)
-         .text(`FEMA Reference: ${rec.femaPdf}, ${rec.femaPage}`, 300, currentY);
-      
-      currentY += 15;
-      
-      // Insurance savings if available
-      if (rec.premiumSavingsPct) {
-        doc.fillColor(colors.success)
-           .text(`Insurance Savings: ${rec.premiumSavingsPct[0]}-${rec.premiumSavingsPct[1]}%`, 70, currentY);
+        // Priority number and title
+        doc.fontSize(14)
+           .fillColor(colors.primary)
+           .text(`${index + 1}. ${rec.title}`, 50, currentY);
+
+        currentY += 20;
+
+        // Description
+        doc.fontSize(10)
+           .fillColor(colors.text)
+           .text(rec.description, 70, currentY, { width: 450 });
+
+        currentY += Math.ceil(rec.description.length / 80) * 12 + 10;
+
+        // Cost and FEMA reference
+        doc.fontSize(9)
+           .fillColor(colors.secondary)
+           .text(`Cost: $${rec.costRangeUsd[0].toLocaleString()} - $${rec.costRangeUsd[1].toLocaleString()}`, 70, currentY)
+           .text(`FEMA Reference: ${rec.femaPdf}, ${rec.femaPage}`, 300, currentY);
+
         currentY += 15;
-      }
-      
-      currentY += 20;
-    });
+
+        // Insurance savings if available
+        if (rec.premiumSavingsPct) {
+          doc.fillColor(colors.success)
+             .text(`Insurance Savings: ${rec.premiumSavingsPct[0]}-${rec.premiumSavingsPct[1]}%`, 70, currentY);
+          currentY += 15;
+        }
+
+        currentY += 20;
+      });
+    } else {
+      doc.fontSize(12)
+         .fillColor(colors.lightGray)
+         .text('No specific recommendations available based on the assessment data.', 70, currentY);
+    }
 
     // Grant Opportunities
     if (automatedReport.grantOpportunities.length > 0) {
@@ -182,22 +222,22 @@ export async function generatePDFReport(req: Request, res: Response) {
         doc.fontSize(12)
            .fillColor(colors.text)
            .text(`• ${grant.title}`, 70, currentY);
-        
+
         currentY += 20;
-        
+
         if (grant.grantProgram) {
           doc.fontSize(10)
              .fillColor(colors.secondary)
              .text(`Program: ${grant.grantProgram}`, 90, currentY);
           currentY += 15;
         }
-        
+
         if (grant.grantSharePct) {
           doc.fillColor(colors.success)
              .text(`Grant Coverage: Up to ${grant.grantSharePct}% of project cost`, 90, currentY);
           currentY += 15;
         }
-        
+
         currentY += 10;
       });
     }
@@ -214,21 +254,21 @@ export async function generatePDFReport(req: Request, res: Response) {
         doc.fontSize(12)
            .fillColor(colors.text)
            .text(program.title, 50, currentY);
-        
+
         currentY += 20;
-        
+
         doc.fontSize(10)
            .fillColor(colors.secondary)
            .text(program.summary, 70, currentY, { width: 450 });
-        
+
         currentY += Math.ceil(program.summary.length / 80) * 12 + 10;
-        
+
         if (program.creditRange) {
           doc.fillColor(colors.success)
              .text(`Potential Savings: ${program.creditRange}`, 70, currentY);
           currentY += 15;
         }
-        
+
         currentY += 20;
       });
     }
@@ -253,6 +293,13 @@ export async function generatePDFReport(req: Request, res: Response) {
 
   } catch (error) {
     console.error("PDF generation error:", error);
-    res.status(500).json({ error: "Failed to generate PDF report" });
+
+    // Send appropriate error response if headers haven't been sent
+    if (!res.headersSent) {
+      res.status(500).json({ 
+        error: "Failed to generate PDF report",
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
   }
 }
