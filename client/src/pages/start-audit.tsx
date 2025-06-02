@@ -205,25 +205,44 @@ export default function StartAudit() {
 
   const createAuditAndProceed = async (zip: string, hazard: string) => {
     try {
+      const auditData = {
+        zipCode: zip,
+        primaryHazard: hazard,
+        status: 'in_progress',
+        paymentStatus: 'pending'
+      };
+
+      console.log('Creating audit with data:', auditData);
+
       const response = await fetch('/api/audits', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          zipCode: zip,
-          primaryHazard: hazard,
-          status: 'in_progress'
-        })
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(auditData)
       });
 
+      console.log('Response status:', response.status);
+      
       if (!response.ok) {
-        throw new Error(`Failed to create audit: ${response.statusText}`);
+        const errorText = await response.text();
+        console.error('Server response:', errorText);
+        throw new Error(`Failed to create audit: ${response.status} ${response.statusText}`);
       }
 
       const audit = await response.json();
+      console.log('Audit created successfully:', audit);
+      
+      if (!audit.id) {
+        throw new Error('Audit creation returned invalid data');
+      }
+
       setLocation(`/audit-wizard/${audit.id}`);
     } catch (error) {
       console.error('Error creating audit:', error);
-      alert("Failed to create audit. Please try again.");
+      alert(`Failed to create audit: ${error.message}. Please try again.`);
+      setShowHazardAnalysis(false);
       setIsLoading(false);
     }
   };

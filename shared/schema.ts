@@ -6,7 +6,7 @@ export const audits = pgTable("audits", {
   id: serial("id").primaryKey(),
   zipCode: text("zip_code").notNull(),
   primaryHazard: text("primary_hazard").notNull(),
-  
+
   // Section A: General Home Information
   homeType: text("home_type"),
   yearBuilt: text("year_built"),
@@ -15,7 +15,7 @@ export const audits = pgTable("audits", {
   insurancePolicies: jsonb("insurance_policies").$type<string[]>().default([]),
   previousGrants: text("previous_grants"),
   previousGrantsProgram: text("previous_grants_program"),
-  
+
   // Individual question responses
   homeTypeResponse: text("home_type_response"),
   yearBuiltResponse: text("year_built_response"),
@@ -24,7 +24,7 @@ export const audits = pgTable("audits", {
   insurancePoliciesResponse: jsonb("insurance_policies_response").$type<string[]>().default([]),
   previousGrantsResponse: text("previous_grants_response"),
   previousGrantsProgramResponse: text("previous_grants_program_response"),
-  
+
   // Section B: Earthquake Readiness
   waterHeaterSecurity: text("water_heater_security"),
   anchoredItems: jsonb("anchored_items").$type<string[]>().default([]),
@@ -41,7 +41,7 @@ export const audits = pgTable("audits", {
   foundationWork: text("foundation_work"),
   ceilingFixtures: text("ceiling_fixtures"),
   roomByRoomChecklist: text("room_by_room_checklist"),
-  
+
   // Section C: Hurricane & High-Wind Protection
   roofInspection: text("roof_inspection"),
   atticVents: text("attic_vents"),
@@ -58,7 +58,7 @@ export const audits = pgTable("audits", {
   gutterAnchors: text("gutter_anchors"),
   retrofitLevel: text("retrofit_level"),
   completedMeasures: jsonb("completed_measures").$type<string[]>().default([]),
-  
+
   // Section D: Wildfire Hardening
   defensibleSpaceWidth: text("defensible_space_width"),
   roofMaterial: text("roof_material"),
@@ -75,7 +75,7 @@ export const audits = pgTable("audits", {
   entryDoorRating: text("entry_door_rating"),
   siteOrientation: text("site_orientation"),
   underElevationFinish: text("under_elevation_finish"),
-  
+
   // Section E: Flood Mitigation
   equipmentElevation: text("equipment_elevation"),
   floodBarriers: text("flood_barriers"),
@@ -92,10 +92,10 @@ export const audits = pgTable("audits", {
   landscapeSwales: text("landscape_swales"),
   floodShields: text("flood_shields"),
   perimeterDrainage: text("perimeter_drainage"),
-  
+
   // Legacy comprehensive responses (for backward compatibility)
   auditResponses: jsonb("audit_responses").$type<Record<string, any>>().default({}),
-  
+
   // Metadata
   photosUploaded: integer("photos_uploaded").default(0),
   stripePaymentId: text("stripe_payment_id"),
@@ -103,9 +103,13 @@ export const audits = pgTable("audits", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const insertAuditSchema = createInsertSchema(audits).omit({
-  id: true,
-  createdAt: true,
+export const insertAuditSchema = z.object({
+  zipCode: z.string().min(5).max(5),
+  primaryHazard: z.string(),
+  status: z.string().optional(),
+  paymentId: z.string().optional(),
+  paymentStatus: z.string().optional(),
+  completed: z.boolean().optional().default(false),
 });
 
 export type InsertAudit = z.infer<typeof insertAuditSchema>;

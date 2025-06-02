@@ -159,19 +159,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create audit
   app.post("/api/audits", async (req, res) => {
     try {
+      console.log("Received audit creation request:", req.body);
+      
       const auditData = insertAuditSchema.parse(req.body);
+      console.log("Parsed audit data:", auditData);
+      
       const audit = await storage.createAudit(auditData);
+      console.log("Created audit:", audit);
+      
       res.json(audit);
     } catch (error: any) {
       console.error("Audit creation error:", error);
+      console.error("Error stack:", error.stack);
+      
       if (error.name === "ZodError") {
+        console.error("Validation errors:", error.errors);
         return res.status(400).json({ 
           message: "Invalid audit data", 
-          errors: error.errors 
+          errors: error.errors,
+          receivedData: req.body
         });
       }
+      
       res.status(500).json({ 
-        message: "Error creating audit: " + error.message 
+        message: "Error creating audit: " + error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
       });
     }
   });
