@@ -443,101 +443,150 @@ export function calculateRiskScore(hazard: Hazard, auditData: AuditData): RiskSc
 
   switch (hazard) {
     case 'earthquake':
-      // Foundation vulnerabilities
+      // Foundation vulnerabilities - HIGH RISK if No/Unsure
       if (auditData.foundationWork === 'No' || auditData.foundationWork === 'Unsure') {
-        score += 25;
+        score += 30;
         riskFactors.push('Unbraced cripple walls or unbolted foundation');
         priorityRecommendations.push('EQ_HIGH_CRIPPLE_WALL', 'EQ_HIGH_SILL_BOLT');
       }
       
-      // Water heater
+      // Water heater - HIGH RISK if not secured
       if (auditData.waterHeaterSecurity === 'No' || auditData.waterHeaterSecurity === 'Unsure') {
-        score += 15;
-        riskFactors.push('Unstrapped water heater');
+        score += 20;
+        riskFactors.push('Unstrapped water heater - fire and water damage risk');
         priorityRecommendations.push('EQ_HIGH_WATER_HEATER');
       }
       
-      // Chimney
+      // Chimney - HIGH RISK if unreinforced masonry
       if (auditData.chimneyInspection === 'No' || auditData.chimneyInspection === 'Unsure') {
-        score += 20;
-        riskFactors.push('Unreinforced masonry chimney');
+        score += 25;
+        riskFactors.push('Unreinforced masonry chimney collapse risk');
         priorityRecommendations.push('EQ_HIGH_CHIMNEY');
       }
       
-      // Garage
+      // Garage soft story - HIGH RISK
       if (auditData.garageRetrofit === 'No' || auditData.garageRetrofit === 'Unsure') {
-        score += 15;
+        score += 20;
         riskFactors.push('Soft-story garage vulnerability');
         priorityRecommendations.push('EQ_HIGH_PF_GARAGE');
+      }
+
+      // Additional earthquake vulnerabilities
+      if (auditData.anchoredItems?.length === 0 || !auditData.anchoredItems) {
+        score += 10;
+        riskFactors.push('Unanchored furniture and appliances');
+        priorityRecommendations.push('EQ_LOW_CONTENTS');
       }
       break;
 
     case 'wind':
-      // Roof condition
+      // Roof vulnerabilities - CRITICAL for wind resistance
       if (auditData.roofInspection === 'No' || auditData.roofInspection === 'Unsure') {
-        score += 30;
+        score += 35;
         riskFactors.push('Roof deck not properly sealed or fastened');
         priorityRecommendations.push('WIND_BASIC_ROOF_SEAL');
       }
       
-      // Window protection
+      // Window/door protection - HIGH RISK without shutters
       if (auditData.windowDoorProtection === 'No' || auditData.windowDoorProtection === 'Unsure') {
-        score += 25;
+        score += 30;
         riskFactors.push('No impact-rated windows or shutters');
         priorityRecommendations.push('WIND_INTERMEDIATE_SHUTTERS');
       }
       
-      // Continuous load path
+      // Continuous load path - STRUCTURAL INTEGRITY
       if (auditData.continuousLoadPath === 'No' || auditData.continuousLoadPath === 'Unsure') {
-        score += 20;
+        score += 25;
         riskFactors.push('Missing hurricane straps or continuous load path');
         priorityRecommendations.push('WIND_ADV_CONT_LOAD_PATH');
+      }
+
+      // Garage door - common failure point
+      if (auditData.garageDoorUpgrade === 'No' || auditData.garageDoorUpgrade === 'Unsure') {
+        score += 15;
+        riskFactors.push('Non-reinforced garage door');
       }
       break;
 
     case 'flood':
-      // Elevation
-      if (auditData.equipmentElevation === 'No' || auditData.equipmentElevation === 'Unsure') {
+      // Equipment elevation - CRITICAL for flood zones
+      if (auditData.equipmentElevation === 'At flood level' || auditData.equipmentElevation === 'Below flood level') {
         score += 40;
+        riskFactors.push('HVAC and utilities at or below flood level');
+        priorityRecommendations.push('FLOOD_UTILITY_PLATFORM');
+      }
+      
+      // Building elevation - HIGHEST RISK FACTOR
+      if (auditData.equipmentElevation === 'Below flood level') {
+        score += 45;
         riskFactors.push('Structure below Base Flood Elevation');
         priorityRecommendations.push('FLOOD_ELEVATE');
       }
       
-      // Flood vents
-      if (auditData.automaticFloodVents === 'No' || auditData.automaticFloodVents === 'Unsure') {
-        score += 20;
-        riskFactors.push('Missing engineered flood vents');
+      // Flood vents - REQUIRED for compliance
+      if (auditData.automaticFloodVents === 'No' || auditData.automaticFloodVents === 'One opening') {
+        score += 25;
+        riskFactors.push('Insufficient or missing engineered flood vents');
         priorityRecommendations.push('FLOOD_WET_FLOODPROOF');
       }
       
-      // Utilities
-      if (auditData.appliancePlatforms === 'No' || auditData.appliancePlatforms === 'Unsure') {
-        score += 15;
-        riskFactors.push('HVAC and utilities not elevated');
+      // Appliance platforms - MEDIUM RISK
+      if (auditData.appliancePlatforms === 'Ground level') {
+        score += 20;
+        riskFactors.push('Appliances not elevated above flood level');
         priorityRecommendations.push('FLOOD_UTILITY_PLATFORM');
+      }
+
+      // Flood barriers
+      if (auditData.floodBarriers === 'None') {
+        score += 15;
+        riskFactors.push('No temporary flood barriers available');
+      }
+
+      // Sump pump
+      if (auditData.sumpPump === 'None') {
+        score += 10;
+        riskFactors.push('No backup drainage system');
       }
       break;
 
     case 'wildfire':
-      // Roof material
-      if (auditData.roofMaterial !== 'Class A fire-rated') {
-        score += 30;
-        riskFactors.push('Non-Class A roof assembly');
+      // Roof material - CRITICAL ignition point
+      if (auditData.roofMaterial !== 'Class A fire-rated' && auditData.roofMaterial !== 'Metal') {
+        score += 35;
+        riskFactors.push('Non-Class A roof assembly - high ignition risk');
         priorityRecommendations.push('WF_ROOF_CLASS_A');
       }
       
-      // Defensible space
-      if (auditData.defensibleSpaceWidth !== '100+ feet' && auditData.defensibleSpaceWidth !== '30-100 feet') {
-        score += 25;
-        riskFactors.push('Insufficient defensible space');
+      // Defensible space - ESSENTIAL for survival
+      if (auditData.defensibleSpaceWidth === 'Less than 30 feet' || auditData.defensibleSpaceWidth === 'None') {
+        score += 40;
+        riskFactors.push('Insufficient defensible space - extreme fire risk');
+        priorityRecommendations.push('WF_DEFENSIBLE_SPACE');
+      } else if (auditData.defensibleSpaceWidth === '30-100 feet') {
+        score += 20;
+        riskFactors.push('Adequate but not optimal defensible space');
         priorityRecommendations.push('WF_DEFENSIBLE_SPACE');
       }
       
-      // Deck
+      // Deck and attachments - EMBER ENTRY POINTS
       if (auditData.underElevationFinish === 'Wood decking' || auditData.underElevationFinish === 'Other combustible') {
-        score += 20;
-        riskFactors.push('Combustible deck materials');
+        score += 25;
+        riskFactors.push('Combustible deck materials - ember ignition risk');
         priorityRecommendations.push('WF_DECK_ENCLOSURE');
+      }
+
+      // Vent protection - EMBER INTRUSION
+      if (auditData.ventProtection === 'No' || auditData.ventProtection === 'Unsure') {
+        score += 15;
+        riskFactors.push('Unprotected vents allow ember entry');
+        priorityRecommendations.push('WF_ACCESSORY_MESH');
+      }
+
+      // Vegetation spacing
+      if (auditData.vegetationSpacing === 'Touching house' || auditData.vegetationSpacing === 'Within 5 feet') {
+        score += 20;
+        riskFactors.push('Vegetation too close to structure');
       }
       break;
   }
@@ -546,7 +595,7 @@ export function calculateRiskScore(hazard: Hazard, auditData: AuditData): RiskSc
     hazard,
     overallScore: Math.min(score, 100),
     riskFactors,
-    priorityRecommendations: priorityRecommendations.slice(0, 3) // Top 3 priorities
+    priorityRecommendations: priorityRecommendations.slice(0, 5) // Top 5 priorities
   };
 }
 
@@ -573,23 +622,44 @@ export function generateAutomatedReport(auditData: AuditData, primaryHazard: Haz
   // Calculate risk scores for all hazards
   const riskScores = hazards.map(hazard => calculateRiskScore(hazard, auditData));
   
-  // Get all priority recommendations
-  const allRecommendationIds = riskScores.flatMap(score => score.priorityRecommendations);
+  // Get the PRIMARY hazard risk score for focused recommendations
+  const primaryRiskScore = riskScores.find(score => score.hazard === primaryHazard);
+  
+  // FIXED: Filter recommendations to ONLY show primary hazard recommendations
+  const primaryRecommendationIds = primaryRiskScore?.priorityRecommendations || [];
   const recommendations = RECOMMENDATION_LIBRARY.filter(rec => 
-    allRecommendationIds.includes(rec.id)
+    rec.hazard === primaryHazard && primaryRecommendationIds.includes(rec.id)
   );
   
-  // Sort by tier priority (high > medium > low)
-  const tierOrder = { high: 3, medium: 2, low: 1, basic: 4, intermediate: 3, advanced: 2, safe_room: 1 };
+  // Sort by tier priority (high > medium > low > basic)
+  const tierOrder = { 
+    high: 5, 
+    medium: 4, 
+    low: 3, 
+    basic: 2, 
+    intermediate: 4, 
+    advanced: 3, 
+    safe_room: 1 
+  };
   recommendations.sort((a, b) => (tierOrder[b.tier] || 0) - (tierOrder[a.tier] || 0));
   
-  // Calculate costs and savings
+  // Calculate costs and savings based on ONLY primary hazard recommendations
   const totalEstimatedCost = recommendations.reduce((sum, rec) => {
     const avgCost = (rec.costRangeUsd[0] + rec.costRangeUsd[1]) / 2;
     return sum + avgCost;
   }, 0);
   
-  const currentPremium = parseInt(auditData.insuredValue || '200000') * 0.01; // Estimate 1% of home value
+  // Estimate current premium based on insured value
+  const insuredValueMapping = {
+    'Under $200,000': 150000,
+    '$200,000–$500,000': 350000,
+    '$500,000–$1,000,000': 750000,
+    'Over $1,000,000': 1200000,
+    'Not sure': 350000
+  };
+  const homeValue = insuredValueMapping[auditData.insuredValue as keyof typeof insuredValueMapping] || 350000;
+  const currentPremium = homeValue * 0.008; // Estimate 0.8% of home value for annual premium
+  
   const totalAnnualSavings = recommendations.reduce((sum, rec) => {
     const savings = estimateAnnualPremiumSavings(rec.id, currentPremium);
     return sum + (savings || 0);
@@ -597,11 +667,16 @@ export function generateAutomatedReport(auditData: AuditData, primaryHazard: Haz
   
   const paybackPeriod = totalAnnualSavings > 0 ? Math.round(totalEstimatedCost / totalAnnualSavings) : 0;
   
-  // Filter grant opportunities
+  // Filter grant opportunities for PRIMARY hazard only
   const grantOpportunities = recommendations.filter(rec => rec.grantProgram);
   
-  // Get relevant insurance programs
-  const relevantHazards = riskScores.filter(score => score.overallScore > 20).map(score => score.hazard);
+  // Get insurance programs for PRIMARY hazard and high-risk secondary hazards
+  const highRiskHazards = riskScores
+    .filter(score => score.overallScore > 30)
+    .map(score => score.hazard);
+  
+  // Always include primary hazard in insurance programs
+  const relevantHazards = [primaryHazard, ...highRiskHazards.filter(h => h !== primaryHazard)];
   const insurancePrograms = INSURANCE_PDF_LIBRARY.filter(pdf => 
     relevantHazards.includes(pdf.hazard)
   );
