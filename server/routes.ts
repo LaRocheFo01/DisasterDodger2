@@ -208,7 +208,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+  // Add this directly to your existing routes file
+  app.get('/test-pdf', (req, res) => {
+    try {
+      console.log('Testing basic PDF download...');
 
+      // Create the simplest possible PDF
+      const { jsPDF } = require('jspdf');
+      const doc = new jsPDF();
+      doc.text('Hello World!', 20, 20);
+
+      // Convert to buffer
+      const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
+      console.log('PDF created, size:', pdfBuffer.length);
+
+      // Set headers
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename=test.pdf');
+
+      console.log('Sending PDF...');
+      res.send(pdfBuffer);
+
+    } catch (error) {
+      console.error('Error:', error);
+      res.status(500).send(`Error: ${error.message}`);
+    }
+  });
   // Update audit
   app.patch("/api/audits/:id", async (req, res) => {
     try {
