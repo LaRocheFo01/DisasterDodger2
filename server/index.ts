@@ -45,7 +45,7 @@ app.use((req, res, next) => {
     console.log("Starting server...");
     console.log("NODE_ENV:", process.env.NODE_ENV);
     console.log("Available env vars:", Object.keys(process.env).filter(key => !key.includes('PASSWORD')).length);
-
+    
     const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -76,25 +76,10 @@ app.use((req, res, next) => {
   }, () => {
     log(`serving on port ${port}`);
   });
-
+  
   } catch (error) {
     console.error("Error starting server:", error);
     console.error("Stack trace:", error.stack);
     process.exit(1);
   }
 })();
-
-import { generatePDFReport } from "./report";
-import cors from 'cors';
-
-// PDF generation endpoint - register before other routes
-app.post('/api/audits/:id/generate-pdf', async (req, res) => {
-  try {
-    await generatePDFReport(req, res);
-  } catch (err) {
-    console.error('Error generating PDF:', err);
-    if (!res.headersSent) {
-      res.status(500).json({ error: 'Failed to generate PDF' });
-    }
-  }
-});

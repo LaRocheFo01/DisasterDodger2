@@ -6,7 +6,6 @@ import type { Audit } from '@shared/schema';
 import { generateAutomatedReport, RECOMMENDATION_LIBRARY, type Hazard } from './automated-report-generator.js';
 import { callDeepseek } from './deepseek-service.js';
 import { generatePDFFromHTML } from './pdf-generator.js';
-import { normalizeHazard } from './hazard-utils.js';
 
 export async function generatePDFReport(req: Request, res: Response) {
   try {
@@ -22,6 +21,9 @@ export async function generatePDFReport(req: Request, res: Response) {
       return res.status(404).json({ message: "Audit not found" });
     }
 
+    // Import the normalization function
+    const { normalizeHazard } = require('./hazard-utils');
+    
     // Normalize primary hazard using the utility function
     const primaryHazard = normalizeHazard(audit.primaryHazard || 'earthquake');
 
