@@ -273,7 +273,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Processing audit with Deepseek AI...");
       
       // Step 1: Call Deepseek with questionnaire answers and PDF content
-      // Note: callDeepseek now automatically includes PDFs from attached_assets
       const pdfContent = answers.pdfContent || [];
       const auditResult = await callDeepseek(answers, 'deepseek/deepseek-r1-0528-qwen3-8b:free', pdfContent);
       
