@@ -1,5 +1,7 @@
-
 import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
 
 export interface DeepseekAuditResult {
   riskScore: number;
@@ -29,13 +31,54 @@ export interface DeepseekAuditResult {
 
 const DEEPSEEK_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
+// Function to extract text from PDF files in attached_assets
+async function extractTextFromAttachedPDFs(): Promise<string> {
+  const attachedAssetsPath = path.join(process.cwd(), 'attached_assets');
+  let combinedText = '';
+
+  try {
+    const files = fs.readdirSync(attachedAssetsPath);
+    const pdfFiles = files.filter(file => file.toLowerCase().endsWith('.pdf'));
+
+    console.log(`[DeepSeek] Found ${pdfFiles.length} PDF files in attached_assets`);
+
+    for (const pdfFile of pdfFiles) {
+      try {
+        const pdfPath = path.join(attachedAssetsPath, pdfFile);
+        const data = new Uint8Array(fs.readFileSync(pdfPath));
+
+        const pdf = await pdfjsLib.getDocument({ data }).promise;
+        let pdfText = `\n\n=== DOCUMENT: ${pdfFile} ===\n`;
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const textContent = await page.getTextContent();
+          const pageText = textContent.items
+            .map((item: any) => item.str)
+            .join(' ');
+          pdfText += pageText + '\n';
+        }
+
+        combinedText += pdfText;
+        console.log(`[DeepSeek] Extracted ${pdfText.length} characters from ${pdfFile}`);
+      } catch (error) {
+        console.error(`[DeepSeek] Error processing ${pdfFile}:`, error);
+      }
+    }
+  } catch (error) {
+    console.error('[DeepSeek] Error reading attached_assets folder:', error);
+  }
+
+  return combinedText;
+}
+
 export async function callDeepseek(
-  answers: Record<string, any>, 
+  auditData: any,
   model: string = 'deepseek/deepseek-r1-0528-qwen3-8b:free',
-  pdfContent?: { name: string; content: string }[]
+  pdfContent: { name: string; content: string }[] = []
 ): Promise<DeepseekAuditResult> {
   const apiKey = process.env.DEEPSEEK_API_KEY;
-  
+
   if (!apiKey) {
     throw new Error('DEEPSEEK_API_KEY environment variable is required');
   }
@@ -72,35 +115,24 @@ export async function callDeepseek(
   "nextSteps": ["Secure water heater", "Clear vegetation", "Review insurance coverage"]
 }`;
 
-  const userPrompt = `Analyze this home safety data and provide comprehensive recommendations:
+  const userPrompt = `Analyze this home safety data and provide recommendations:
 
 Property Data:
-${JSON.stringify(answers, null, 2)}
+${JSON.stringify(auditData, null, 2)}
 
 ${pdfContent && pdfContent.length > 0 ? `
-Reference Documents Available:
+Reference Documents:
 ${pdfContent.map(pdf => `
 Document: ${pdf.name}
-Key Content: ${pdf.content.substring(0, 2000)}...
+Content: ${pdf.content.substring(0, 3000)}...
 `).join('\n')}
-
-IMPORTANT: Use these FEMA documents to provide specific, actionable recommendations with proper citations. Include multiple priority levels and detailed cost estimates.
 ` : ''}
 
-Provide a comprehensive analysis with:
-- Risk score based on location and property characteristics
-- Multiple hazard types for the region
-- At least 5-8 detailed recommendations with varying priorities
-- Specific FEMA citations from the reference documents
-- Grant opportunities specific to the region
-- Insurance considerations
-- Clear next steps
-
-Return only the JSON object, no other text.`;
+Use the reference documents to provide more accurate and detailed recommendations based on FEMA guidelines and best practices. Return only the JSON object, no other text.`;
 
   try {
     console.log('[DeepSeek] Making API call...');
-    
+
     const response = await axios.post(
       DEEPSEEK_API_URL,
       {
@@ -124,27 +156,27 @@ Return only the JSON object, no other text.`;
     );
 
     console.log('[DeepSeek] API response received');
-    
+
     const content = response.data.choices[0].message.content;
     console.log('[DeepSeek] Raw response (first 200 chars):', content.substring(0, 200));
 
     // Clean the response more aggressively
     let cleanedContent = content.trim();
-    
+
     // Remove common markdown patterns
     cleanedContent = cleanedContent.replace(/```json\s*/g, '');
     cleanedContent = cleanedContent.replace(/```\s*/g, '');
     cleanedContent = cleanedContent.replace(/^[^{]*({.*})[^}]*$/s, '$1');
-    
+
     // Find JSON object boundaries
     const startIndex = cleanedContent.indexOf('{');
     const lastIndex = cleanedContent.lastIndexOf('}');
-    
+
     if (startIndex === -1 || lastIndex === -1) {
       console.error('[DeepSeek] No JSON object found in response:', content);
       throw new Error('No JSON object found in DeepSeek response');
     }
-    
+
     cleanedContent = cleanedContent.substring(startIndex, lastIndex + 1);
     console.log('[DeepSeek] Cleaned JSON (first 200 chars):', cleanedContent.substring(0, 200));
 
@@ -155,43 +187,43 @@ Return only the JSON object, no other text.`;
     } catch (parseError) {
       console.error('[DeepSeek] JSON parse failed:', parseError);
       console.error('[DeepSeek] Attempted to parse:', cleanedContent);
-      
+
       // Return a fallback result instead of failing
       console.log('[DeepSeek] Using fallback result due to parse error');
-      auditResult = createFallbackResult(answers);
+      auditResult = createFallbackResult(auditData);
     }
 
     // Validate the result has required fields
     if (!auditResult.riskScore && auditResult.riskScore !== 0) {
       console.warn('[DeepSeek] Missing riskScore, using fallback');
-      auditResult = createFallbackResult(answers);
+      auditResult = createFallbackResult(auditData);
     }
 
     console.log('[DeepSeek] Successfully parsed audit result, risk score:', auditResult.riskScore);
     return auditResult;
-    
+
   } catch (error: any) {
     console.error('[DeepSeek] API error:', error.response?.data || error.message);
-    
+
     if (error.response?.status === 401) {
       throw new Error('Invalid DeepSeek API key. Get your free key from https://openrouter.ai/');
     }
-    
+
     if (error.response?.status === 429) {
       throw new Error('DeepSeek API rate limit exceeded. Please wait a moment and try again.');
     }
-    
+
     // If API fails completely, return a fallback result
     console.log('[DeepSeek] API failed, using fallback result');
-    return createFallbackResult(answers);
+    return createFallbackResult(auditData);
   }
 }
 
 // Fallback function when API fails or returns invalid JSON
-function createFallbackResult(answers: Record<string, any>): DeepseekAuditResult {
-  const hazard = answers.primaryHazard || 'Natural Disaster';
-  const zipCode = answers.zipCode || 'Unknown';
-  
+function createFallbackResult(auditData: any): DeepseekAuditResult {
+  const hazard = auditData.primaryHazard || 'Natural Disaster';
+  const zipCode = auditData.zipCode || 'Unknown';
+
   return {
     riskScore: 45,
     primaryHazards: [hazard, 'General Weather Events'],
@@ -420,7 +452,7 @@ export function renderAuditHTML(audit: DeepseekAuditResult, auditData: any): str
             <div class="score">${audit.riskScore}/100</div>
             <div>Overall Risk Score</div>
         </div>
-        
+
         <h2>Primary Hazards Identified</h2>
         <div class="hazards">
             ${audit.primaryHazards.map(hazard => 

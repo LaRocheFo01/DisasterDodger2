@@ -262,7 +262,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // New Deepseek AI workflow endpoint
   app.post("/api/audit", async (req, res) => {
     try {
-      const { answers, pdfContent } = req.body;
+      const { answers } = req.body;
       
       if (!answers || typeof answers !== 'object') {
         return res.status(400).json({ 
@@ -271,10 +271,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       console.log("Processing audit with Deepseek AI...");
-      console.log("PDF content available:", pdfContent?.length || 0, "documents");
       
       // Step 1: Call Deepseek with questionnaire answers and PDF content
-      const auditResult = await callDeepseek(answers, 'deepseek/deepseek-r1-0528-qwen3-8b:free', pdfContent || []);
+      // Note: callDeepseek now automatically includes PDFs from attached_assets
+      const pdfContent = answers.pdfContent || [];
+      const auditResult = await callDeepseek(answers, 'deepseek/deepseek-r1-0528-qwen3-8b:free', pdfContent);
       
       // Step 2: Generate HTML from audit result
       const auditData = {
