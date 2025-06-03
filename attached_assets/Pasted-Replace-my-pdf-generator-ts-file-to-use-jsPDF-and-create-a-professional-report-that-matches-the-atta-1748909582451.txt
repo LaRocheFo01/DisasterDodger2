@@ -1,0 +1,49 @@
+Replace my pdf-generator.ts file to use jsPDF and create a professional report that matches the attached PDF format.
+
+The new PDF should include these exact sections in this order:
+
+1. **Cover Sheet** with:
+   - "Disaster Dodger™" title (large, green)
+   - "Home Assessment Audit Report" subtitle
+   - Property details table: Address, ZIP Code/Hazard Region, Year Built, Construction Type, Date of Inspection, Assessor
+
+2. **Executive Summary** with:
+   - Introduction paragraph about evaluating the four main perils
+   - FEMA publication references
+   - Risk summary table with columns: Hazard | Current Risk | Immediate Priority | Five-Year Priority | Residual Risk After All Work
+   - Total estimated retrofit cost and benefit-cost ratio
+
+3. **Risk Profile** with:
+   - Data table showing: Seismic Design Cat, Basic Wind Speed, Wildfire Flame Length, FEMA NFIP info
+
+4. **Structural Observations** with:
+   - Table format: Element | Condition | Notes/Recommendations
+   - Include Foundation, Roof, Gable Ends, Chimney
+
+5. **Non-Structural/Utility Items** with:
+   - Bullet points for Water Heater, Furnace & A/C, Cabinetry, Large Electronics
+
+6. **Life-Safety & Preparedness** with:
+   - Table: Item | Status | Upgrade
+   - Family Emergency Plan, 72-hour Kit, Gas Shut-off Tool
+
+7. **Recommendations & Budget** with:
+   - Table: Priority | Action | Unit Cost | Qty | Sub-Total | DIY?
+   - Show projected total and homeowner out-of-pocket after grants
+
+8. **Potential Funding & Insurance Impacts** with:
+   - Bullet points for grant programs and insurance discounts
+
+9. **Disclaimers** section
+
+Requirements:
+- Use the existing jsPDF library (already installed)
+- Keep the same function signature: generatePDFFromHTML(audit: DeepseekAuditResult, auditData: any): Promise<Buffer>
+- Use professional styling with green headers (#16A34A)
+- Include proper tables with borders
+- Use appropriate font sizes and spacing
+- Add page breaks between major sections
+- Map the DeepseekAuditResult data to these sections appropriately
+- Make it look as close as possible to the attached PDF sample
+
+The final PDF should be comprehensive, professional, and grant-ready just like the sample.
