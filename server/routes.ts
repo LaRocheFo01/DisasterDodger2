@@ -10,7 +10,6 @@ import { generateAutomatedReport, type Hazard } from "./automated-report-generat
 import { callDeepseek, type DeepseekAuditResult } from "./deepseek-service";
 import { generatePDFFromHTML } from "./pdf-generator";
 import { normalizeHazard } from "./hazard-utils";
-import { testBasicPDF, testDeepSeekOnly, testReportHTML, testFullPDFWorkflow } from './debug-routes';
 
 // Stripe secret key from environment variables
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -125,12 +124,6 @@ function getRegionalContext(zipCode: string) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-
-  // Add debug routes (put them BEFORE your existing routes)
-  app.get('/api/test-basic-pdf', testBasicPDF);
-  app.get('/api/test-deepseek', testDeepSeekOnly);
-  app.get('/api/test-html/:id?', testReportHTML);
-  app.get('/api/test-full-pdf/:id?', testFullPDFWorkflow);
 
   // Create payment intent for audit
   app.post("/api/create-payment-intent", async (req, res) => {
