@@ -1,45 +1,93 @@
+
 import type { Request, Response } from 'express';
 import { storage } from './storage';
 import { callDeepseek } from './deepseek-service';
-import { generatePDFFromHTML } from './pdf-generator';
+import { jsPDF } from 'jspdf';
 
 export async function generatePDFReport(req: Request, res: Response) {
   try {
     const auditId = parseInt(req.params.id);
+    console.log(`[Backend] Starting PDF generation for audit ${auditId}`);
 
     if (isNaN(auditId)) {
-      return res.status(400).json({ message: "Invalid audit ID" });
+      console.error('[Backend] Invalid audit ID:', req.params.id);
+      return res.status(400).json({ error: "Invalid audit ID" });
     }
 
+    // Get audit data
     const audit = await storage.getAudit(auditId);
-
     if (!audit) {
-      return res.status(404).json({ message: "Audit not found" });
+      console.error('[Backend] Audit not found:', auditId);
+      return res.status(404).json({ error: "Audit not found" });
     }
 
-    console.log("Generating report with Deepseek AI for audit:", auditId);
+    console.log('[Backend] Audit data retrieved:', audit);
 
-    // Use Deepseek AI for analysis instead of automated system
-    const auditData = { ...audit };
-    const deepseekResult = await callDeepseek(auditData, 'deepseek/deepseek-r1-0528-qwen3-8b:free');
+    // Call DeepSeek API
+    console.log('[Backend] Calling DeepSeek API...');
+    const deepseekResult = await callDeepseek(audit);
+    console.log('[Backend] DeepSeek analysis complete, risk score:', deepseekResult.riskScore);
 
-    // Generate PDF using Puppeteer with the AI analysis
-    const pdfBuffer = await generatePDFFromHTML(deepseekResult, auditData);
+    // Generate simple PDF with jsPDF
+    console.log('[Backend] Generating PDF...');
+    const doc = new jsPDF();
+    
+    // Title
+    doc.setFontSize(20);
+    doc.text('Disaster Dodger Report', 20, 30);
+    
+    // Basic info
+    doc.setFontSize(12);
+    doc.text(`Property: ${audit.zipCode}`, 20, 50);
+    doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 60);
+    doc.text(`Risk Score: ${deepseekResult.riskScore}/100`, 20, 70);
+    
+    // Hazards
+    doc.text('Primary Hazards:', 20, 90);
+    let yPos = 100;
+    if (deepseekResult.primaryHazards) {
+      deepseekResult.primaryHazards.forEach((hazard, i) => {
+        doc.text(`${i + 1}. ${hazard}`, 25, yPos);
+        yPos += 10;
+      });
+    }
+    
+    // Summary
+    yPos += 10;
+    doc.text('Summary:', 20, yPos);
+    yPos += 10;
+    if (deepseekResult.summary) {
+      const summaryLines = doc.splitTextToSize(deepseekResult.summary, 170);
+      doc.text(summaryLines, 20, yPos);
+    }
 
-    // Set headers for PDF download
-    const filename = `Disaster_Dodger_AI_Report_${audit.zipCode}_${new Date().toISOString().split('T')[0]}.pdf`;
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
-    res.setHeader("Content-Length", pdfBuffer.length.toString());
+    // Convert to buffer
+    const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
+    console.log('[Backend] PDF generated, size:', pdfBuffer.length, 'bytes');
+
+    // Set proper headers
+    const filename = `Report_${auditId}_${Date.now()}.pdf`;
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Length', pdfBuffer.length.toString());
+    res.setHeader('Cache-Control', 'no-cache');
+
+    console.log('[Backend] Sending PDF response...');
+    res.end(pdfBuffer);
 
     // Mark audit as completed
     await storage.updateAudit(auditId, { completed: true });
-
-    // Send PDF
-    res.send(pdfBuffer);
+    console.log('[Backend] Audit marked as completed');
 
   } catch (error: any) {
-    console.error("Deepseek PDF generation error:", error);
-    res.status(500).json({ error: "Failed to generate AI report: " + error.message });
+    console.error('[Backend] PDF generation error:', error);
+    console.error('[Backend] Error stack:', error.stack);
+    
+    if (!res.headersSent) {
+      res.status(500).json({ 
+        error: error.message || 'PDF generation failed',
+        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      });
+    }
   }
 }

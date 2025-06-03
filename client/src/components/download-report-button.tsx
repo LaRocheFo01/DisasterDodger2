@@ -1,45 +1,71 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Download, FileText, Loader2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Download, Loader2 } from 'lucide-react';
 
 interface DownloadReportButtonProps {
   auditId: number;
-  zipCode?: string;
-  className?: string;
-  template?: string;
+  disabled?: boolean;
 }
 
-export function DownloadReportButton({ auditId, zipCode, className, template = 'comprehensive' }: DownloadReportButtonProps) {
-  const [isGenerating, setIsGenerating] = useState(false);
-  const { toast } = useToast();
+export function DownloadReportButton({ auditId, disabled }: DownloadReportButtonProps) {
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleDownload = async () => {
-    setIsGenerating(true);
-    
     try {
-      const templateParam = template ? `?template=${template}` : '';
-      const response = await fetch(`/api/audits/${auditId}/generate-pdf${templateParam}`, {
+      setIsDownloading(true);
+      setError(null);
+      
+      console.log(`Starting PDF download for audit ${auditId}...`);
+      
+      // Make the request to your backend
+      const response = await fetch(`/api/audits/${auditId}/generate-pdf`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Accept': 'application/pdf',
         },
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+
       if (!response.ok) {
-        throw new Error('Failed to generate PDF report');
+        // Try to get error message from response
+        let errorMessage = `Server error: ${response.status}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorData.message || errorMessage;
+        } catch (e) {
+          // If response isn't JSON, use the text
+          const errorText = await response.text();
+          errorMessage = errorText || errorMessage;
+        }
+        throw new Error(errorMessage);
       }
 
-      // Create blob from response
+      // Check if response is actually PDF
+      const contentType = response.headers.get('content-type');
+      console.log('Content-Type:', contentType);
+      
+      if (!contentType?.includes('application/pdf')) {
+        console.warn('Response is not PDF, content-type:', contentType);
+        // Still try to download, might be working anyway
+      }
+
+      // Get the PDF blob
       const blob = await response.blob();
-      
-      // Create download URL
-      const url = URL.createObjectURL(blob);
-      
-      // Create temporary download link
+      console.log('Downloaded blob size:', blob.size, 'bytes');
+
+      if (blob.size === 0) {
+        throw new Error('Received empty PDF file');
+      }
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `Disaster_Dodger_Audit_${zipCode || auditId}_${new Date().toISOString().split('T')[0]}.pdf`;
+      link.download = `Disaster_Dodger_Report_${auditId}_${new Date().toISOString().split('T')[0]}.pdf`;
       
       // Trigger download
       document.body.appendChild(link);
@@ -47,42 +73,44 @@ export function DownloadReportButton({ auditId, zipCode, className, template = '
       
       // Cleanup
       document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      window.URL.revokeObjectURL(url);
       
-      toast({
-        title: "Report Downloaded",
-        description: "Your comprehensive home safety audit report has been downloaded successfully.",
-      });
-      
-    } catch (error) {
-      console.error('PDF generation error:', error);
-      toast({
-        title: "Download Failed",
-        description: "There was an error generating your report. Please try again.",
-        variant: "destructive",
-      });
+      console.log('PDF download completed successfully');
+
+    } catch (error: any) {
+      console.error('Download failed:', error);
+      setError(error.message || 'Failed to download PDF');
     } finally {
-      setIsGenerating(false);
+      setIsDownloading(false);
     }
   };
 
   return (
-    <Button
-      onClick={handleDownload}
-      disabled={isGenerating}
-      className={`bg-disaster-green-600 hover:bg-disaster-green-700 text-white ${className}`}
-    >
-      {isGenerating ? (
-        <>
-          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          Generating PDF...
-        </>
-      ) : (
-        <>
-          <FileText className="h-4 w-4 mr-2" />
-          Download Report PDF
-        </>
+    <div className="space-y-2">
+      <Button
+        onClick={handleDownload}
+        disabled={disabled || isDownloading}
+        className="w-full"
+        variant="default"
+      >
+        {isDownloading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Generating PDF...
+          </>
+        ) : (
+          <>
+            <Download className="mr-2 h-4 w-4" />
+            Download Report
+          </>
+        )}
+      </Button>
+      
+      {error && (
+        <div className="text-sm text-red-600 bg-red-50 p-2 rounded">
+          Error: {error}
+        </div>
       )}
-    </Button>
+    </div>
   );
 }
