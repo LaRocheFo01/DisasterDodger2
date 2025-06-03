@@ -30,7 +30,7 @@ const DEEPSEEK_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 export async function callDeepseek(
   answers: Record<string, any>, 
-  model: string = 'deepseek/deepseek-chat',
+  model: string = 'deepseek/deepseek-r1',
   pdfUrls?: string[]
 ): Promise<DeepseekAuditResult> {
   const apiKey = process.env.DEEPSEEK_API_KEY;

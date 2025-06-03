@@ -21,7 +21,7 @@ export async function generatePDFReport(req: Request, res: Response) {
 
     // Use Deepseek AI for analysis instead of automated system
     const auditData = { ...audit };
-    const deepseekResult = await callDeepseek(auditData, 'deepseek-chat');
+    const deepseekResult = await callDeepseek(auditData, 'deepseek/deepseek-r1');
 
     // Generate PDF using Puppeteer with the AI analysis
     const pdfBuffer = await generatePDFFromHTML(deepseekResult, auditData);
