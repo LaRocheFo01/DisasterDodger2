@@ -39,18 +39,19 @@ export function DeepseekAuditTest() {
     }
 
     setIsGenerating(true);
-    
+
     try {
       console.log('Submitting to Deepseek API:', formData);
-      
+
       const response = await fetch('/api/audit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          answers: formData
-        })
+        body: JSON.stringify({ 
+          answers: formData,
+          pdfContent: uploadedPDFs 
+        }),
       });
 
       if (!response.ok) {
@@ -60,28 +61,28 @@ export function DeepseekAuditTest() {
 
       // Create blob from response
       const blob = await response.blob();
-      
+
       // Create download URL
       const url = URL.createObjectURL(blob);
-      
+
       // Create temporary download link
       const link = document.createElement('a');
       link.href = url;
       link.download = `Deepseek_AI_Audit_${formData.zipCode}_${new Date().toISOString().split('T')[0]}.pdf`;
-      
+
       // Trigger download
       document.body.appendChild(link);
       link.click();
-      
+
       // Cleanup
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      
+
       toast({
         title: "AI Report Generated",
         description: "Your Deepseek AI audit report has been generated and downloaded successfully.",
       });
-      
+
     } catch (error: any) {
       console.error('Deepseek audit error:', error);
       toast({

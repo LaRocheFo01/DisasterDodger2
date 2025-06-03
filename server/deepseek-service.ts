@@ -72,20 +72,31 @@ export async function callDeepseek(
   "nextSteps": ["Secure water heater", "Clear vegetation", "Review insurance coverage"]
 }`;
 
-  const userPrompt = `Analyze this home safety data and provide recommendations:
+  const userPrompt = `Analyze this home safety data and provide comprehensive recommendations:
 
 Property Data:
 ${JSON.stringify(answers, null, 2)}
 
 ${pdfContent && pdfContent.length > 0 ? `
-Reference Documents:
+Reference Documents Available:
 ${pdfContent.map(pdf => `
 Document: ${pdf.name}
-Content: ${pdf.content.substring(0, 3000)}...
+Key Content: ${pdf.content.substring(0, 2000)}...
 `).join('\n')}
+
+IMPORTANT: Use these FEMA documents to provide specific, actionable recommendations with proper citations. Include multiple priority levels and detailed cost estimates.
 ` : ''}
 
-Use the reference documents to provide more accurate and detailed recommendations based on FEMA guidelines and best practices. Return only the JSON object, no other text.`;
+Provide a comprehensive analysis with:
+- Risk score based on location and property characteristics
+- Multiple hazard types for the region
+- At least 5-8 detailed recommendations with varying priorities
+- Specific FEMA citations from the reference documents
+- Grant opportunities specific to the region
+- Insurance considerations
+- Clear next steps
+
+Return only the JSON object, no other text.`;
 
   try {
     console.log('[DeepSeek] Making API call...');

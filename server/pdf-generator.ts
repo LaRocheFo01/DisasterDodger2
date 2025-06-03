@@ -195,12 +195,42 @@ export async function generatePDFFromHTML(
     doc.setTextColor(...primaryGreen);
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    doc.text('Priority Recommendations', margin, yPos);
+    doc.text('Detailed Risk Assessment & Recommendations', margin, yPos);
     
     yPos += 20;
     
+    // Add audit data summary
+    doc.setTextColor(...textBlack);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Property Assessment Summary:', margin, yPos);
+    
+    yPos += 10;
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    
+    const assessmentDetails = [
+      `Home Type: ${auditData.homeTypeResponse || 'Not specified'}`,
+      `Year Built: ${auditData.yearBuiltResponse || 'Not specified'}`,
+      `Insurance Value: ${auditData.insuredValueResponse || 'Not specified'}`,
+      `Previous Grants: ${auditData.previousGrantsResponse || 'No'}`,
+      `Roof Condition: ${auditData.roofInspection || 'Not assessed'}`,
+      `Wind Protection: ${auditData.windowDoorProtection || 'Standard'}`,
+    ];
+    
+    assessmentDetails.forEach(detail => {
+      yPos = addWrappedText(detail, margin, yPos, contentWidth, 10);
+      yPos += 2;
+    });
+    
+    yPos += 15;
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Priority Action Items:', margin, yPos);
+    yPos += 10;
+    
     audit.recommendations?.forEach((rec, index) => {
-      checkPageBreak(40);
+      checkPageBreak(50);
       
       // Priority badge
       const priorityColor = rec.priority === 'High' ? [220, 38, 38] :
@@ -236,6 +266,40 @@ export async function generatePDFFromHTML(
       }
       
       yPos += 15;
+    });
+
+    // Add regional hazard analysis
+    checkPageBreak(60);
+    
+    doc.setTextColor(...primaryGreen);
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Regional Hazard Analysis', margin, yPos);
+    
+    yPos += 15;
+    doc.setTextColor(...textBlack);
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    
+    const regionalText = `Based on ZIP code ${auditData.zipCode}, your area faces specific natural disaster risks. Historical data shows patterns of ${audit.primaryHazards?.join(', ')} events in this region. The assessment considers local building codes, climate patterns, and emergency response infrastructure.`;
+    yPos = addWrappedText(regionalText, margin, yPos, contentWidth, 11);
+    
+    yPos += 15;
+    doc.setFont('helvetica', 'bold');
+    doc.text('Compliance & Building Codes:', margin, yPos);
+    yPos += 8;
+    doc.setFont('helvetica', 'normal');
+    
+    const complianceItems = [
+      'Review local building codes for recent updates',
+      'Ensure compliance with current wind resistance standards',
+      'Verify electrical and plumbing meet safety requirements',
+      'Check for required permits before major modifications'
+    ];
+    
+    complianceItems.forEach(item => {
+      doc.text(`• ${item}`, margin + 5, yPos);
+      yPos += 6;
     });
 
     // 4. GRANT OPPORTUNITIES & INSURANCE
