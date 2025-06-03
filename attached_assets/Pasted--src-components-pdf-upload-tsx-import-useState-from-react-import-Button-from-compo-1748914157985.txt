@@ -1,0 +1,133 @@
+// src/components/pdf-upload.tsx
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Upload, X, FileText } from 'lucide-react';
+
+interface PDFUploadProps {
+  onPDFsChange: (pdfs: { name: string; content: string }[]) => void;
+}
+
+export function PDFUpload({ onPDFsChange }: PDFUploadProps) {
+  const [uploadedPDFs, setUploadedPDFs] = useState<{ name: string; content: string; size: number }[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files) return;
+
+    setIsProcessing(true);
+    const newPDFs: { name: string; content: string; size: number }[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      
+      if (file.type !== 'application/pdf') {
+        console.warn(`Skipping non-PDF file: ${file.name}`);
+        continue;
+      }
+
+      try {
+        // Extract text from PDF using PDF.js (you'll need to install this)
+        const content = await extractTextFromPDF(file);
+        newPDFs.push({
+          name: file.name,
+          content: content,
+          size: file.size
+        });
+      } catch (error) {
+        console.error(`Failed to process ${file.name}:`, error);
+      }
+    }
+
+    const allPDFs = [...uploadedPDFs, ...newPDFs];
+    setUploadedPDFs(allPDFs);
+    onPDFsChange(allPDFs);
+    setIsProcessing(false);
+  };
+
+  const removePDF = (index: number) => {
+    const filtered = uploadedPDFs.filter((_, i) => i !== index);
+    setUploadedPDFs(filtered);
+    onPDFsChange(filtered);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+        <input
+          type="file"
+          id="pdf-upload"
+          multiple
+          accept=".pdf"
+          onChange={handleFileUpload}
+          className="hidden"
+          disabled={isProcessing}
+        />
+        <label htmlFor="pdf-upload" className="cursor-pointer">
+          <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+          <p className="text-lg font-medium text-gray-900 mb-2">
+            Upload Reference PDFs
+          </p>
+          <p className="text-sm text-gray-500">
+            Upload FEMA guides, building codes, or other reference materials
+          </p>
+          <Button type="button" className="mt-4" disabled={isProcessing}>
+            {isProcessing ? 'Processing...' : 'Choose PDFs'}
+          </Button>
+        </label>
+      </div>
+
+      {uploadedPDFs.length > 0 && (
+        <div className="space-y-2">
+          <h4 className="font-medium text-gray-900">Uploaded Reference Materials:</h4>
+          {uploadedPDFs.map((pdf, index) => (
+            <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded">
+              <div className="flex items-center space-x-3">
+                <FileText className="h-5 w-5 text-red-500" />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{pdf.name}</p>
+                  <p className="text-xs text-gray-500">
+                    {Math.round(pdf.size / 1024)} KB • {pdf.content.length} characters extracted
+                  </p>
+                </div>
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => removePDF(index)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// PDF text extraction function
+async function extractTextFromPDF(file: File): Promise<string> {
+  // You'll need to install: npm install pdfjs-dist
+  const pdfjsLib = await import('pdfjs-dist');
+  
+  // Set worker source
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  
+  let fullText = '';
+  
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const textContent = await page.getTextContent();
+    const pageText = textContent.items
+      .map((item: any) => item.str)
+      .join(' ');
+    fullText += pageText + '\n\n';
+  }
+  
+  return fullText.trim();
+}

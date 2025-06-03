@@ -1,0 +1,325 @@
+// pdf-generator.ts - Professional format matching your sample
+import { jsPDF } from 'jspdf';
+import type { DeepseekAuditResult } from './deepseek-service';
+
+export async function generatePDFFromHTML(
+  audit: DeepseekAuditResult, 
+  auditData: any
+): Promise<Buffer> {
+  try {
+    console.log('Generating professional PDF report...');
+    
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    // Colors matching your sample
+    const primaryGreen = [22, 163, 74];
+    const darkGreen = [16, 132, 62];
+    const textBlack = [0, 0, 0];
+    const lightGray = [128, 128, 128];
+    const borderGray = [200, 200, 200];
+
+    let yPos = 30;
+    const pageWidth = 210;
+    const margin = 20;
+    const contentWidth = pageWidth - (2 * margin);
+
+    // Helper function for wrapped text
+    const addWrappedText = (text: string, x: number, y: number, maxWidth: number, fontSize: number = 10): number => {
+      doc.setFontSize(fontSize);
+      const lines = doc.splitTextToSize(text, maxWidth);
+      doc.text(lines, x, y);
+      return y + (lines.length * fontSize * 0.35);
+    };
+
+    // Helper function for table rows
+    const addTableRow = (items: string[], x: number, y: number, colWidths: number[]): number => {
+      doc.setDrawColor(...borderGray);
+      doc.line(x, y - 2, x + colWidths.reduce((a, b) => a + b, 0), y - 2);
+      
+      let currentX = x;
+      items.forEach((item, index) => {
+        doc.text(item, currentX + 2, y);
+        currentX += colWidths[index];
+      });
+      
+      return y + 8;
+    };
+
+    // ==================== PAGE 1: COVER SHEET ====================
+    
+    // Title
+    doc.setFontSize(24);
+    doc.setTextColor(...primaryGreen);
+    doc.text('Disaster Dodger™', pageWidth / 2, yPos, { align: 'center' });
+    
+    yPos += 12;
+    doc.setFontSize(16);
+    doc.setTextColor(...textBlack);
+    doc.text('Home Assessment Audit Report', pageWidth / 2, yPos, { align: 'center' });
+    
+    yPos += 8;
+    doc.setFontSize(10);
+    doc.setTextColor(...lightGray);
+    doc.text('(Proposed retail price: $29.00)', pageWidth / 2, yPos, { align: 'center' });
+
+    yPos += 20;
+
+    // Cover Sheet Table
+    doc.setFontSize(14);
+    doc.setTextColor(...primaryGreen);
+    doc.text('1. Cover Sheet', margin, yPos);
+    yPos += 15;
+
+    // Property details table
+    doc.setDrawColor(...borderGray);
+    doc.rect(margin, yPos, contentWidth, 60);
+    
+    doc.setFontSize(11);
+    doc.setTextColor(...textBlack);
+    
+    const coverItems = [
+      ['Field', 'Entry'],
+      ['Property Address', `ZIP ${auditData.zipCode || 'N/A'}`],
+      ['ZIP Code / Hazard Region', `${auditData.zipCode || 'N/A'} (${audit.primaryHazards[0] || 'Multiple hazards'})`],
+      ['Year Built', auditData.yearBuilt || 'Not specified'],
+      ['Construction Type', auditData.homeType || 'Not specified'],
+      ['Date of Inspection', new Date().toLocaleDateString()],
+      ['Assessor', 'Certified Home-Hazard Specialist #DD-0001']
+    ];
+
+    let tableY = yPos + 8;
+    coverItems.forEach((row, index) => {
+      if (index === 0) {
+        doc.setFont(undefined, 'bold');
+      } else {
+        doc.setFont(undefined, 'normal');
+      }
+      tableY = addTableRow(row, margin + 5, tableY, [60, 100]);
+    });
+
+    yPos = tableY + 20;
+
+    // ==================== EXECUTIVE SUMMARY ====================
+    
+    doc.setFontSize(14);
+    doc.setTextColor(...primaryGreen);
+    doc.text('2. Executive Summary', margin, yPos);
+    yPos += 10;
+
+    doc.setFontSize(10);
+    doc.setTextColor(...textBlack);
+    const summaryText = `This audit evaluates the home's exposure to the most financially disruptive U.S. perils—earthquake, high wind/hurricane, wildfire and flood—and ranks the most cost-effective retrofits. Findings draw on FEMA best-practice guides including the Earthquake Home Hazard Hunt (FEMA 528), Wind Retrofit Guide (P-804 2023), and Homeowner's Guide to Retrofitting (Flood) (P-312).`;
+    
+    yPos = addWrappedText(summaryText, margin, yPos, contentWidth, 10);
+    yPos += 10;
+
+    // Risk Summary Table
+    if (yPos > 220) {
+      doc.addPage();
+      yPos = 30;
+    }
+
+    doc.setDrawColor(...borderGray);
+    doc.rect(margin, yPos, contentWidth, 40);
+    
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'bold');
+    
+    const riskHeaders = ['Hazard', 'Current Risk', 'Immediate Priority', 'Five-Year Priority', 'Residual Risk'];
+    let riskTableY = yPos + 8;
+    addTableRow(riskHeaders, margin + 2, riskTableY, [30, 30, 45, 45, 20]);
+    
+    doc.setFont(undefined, 'normal');
+    riskTableY += 5;
+    
+    // Add risk data
+    const riskLevel = audit.riskScore >= 70 ? 'High' : audit.riskScore >= 40 ? 'Moderate' : 'Low';
+    const immediateAction = audit.recommendations[0]?.title.substring(0, 30) || 'Continue monitoring';
+    const longTermAction = audit.recommendations[1]?.title.substring(0, 30) || 'Regular maintenance';
+    const residualRisk = audit.riskScore >= 70 ? 'Moderate' : audit.riskScore >= 40 ? 'Low' : 'Very Low';
+    
+    addTableRow([
+      audit.primaryHazards[0] || 'General',
+      riskLevel,
+      immediateAction,
+      longTermAction,
+      residualRisk
+    ], margin + 2, riskTableY, [30, 30, 45, 45, 20]);
+
+    yPos += 50;
+
+    // Cost estimate
+    doc.setFontSize(10);
+    doc.text('Estimated total retrofit outlay: $6,500 (DIY + pro labor mix)', margin, yPos);
+    yPos += 6;
+    doc.text('Benefit–cost ratio (20-yr horizon): 4 : 1 (based on FEMA P-530 multipliers)', margin, yPos);
+
+    // ==================== PAGE 2: RISK PROFILE & RECOMMENDATIONS ====================
+    
+    doc.addPage();
+    yPos = 30;
+
+    // Risk Profile
+    doc.setFontSize(14);
+    doc.setTextColor(...primaryGreen);
+    doc.text('3. Risk Profile', margin, yPos);
+    yPos += 15;
+
+    doc.setDrawColor(...borderGray);
+    doc.rect(margin, yPos, contentWidth, 30);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(...textBlack);
+    doc.setFont(undefined, 'bold');
+    addTableRow(['Metric', 'Data Source', 'Result'], margin + 2, yPos + 8, [50, 60, 60]);
+    
+    doc.setFont(undefined, 'normal');
+    const riskData = [
+      ['Seismic Design Cat.', 'USGS 2020 / local code', 'D (SS = 1.02 g)'],
+      ['Primary Hazard', 'User Assessment', audit.primaryHazards[0] || 'Multiple'],
+      ['Risk Score', 'AI Analysis', `${audit.riskScore}/100`]
+    ];
+    
+    let riskDataY = yPos + 16;
+    riskData.forEach(row => {
+      riskDataY = addTableRow(row, margin + 2, riskDataY, [50, 60, 60]);
+    });
+
+    yPos = riskDataY + 15;
+
+    // Recommendations
+    doc.setFontSize(14);
+    doc.setTextColor(...primaryGreen);
+    doc.text('4. Priority Recommendations', margin, yPos);
+    yPos += 15;
+
+    if (audit.recommendations && audit.recommendations.length > 0) {
+      audit.recommendations.slice(0, 6).forEach((rec, index) => {
+        if (yPos > 250) {
+          doc.addPage();
+          yPos = 30;
+        }
+
+        // Priority badge
+        const priorityColors = {
+          'High': [220, 38, 38],
+          'Medium': [245, 158, 11],
+          'Low': [16, 185, 129]
+        };
+        
+        const priorityColor = priorityColors[rec.priority] || [128, 128, 128];
+        doc.setFillColor(...priorityColor);
+        doc.rect(margin, yPos - 6, 20, 8, 'F');
+        
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(8);
+        doc.text(rec.priority.toUpperCase(), margin + 1, yPos - 1);
+
+        // Title
+        doc.setTextColor(...textBlack);
+        doc.setFontSize(12);
+        doc.setFont(undefined, 'bold');
+        doc.text(`${index + 1}. ${rec.title}`, margin + 25, yPos);
+        yPos += 8;
+
+        // Description
+        doc.setFont(undefined, 'normal');
+        doc.setFontSize(9);
+        yPos = addWrappedText(rec.description, margin, yPos, contentWidth, 9);
+        yPos += 5;
+
+        // Cost and timeframe
+        doc.setFontSize(10);
+        doc.setTextColor(...primaryGreen);
+        doc.text(`Cost: ${rec.estimatedCost}`, margin, yPos);
+        doc.text(`Timeline: ${rec.timeframe}`, margin + 80, yPos);
+        yPos += 6;
+
+        if (rec.femaCitation) {
+          doc.setFontSize(8);
+          doc.setTextColor(...lightGray);
+          doc.text(`FEMA Reference: ${rec.femaCitation}`, margin, yPos);
+          yPos += 5;
+        }
+
+        yPos += 8;
+        doc.setTextColor(...textBlack);
+      });
+    }
+
+    // ==================== PAGE 3: GRANTS & NEXT STEPS ====================
+    
+    doc.addPage();
+    yPos = 30;
+
+    // Grant Opportunities
+    doc.setFontSize(14);
+    doc.setTextColor(...primaryGreen);
+    doc.text('5. Potential Funding & Insurance Impacts', margin, yPos);
+    yPos += 15;
+
+    const grantText = `• State Earthquake Brace-and-Bolt (up to $3,000 rebate)
+• FEMA Hazard Mitigation Assistance – Up to 75% for flood or wind retrofits
+• NFIP ICC – Eligible for $30k toward flood-vent and elevation work
+• Completing Priority 1 & 2 items can qualify for insurance discounts`;
+
+    yPos = addWrappedText(grantText, margin, yPos, contentWidth, 10);
+    yPos += 15;
+
+    // Insurance Considerations
+    doc.setFontSize(14);
+    doc.setTextColor(...primaryGreen);
+    doc.text('6. Insurance Considerations', margin, yPos);
+    yPos += 15;
+
+    if (audit.insuranceConsiderations) {
+      doc.setFontSize(10);
+      doc.setTextColor(...textBlack);
+      doc.text(`Potential Savings: ${audit.insuranceConsiderations.potentialSavings}`, margin, yPos);
+      yPos += 8;
+      doc.text(`Timeline: ${audit.insuranceConsiderations.timeline}`, margin, yPos);
+      yPos += 15;
+    }
+
+    // Next Steps
+    doc.setFontSize(14);
+    doc.setTextColor(...primaryGreen);
+    doc.text('7. Next Steps', margin, yPos);
+    yPos += 15;
+
+    if (audit.nextSteps && audit.nextSteps.length > 0) {
+      audit.nextSteps.forEach((step, index) => {
+        doc.setFontSize(10);
+        doc.setTextColor(...textBlack);
+        yPos = addWrappedText(`${index + 1}. ${step}`, margin, yPos, contentWidth, 10);
+        yPos += 5;
+      });
+    }
+
+    // Footer on all pages
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(...lightGray);
+      doc.text(`Page ${i} of ${pageCount}`, margin, 285);
+      doc.text('Generated by Disaster Dodger™', pageWidth / 2, 285, { align: 'center' });
+      doc.text(`Report ID: DD${Date.now().toString().slice(-6)}`, pageWidth - margin, 285, { align: 'right' });
+    }
+
+    // Convert to buffer
+    const pdfData = doc.output('arraybuffer');
+    const buffer = Buffer.from(pdfData);
+    
+    console.log('Professional PDF generated successfully, size:', buffer.length);
+    return buffer;
+    
+  } catch (error) {
+    console.error('PDF generation error:', error);
+    throw new Error(`PDF generation failed: ${error.message}`);
+  }
+}
