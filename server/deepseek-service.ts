@@ -32,7 +32,7 @@ const DEEPSEEK_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 export async function callDeepseek(
   answers: Record<string, any>, 
   model: string = 'deepseek/deepseek-r1-0528-qwen3-8b:free',
-  pdfUrls?: string[]
+  pdfContent?: { name: string; content: string }[]
 ): Promise<DeepseekAuditResult> {
   const apiKey = process.env.DEEPSEEK_API_KEY;
   
@@ -77,9 +77,15 @@ export async function callDeepseek(
 Property Data:
 ${JSON.stringify(answers, null, 2)}
 
-${pdfUrls ? `Reference Materials: ${pdfUrls.join(', ')}` : ''}
+${pdfContent && pdfContent.length > 0 ? `
+Reference Documents:
+${pdfContent.map(pdf => `
+Document: ${pdf.name}
+Content: ${pdf.content.substring(0, 3000)}...
+`).join('\n')}
+` : ''}
 
-Return only the JSON object, no other text.`;
+Use the reference documents to provide more accurate and detailed recommendations based on FEMA guidelines and best practices. Return only the JSON object, no other text.`;
 
   try {
     console.log('[DeepSeek] Making API call...');

@@ -272,8 +272,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log("Processing audit with Deepseek AI...");
       
-      // Step 1: Call Deepseek with questionnaire answers
-      const auditResult = await callDeepseek(answers, 'deepseek-chat');
+      // Step 1: Call Deepseek with questionnaire answers and PDF content
+      const pdfContent = answers.pdfContent || [];
+      const auditResult = await callDeepseek(answers, 'deepseek/deepseek-r1-0528-qwen3-8b:free', pdfContent);
       
       // Step 2: Generate HTML from audit result
       const auditData = {
