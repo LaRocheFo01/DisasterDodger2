@@ -5,7 +5,6 @@ import type { Audit } from '@shared/schema';
 
 import { generateAutomatedReport, RECOMMENDATION_LIBRARY, type Hazard } from './automated-report-generator.js';
 import { callDeepseek } from './deepseek-service.js';
-import { generatePDFFromHTML } from './pdf-generator.js';
 import { normalizeHazard } from './hazard-utils.js';
 
 export async function generatePDFReport(req: Request, res: Response) {
