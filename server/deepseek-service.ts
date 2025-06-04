@@ -39,9 +39,6 @@ export async function callDeepseek(
     throw new Error('DEEPSEEK_API_KEY environment variable is required');
   }
 
-  const backendPDFs = await loadAttachedPDFs();
-  const combinedPDFs = [...backendPDFs, ...(pdfContent || [])];
-
   const systemPrompt = `You are a professional home safety auditor. Analyze the questionnaire and return ONLY a valid JSON object with this exact structure (no markdown, no explanations, just the JSON):
 
 {
@@ -79,15 +76,15 @@ export async function callDeepseek(
 Property Data:
 ${JSON.stringify(answers, null, 2)}
 
-${combinedPDFs.length > 0 ? `
+${pdfContent && pdfContent.length > 0 ? `
 Reference Documents:
-${combinedPDFs.map(pdf => `
+${pdfContent.map(pdf => `
 Document: ${pdf.name}
 Content: ${pdf.content.substring(0, 3000)}...
 `).join('\n')}
 ` : ''}
 
-Use the reference documents to provide more accurate and detailed recommendations based on FEMA guidelines and best practices. Return only the JSON object, no other text.`;
+Use FEMA guidelines and best practices to provide accurate recommendations. Return only the JSON object, no other text.`;
 
   try {
     console.log('[DeepSeek] Making API call...');
