@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 
 export interface DeepseekAuditResult {
@@ -30,15 +29,18 @@ export interface DeepseekAuditResult {
 const DEEPSEEK_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
 export async function callDeepseek(
-  answers: Record<string, any>, 
+  answers: Record<string, any>,
   model: string = 'deepseek/deepseek-r1-0528-qwen3-8b:free',
   pdfContent?: { name: string; content: string }[]
 ): Promise<DeepseekAuditResult> {
   const apiKey = process.env.DEEPSEEK_API_KEY;
-  
+
   if (!apiKey) {
     throw new Error('DEEPSEEK_API_KEY environment variable is required');
   }
+
+  const backendPDFs = await loadAttachedPDFs();
+  const combinedPDFs = [...backendPDFs, ...(pdfContent || [])];
 
   const systemPrompt = `You are a professional home safety auditor. Analyze the questionnaire and return ONLY a valid JSON object with this exact structure (no markdown, no explanations, just the JSON):
 
@@ -77,9 +79,9 @@ export async function callDeepseek(
 Property Data:
 ${JSON.stringify(answers, null, 2)}
 
-${pdfContent && pdfContent.length > 0 ? `
+${combinedPDFs.length > 0 ? `
 Reference Documents:
-${pdfContent.map(pdf => `
+${combinedPDFs.map(pdf => `
 Document: ${pdf.name}
 Content: ${pdf.content.substring(0, 3000)}...
 `).join('\n')}
@@ -89,7 +91,7 @@ Use the reference documents to provide more accurate and detailed recommendation
 
   try {
     console.log('[DeepSeek] Making API call...');
-    
+
     const response = await axios.post(
       DEEPSEEK_API_URL,
       {
@@ -105,384 +107,266 @@ Use the reference documents to provide more accurate and detailed recommendation
         headers: {
           'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://disaster-dodger.replit.app',
-          'X-Title': 'Disaster Dodger Safety Audit'
+          'HTTP-Referer': 'https://replit.com',
+          'X-Title': 'Home Safety Audit'
         },
         timeout: 30000
       }
     );
 
     console.log('[DeepSeek] API response received');
-    
-    const content = response.data.choices[0].message.content;
-    console.log('[DeepSeek] Raw response (first 200 chars):', content.substring(0, 200));
 
-    // Clean the response more aggressively
-    let cleanedContent = content.trim();
-    
-    // Remove common markdown patterns
-    cleanedContent = cleanedContent.replace(/```json\s*/g, '');
-    cleanedContent = cleanedContent.replace(/```\s*/g, '');
-    cleanedContent = cleanedContent.replace(/^[^{]*({.*})[^}]*$/s, '$1');
-    
-    // Find JSON object boundaries
-    const startIndex = cleanedContent.indexOf('{');
-    const lastIndex = cleanedContent.lastIndexOf('}');
-    
-    if (startIndex === -1 || lastIndex === -1) {
-      console.error('[DeepSeek] No JSON object found in response:', content);
-      throw new Error('No JSON object found in DeepSeek response');
-    }
-    
-    cleanedContent = cleanedContent.substring(startIndex, lastIndex + 1);
-    console.log('[DeepSeek] Cleaned JSON (first 200 chars):', cleanedContent.substring(0, 200));
+    if (response.data && response.data.choices && response.data.choices[0]) {
+      const content = response.data.choices[0].message.content;
+      console.log('[DeepSeek] Raw response:', content);
 
-    // Parse the JSON
-    let auditResult: DeepseekAuditResult;
-    try {
-      auditResult = JSON.parse(cleanedContent);
-    } catch (parseError) {
-      console.error('[DeepSeek] JSON parse failed:', parseError);
-      console.error('[DeepSeek] Attempted to parse:', cleanedContent);
+      // Clean up the response to extract just the JSON
+      let jsonString = content.trim();
       
-      // Return a fallback result instead of failing
-      console.log('[DeepSeek] Using fallback result due to parse error');
-      auditResult = createFallbackResult(answers);
-    }
+      // Remove markdown code blocks if present
+      if (jsonString.startsWith('```')) {
+        jsonString = jsonString.replace(/^```[a-z]*\n?/i, '').replace(/\n?```$/i, '');
+      }
+      
+      // Find the JSON object boundaries
+      const startIndex = jsonString.indexOf('{');
+      const lastIndex = jsonString.lastIndexOf('}');
+      
+      if (startIndex !== -1 && lastIndex !== -1 && lastIndex > startIndex) {
+        jsonString = jsonString.substring(startIndex, lastIndex + 1);
+      }
 
-    // Validate the result has required fields
-    if (!auditResult.riskScore && auditResult.riskScore !== 0) {
-      console.warn('[DeepSeek] Missing riskScore, using fallback');
-      auditResult = createFallbackResult(answers);
-    }
+      let auditResult: DeepseekAuditResult;
+      try {
+        auditResult = JSON.parse(jsonString);
+      } catch (parseError) {
+        console.error('[DeepSeek] JSON parse error:', parseError);
+        console.error('[DeepSeek] Raw content:', content);
+        throw new Error(`Failed to parse JSON response: ${parseError}`);
+      }
 
-    console.log('[DeepSeek] Successfully parsed audit result, risk score:', auditResult.riskScore);
-    return auditResult;
-    
+      // Validate the structure
+      if (!auditResult.riskScore || !auditResult.primaryHazards || !auditResult.recommendations) {
+        throw new Error('Invalid response structure from DeepSeek API');
+      }
+
+      return auditResult;
+    } else {
+      throw new Error('Invalid response format from DeepSeek API');
+    }
   } catch (error: any) {
-    console.error('[DeepSeek] API error:', error.response?.data || error.message);
-    
-    if (error.response?.status === 401) {
-      throw new Error('Invalid DeepSeek API key. Get your free key from https://openrouter.ai/');
-    }
-    
-    if (error.response?.status === 429) {
-      throw new Error('DeepSeek API rate limit exceeded. Please wait a moment and try again.');
-    }
-    
-    // If API fails completely, return a fallback result
-    console.log('[DeepSeek] API failed, using fallback result');
-    return createFallbackResult(answers);
+    console.error('Deepseek API error:', error.response?.data || error.message);
+    throw new Error(`Deepseek API error: ${error.response?.data?.error?.message || error.message}`);
   }
 }
 
-// Fallback function when API fails or returns invalid JSON
-function createFallbackResult(answers: Record<string, any>): DeepseekAuditResult {
-  const hazard = answers.primaryHazard || 'Natural Disaster';
-  const zipCode = answers.zipCode || 'Unknown';
-  
-  return {
-    riskScore: 45,
-    primaryHazards: [hazard, 'General Weather Events'],
-    recommendations: [
-      {
-        priority: 'High',
-        title: 'Emergency Kit Preparation',
-        description: 'Assemble a 72-hour emergency kit with water, food, flashlights, and first aid supplies.',
-        estimatedCost: '$200-$500',
-        timeframe: '1-2 days',
-        femaCitation: 'FEMA Ready.gov'
-      },
-      {
-        priority: 'Medium',
-        title: 'Home Safety Assessment',
-        description: 'Conduct a detailed walkthrough to identify specific vulnerabilities in your home.',
-        estimatedCost: '$0-$200',
-        timeframe: '1 week'
-      },
-      {
-        priority: 'Medium',
-        title: 'Insurance Review',
-        description: 'Review your current insurance coverage to ensure adequate protection.',
-        estimatedCost: '$0',
-        timeframe: '1-2 hours'
-      }
-    ],
-    grantOpportunities: [
-      {
-        program: 'FEMA Individual Assistance',
-        description: 'Federal assistance for disaster recovery and mitigation',
-        eligibility: 'Property owners affected by federally declared disasters',
-        maxAmount: 'Varies by program'
-      }
-    ],
-    insuranceConsiderations: {
-      potentialSavings: '5-10% annual premium reduction',
-      requirements: ['Complete basic safety improvements', 'Document upgrades'],
-      timeline: 'Savings available after verification'
-    },
-    summary: `Based on your location in ${zipCode} and primary concern about ${hazard}, your property has moderate risk exposure. Focus on basic preparedness and safety improvements to reduce vulnerability.`,
-    nextSteps: [
-      'Prepare emergency kit',
-      'Review insurance coverage',
-      'Identify specific home vulnerabilities',
-      'Consider professional safety assessment'
-    ]
-  };
-}
-
 export function renderAuditHTML(audit: DeepseekAuditResult, auditData: any): string {
+  const zipCode = auditData.zipCode || 'Unknown';
+  const homeType = auditData.homeType || 'Unknown';
+  const yearBuilt = auditData.yearBuilt || 'Unknown';
+
   return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Safety Audit Report</title>
-    <style>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Home Safety Audit Report - ${zipCode}</title>
+      <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #fff;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          max-width: 800px;
+          margin: 0 auto;
+          padding: 20px;
+          background: #f9f9f9;
         }
         .header {
-            text-align: center;
-            border-bottom: 3px solid #16A34A;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 2rem;
+          border-radius: 10px;
+          text-align: center;
+          margin-bottom: 2rem;
         }
         .header h1 {
-            color: #16A34A;
-            font-size: 2.5em;
-            margin: 0;
+          margin: 0;
+          font-size: 2.5rem;
+          font-weight: 300;
         }
-        .header .subtitle {
-            color: #666;
-            font-size: 1.2em;
-            margin-top: 10px;
+        .header p {
+          margin: 0.5rem 0 0 0;
+          opacity: 0.9;
+          font-size: 1.1rem;
         }
         .section {
-            margin-bottom: 30px;
-            page-break-inside: avoid;
+          background: white;
+          margin-bottom: 2rem;
+          padding: 2rem;
+          border-radius: 10px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         .section h2 {
-            color: #16A34A;
-            border-bottom: 2px solid #10B981;
-            padding-bottom: 5px;
-            font-size: 1.5em;
+          color: #667eea;
+          border-bottom: 2px solid #667eea;
+          padding-bottom: 0.5rem;
+          margin-bottom: 1.5rem;
         }
         .risk-score {
-            background: ${audit.riskScore >= 70 ? '#FEE2E2' : audit.riskScore >= 40 ? '#FEF3C7' : '#D1FAE5'};
-            border: 2px solid ${audit.riskScore >= 70 ? '#DC2626' : audit.riskScore >= 40 ? '#F59E0B' : '#10B981'};
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .risk-score .score {
-            font-size: 3em;
-            font-weight: bold;
-            color: ${audit.riskScore >= 70 ? '#DC2626' : audit.riskScore >= 40 ? '#F59E0B' : '#10B981'};
+          font-size: 3rem;
+          font-weight: bold;
+          text-align: center;
+          color: ${audit.riskScore > 70 ? '#e74c3c' : audit.riskScore > 40 ? '#f39c12' : '#27ae60'};
+          margin: 1rem 0;
         }
         .hazards {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1rem;
+          margin: 1rem 0;
         }
         .hazard-tag {
-            background: #F3F4F6;
-            border: 1px solid #D1D5DB;
-            border-radius: 20px;
-            padding: 5px 15px;
-            font-size: 0.9em;
-            color: #374151;
-        }
-        .recommendations {
-            margin-bottom: 20px;
+          background: #667eea;
+          color: white;
+          padding: 0.5rem 1rem;
+          border-radius: 25px;
+          font-weight: 500;
         }
         .recommendation {
-            border: 1px solid #E5E7EB;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            background: #FAFAFA;
+          border-left: 4px solid #667eea;
+          padding: 1rem;
+          margin: 1rem 0;
+          background: #f8f9ff;
+          border-radius: 0 5px 5px 0;
         }
-        .recommendation.high {
-            border-left: 5px solid #DC2626;
-        }
-        .recommendation.medium {
-            border-left: 5px solid #F59E0B;
-        }
-        .recommendation.low {
-            border-left: 5px solid #10B981;
-        }
-        .recommendation h4 {
-            margin: 0 0 10px 0;
-            color: #1F2937;
+        .recommendation h3 {
+          margin: 0 0 0.5rem 0;
+          color: #667eea;
         }
         .recommendation .priority {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: bold;
-            margin-bottom: 10px;
+          display: inline-block;
+          padding: 0.2rem 0.5rem;
+          border-radius: 3px;
+          font-size: 0.8rem;
+          font-weight: bold;
+          margin-bottom: 0.5rem;
         }
-        .priority.high {
-            background: #DC2626;
-            color: white;
-        }
-        .priority.medium {
-            background: #F59E0B;
-            color: white;
-        }
-        .priority.low {
-            background: #10B981;
-            color: white;
-        }
-        .cost-estimate {
-            font-weight: bold;
-            color: #059669;
-        }
-        .grants {
-            background: #EFF6FF;
-            border: 1px solid #DBEAFE;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
+        .priority.High { background: #e74c3c; color: white; }
+        .priority.Medium { background: #f39c12; color: white; }
+        .priority.Low { background: #27ae60; color: white; }
         .grant {
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #DBEAFE;
+          background: #e8f5e8;
+          border: 1px solid #27ae60;
+          padding: 1rem;
+          margin: 1rem 0;
+          border-radius: 5px;
         }
-        .grant:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
+        .grant h3 {
+          color: #27ae60;
+          margin: 0 0 0.5rem 0;
         }
-        .insurance-box {
-            background: #F0FDF4;
-            border: 1px solid #BBF7D0;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
+        .insurance {
+          background: #e3f2fd;
+          border: 1px solid #2196f3;
+          padding: 1rem;
+          border-radius: 5px;
         }
         .next-steps {
-            background: #FEF3C7;
-            border: 1px solid #FCD34D;
-            border-radius: 8px;
-            padding: 15px;
+          background: #fff3e0;
+          border: 1px solid #ff9800;
+          padding: 1rem;
+          border-radius: 5px;
         }
         .next-steps ul {
-            margin: 0;
-            padding-left: 20px;
+          margin: 0.5rem 0 0 0;
+          padding-left: 1.5rem;
         }
         .footer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #E5E7EB;
-            text-align: center;
-            color: #6B7280;
-            font-size: 0.9em;
+          text-align: center;
+          color: #666;
+          font-size: 0.9rem;
+          margin-top: 2rem;
+          padding: 1rem;
+          border-top: 1px solid #eee;
         }
-        @media print {
-            body { padding: 0; }
-            .section { page-break-inside: avoid; }
-        }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>Disaster Dodger™</h1>
-        <div class="subtitle">Comprehensive Home Safety Audit Report</div>
-        <p>Property: ${auditData.zipCode || 'Not specified'} | Report Date: ${new Date().toLocaleDateString()}</p>
-    </div>
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>Home Safety Audit Report</h1>
+        <p>Property: ${zipCode} | Type: ${homeType} | Built: ${yearBuilt}</p>
+        <p>Generated on ${new Date().toLocaleDateString()}</p>
+      </div>
 
-    <div class="section">
-        <div class="risk-score">
-            <div class="score">${audit.riskScore}/100</div>
-            <div>Overall Risk Score</div>
-        </div>
-        
-        <h2>Primary Hazards Identified</h2>
+      <div class="section">
+        <h2>Risk Assessment</h2>
+        <div class="risk-score">${audit.riskScore}/100</div>
+        <p><strong>Primary Hazards:</strong></p>
         <div class="hazards">
-            ${audit.primaryHazards.map(hazard => 
-                `<span class="hazard-tag">${hazard}</span>`
-            ).join('')}
+          ${audit.primaryHazards.map(hazard => `<span class="hazard-tag">${hazard}</span>`).join('')}
         </div>
-    </div>
+      </div>
 
-    <div class="section">
+      <div class="section">
         <h2>Executive Summary</h2>
         <p>${audit.summary}</p>
-    </div>
+      </div>
 
-    <div class="section">
-        <h2>Priority Recommendations</h2>
-        <div class="recommendations">
-            ${audit.recommendations.map(rec => `
-                <div class="recommendation ${rec.priority.toLowerCase()}">
-                    <span class="priority ${rec.priority.toLowerCase()}">${rec.priority} Priority</span>
-                    <h4>${rec.title}</h4>
-                    <p>${rec.description}</p>
-                    <p><span class="cost-estimate">Estimated Cost: ${rec.estimatedCost}</span></p>
-                    <p><strong>Timeframe:</strong> ${rec.timeframe}</p>
-                    ${rec.femaCitation ? `<p><strong>FEMA Reference:</strong> ${rec.femaCitation}</p>` : ''}
-                </div>
-            `).join('')}
-        </div>
-    </div>
+      <div class="section">
+        <h2>Recommendations</h2>
+        ${audit.recommendations.map(rec => `
+          <div class="recommendation">
+            <span class="priority ${rec.priority}">${rec.priority} Priority</span>
+            <h3>${rec.title}</h3>
+            <p>${rec.description}</p>
+            <p><strong>Estimated Cost:</strong> ${rec.estimatedCost}</p>
+            <p><strong>Timeframe:</strong> ${rec.timeframe}</p>
+            ${rec.femaCitation ? `<p><strong>FEMA Reference:</strong> ${rec.femaCitation}</p>` : ''}
+          </div>
+        `).join('')}
+      </div>
 
-    ${audit.grantOpportunities.length > 0 ? `
-    <div class="section">
+      ${audit.grantOpportunities.length > 0 ? `
+      <div class="section">
         <h2>Grant Opportunities</h2>
-        <div class="grants">
-            ${audit.grantOpportunities.map(grant => `
-                <div class="grant">
-                    <h4>${grant.program}</h4>
-                    <p>${grant.description}</p>
-                    <p><strong>Eligibility:</strong> ${grant.eligibility}</p>
-                    <p><strong>Maximum Amount:</strong> ${grant.maxAmount}</p>
-                </div>
-            `).join('')}
-        </div>
-    </div>
-    ` : ''}
+        ${audit.grantOpportunities.map(grant => `
+          <div class="grant">
+            <h3>${grant.program}</h3>
+            <p>${grant.description}</p>
+            <p><strong>Eligibility:</strong> ${grant.eligibility}</p>
+            <p><strong>Maximum Amount:</strong> ${grant.maxAmount}</p>
+          </div>
+        `).join('')}
+      </div>
+      ` : ''}
 
-    <div class="section">
+      <div class="section">
         <h2>Insurance Considerations</h2>
-        <div class="insurance-box">
-            <p><strong>Potential Savings:</strong> ${audit.insuranceConsiderations.potentialSavings}</p>
-            <p><strong>Requirements:</strong></p>
-            <ul>
-                ${audit.insuranceConsiderations.requirements.map(req => 
-                    `<li>${req}</li>`
-                ).join('')}
-            </ul>
-            <p><strong>Timeline:</strong> ${audit.insuranceConsiderations.timeline}</p>
+        <div class="insurance">
+          <p><strong>Potential Savings:</strong> ${audit.insuranceConsiderations.potentialSavings}</p>
+          <p><strong>Requirements:</strong></p>
+          <ul>
+            ${audit.insuranceConsiderations.requirements.map(req => `<li>${req}</li>`).join('')}
+          </ul>
+          <p><strong>Timeline:</strong> ${audit.insuranceConsiderations.timeline}</p>
         </div>
-    </div>
+      </div>
 
-    <div class="section">
+      <div class="section">
         <h2>Next Steps</h2>
         <div class="next-steps">
-            <ul>
-                ${audit.nextSteps.map(step => `<li>${step}</li>`).join('')}
-            </ul>
+          <ul>
+            ${audit.nextSteps.map(step => `<li>${step}</li>`).join('')}
+          </ul>
         </div>
-    </div>
+      </div>
 
-    <div class="footer">
-        <p>This report is based on self-reported information and should not replace professional inspection or engineering analysis. 
-        Consult with licensed professionals before making modifications to your property.</p>
-        <p>Generated by Disaster Dodger™ | Report ID: ${Date.now()}</p>
-    </div>
-</body>
-</html>`;
+      <div class="footer">
+        <p>This report was generated using advanced AI analysis and FEMA guidelines.</p>
+        <p>For questions or clarifications, please consult with a qualified home safety professional.</p>
+      </div>
+    </body>
+    </html>
+  `;
 }

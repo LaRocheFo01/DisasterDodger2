@@ -346,7 +346,4 @@ function getRegionalContext(zipCode: string) {
   };
 }
 
-  // Create HTTP server
-  const httpServer = createServer(app);
-  return httpServer;
-}
+
