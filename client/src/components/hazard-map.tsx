@@ -24,7 +24,9 @@ interface HazardMapProps {
   zipCode: string;
 }
 
-const getHazardIcon = (hazardType: string) => {
+const getHazardIcon = (hazardType: string | undefined) => {
+  if (!hazardType) return <AlertTriangle className="w-5 h-5" />;
+  
   switch (hazardType.toLowerCase()) {
     case 'earthquake':
       return <Mountain className="w-5 h-5" />;
@@ -166,10 +168,10 @@ export default function HazardMap({ zipCode }: HazardMapProps) {
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center">
                   {getHazardIcon(hazardData.primaryHazard)}
-                  <span className="ml-2 font-semibold">Primary Hazard: {hazardData.primaryHazard}</span>
+                  <span className="ml-2 font-semibold">Primary Hazard: {hazardData.primaryHazard || 'Unknown'}</span>
                 </div>
-                <div className={`px-3 py-1 rounded-full text-sm font-medium ${getRiskColor(hazardData.primaryRisk)}`}>
-                  Risk Level: {hazardData.primaryRisk}/5
+                <div className={`px-3 py-1 rounded-full text-sm font-medium ${getRiskColor(hazardData.primaryRisk || 0)}`}>
+                  Risk Level: {hazardData.primaryRisk || 0}/5
                 </div>
               </div>
             </div>
@@ -192,17 +194,21 @@ export default function HazardMap({ zipCode }: HazardMapProps) {
             {hazardData.allHazards?.map((hazard, index) => (
               <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
                 <div className="flex items-center">
-                  {getHazardIcon(hazard.type)}
+                  {getHazardIcon(hazard?.type)}
                   <div className="ml-3">
-                    <div className="font-medium">{hazard.type}</div>
-                    <div className="text-sm text-gray-600">Severity: {hazard.severity}</div>
+                    <div className="font-medium">{hazard?.type || 'Unknown'}</div>
+                    <div className="text-sm text-gray-600">Severity: {hazard?.severity || 'Unknown'}</div>
                   </div>
                 </div>
-                <div className={`px-3 py-1 rounded-full text-sm font-medium ${getRiskColor(hazard.risk)}`}>
-                  {hazard.risk}/5
+                <div className={`px-3 py-1 rounded-full text-sm font-medium ${getRiskColor(hazard?.risk || 0)}`}>
+                  {hazard?.risk || 0}/5
                 </div>
               </div>
-            ))}
+            )) || (
+              <div className="text-center text-gray-500 p-4">
+                No hazard data available
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
