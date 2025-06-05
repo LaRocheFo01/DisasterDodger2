@@ -25,40 +25,58 @@ export async function generatePDFReport(req: Request, res: Response) {
 
     // Call DeepSeek API
     console.log('[Backend] Calling DeepSeek API...');
-    const deepseekResult = await callDeepseek(audit);
-    console.log('[Backend] DeepSeek analysis complete, risk score:', deepseekResult.riskScore);
+    const deepseekResult = await callDeepseek(
+      audit, 
+      'deepseek/deepseek-r1-0528-qwen3-8b:free',
+      'comprehensive',
+      audit.zipCode || '',
+      audit.primaryHazard || 'earthquake'
+    );
+    console.log('[Backend] DeepSeek analysis complete:', deepseekResult.name);
 
-    // Generate simple PDF with jsPDF
+    // Generate PDF with jsPDF using new ReportTemplate structure
     console.log('[Backend] Generating PDF...');
     const doc = new jsPDF();
     
     // Title
     doc.setFontSize(20);
-    doc.text('Disaster Dodger Report', 20, 30);
+    doc.text(deepseekResult.name, 20, 30);
     
     // Basic info
     doc.setFontSize(12);
     doc.text(`Property: ${audit.zipCode}`, 20, 50);
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 60);
-    doc.text(`Risk Score: ${deepseekResult.riskScore}/100`, 20, 70);
+    doc.text(deepseekResult.description, 20, 60);
     
-    // Hazards
-    doc.text('Primary Hazards:', 20, 90);
-    let yPos = 100;
-    if (deepseekResult.primaryHazards) {
-      deepseekResult.primaryHazards.forEach((hazard, i) => {
-        doc.text(`${i + 1}. ${hazard}`, 25, yPos);
-        yPos += 10;
-      });
-    }
+    let yPos = 80;
     
-    // Summary
-    yPos += 10;
-    doc.text('Summary:', 20, yPos);
-    yPos += 10;
-    if (deepseekResult.summary) {
-      const summaryLines = doc.splitTextToSize(deepseekResult.summary, 170);
-      doc.text(summaryLines, 20, yPos);
+    // Generate sections from the report template
+    const enabledSections = deepseekResult.sections
+      .filter(section => section.enabled)
+      .sort((a, b) => a.order - b.order);
+    
+    for (const section of enabledSections) {
+      // Check if we need a new page
+      if (yPos > 250) {
+        doc.addPage();
+        yPos = 20;
+      }
+      
+      // Section title
+      doc.setFontSize(16);
+      doc.setFont(undefined, 'bold');
+      doc.text(section.title, 20, yPos);
+      yPos += 15;
+      
+      // Section content
+      doc.setFontSize(12);
+      doc.setFont(undefined, 'normal');
+      if (section.customContent) {
+        const contentLines = doc.splitTextToSize(section.customContent, 170);
+        doc.text(contentLines, 20, yPos);
+        yPos += contentLines.length * 6 + 10;
+      }
+      
+      yPos += 10;
     }
 
     // Convert to buffer

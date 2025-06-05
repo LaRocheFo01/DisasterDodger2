@@ -1,29 +1,50 @@
 import axios from 'axios';
 
-export interface DeepseekAuditResult {
-  riskScore: number;
-  primaryHazards: string[];
-  recommendations: {
-    priority: string;
-    title: string;
-    description: string;
-    estimatedCost: string;
-    timeframe: string;
-    femaCitation?: string;
-  }[];
-  grantOpportunities: {
-    program: string;
-    description: string;
-    eligibility: string;
-    maxAmount: string;
-  }[];
-  insuranceConsiderations: {
-    potentialSavings: string;
-    requirements: string[];
-    timeline: string;
+export interface ReportSection {
+  id: string;
+  title: string;
+  type: 'cover' | 'summary' | 'analysis' | 'recommendations' | 'costs' | 'grants' | 'custom';
+  enabled: boolean;
+  order: number;
+  customContent?: string;
+}
+
+export interface ReportStyling {
+  fonts: {
+    primary: string;
+    secondary: string;
+    size: {
+      title: number;
+      header: number;
+      body: number;
+      small: number;
+    };
   };
-  summary: string;
-  nextSteps: string[];
+  colors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    text: string;
+    lightGray: string;
+    background: string;
+    white: string;
+    danger: string;
+    warning: string;
+    success: string;
+  };
+  layout: {
+    margins: number;
+    pageSize: string;
+    spacing: number;
+  };
+}
+
+export interface DeepseekAuditResult {
+  id: string;
+  name: string;
+  description: string;
+  sections: ReportSection[];
+  styling: ReportStyling;
 }
 
 const DEEPSEEK_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
@@ -31,7 +52,9 @@ const DEEPSEEK_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 export async function callDeepseek(
   answers: Record<string, any>,
   model: string = 'deepseek/deepseek-r1-0528-qwen3-8b:free',
-  pdfContent?: { name: string; content: string }[]
+  templateId: string = 'comprehensive',
+  zipCode: string = '',
+  primaryHazard: string = 'earthquake'
 ): Promise<DeepseekAuditResult> {
   const apiKey = process.env.DEEPSEEK_API_KEY;
 
@@ -39,52 +62,63 @@ export async function callDeepseek(
     throw new Error('DEEPSEEK_API_KEY environment variable is required');
   }
 
-  const systemPrompt = `You are a professional home safety auditor. Analyze the questionnaire and return ONLY a valid JSON object with this exact structure (no markdown, no explanations, just the JSON):
+  const timestamp = new Date().toISOString();
+  
+  const systemPrompt = `You are a report-generation assistant. Your job is to produce a JSON object that exactly matches the TypeScript interface ReportTemplate. Do not output any extra text or explanation—only the JSON. Use UTF-8 encoding, double-quotes, and valid JSON syntax.
 
+Always start with:
 {
-  "riskScore": 65,
-  "primaryHazards": ["Earthquake", "Wildfire"],
-  "recommendations": [
-    {
-      "priority": "High",
-      "title": "Secure Water Heater",
-      "description": "Install earthquake straps on water heater to prevent tipping and gas leaks during seismic events.",
-      "estimatedCost": "$150-$300",
-      "timeframe": "1-2 hours",
-      "femaCitation": "FEMA P-530"
-    }
-  ],
-  "grantOpportunities": [
-    {
-      "program": "FEMA Hazard Mitigation Grant",
-      "description": "Federal funding for hazard mitigation projects",
-      "eligibility": "Property owners in declared disaster areas",
-      "maxAmount": "$5,000"
-    }
-  ],
-  "insuranceConsiderations": {
-    "potentialSavings": "5-15% annual premium reduction",
-    "requirements": ["Complete high-priority retrofits", "Provide documentation"],
-    "timeline": "Savings available after completion"
+  "id": string,
+  "name": string,
+  "description": string,
+  "sections": [...],
+  "styling": {...}
+}
+
+For each element of sections, produce:
+{
+  "id": one of ["cover","summary","analysis","recommendations","costs","grants"],
+  "title": the human-readable heading,
+  "type": one of ["cover","summary","analysis","recommendations","costs","grants"],
+  "enabled": true if the section is required (otherwise false),
+  "order": integer (1-6) indicating its position,
+  "customContent": string // the actual text for that section
+}
+
+Template definitions for ${templateId}:
+- comprehensive: Cover Page, Executive Summary, Detailed Answer Analysis, Priority Upgrades & Recommendations, Cost Estimates & Financial Assistance
+- executive: Cover Page, Executive Summary, Priority Recommendations  
+- detailed: Cover Page, Executive Summary, Detailed Answer Analysis, Priority Upgrades & Recommendations, Cost Estimates & Financial Assistance, Grant Opportunities
+
+Always include styling with these exact values:
+{
+  "fonts": {
+    "primary": "Helvetica",
+    "secondary": "Helvetica-Bold", 
+    "size": {"title": 36, "header": 18, "body": 12, "small": 10}
   },
-  "summary": "Your property shows moderate risk from earthquakes and wildfires. Priority should be given to securing utilities and creating defensible space.",
-  "nextSteps": ["Secure water heater", "Clear vegetation", "Review insurance coverage"]
+  "colors": {
+    "primary": "#16A34A", "secondary": "#10B981", "accent": "#0F4C81",
+    "text": "#1F2937", "lightGray": "#6B7280", "background": "#F9FAFB",
+    "white": "#FFFFFF", "danger": "#DC2626", "warning": "#F59E0B", "success": "#10B981"
+  },
+  "layout": {"margins": 40, "pageSize": "A4", "spacing": 20}
 }`;
 
-  const userPrompt = `Analyze this home safety data and provide recommendations:
+  const userPrompt = `Generate a safety report with these parameters:
+- templateId: "${templateId}"
+- zipCode: "${zipCode}"
+- primaryHazard: "${primaryHazard}"
+- answers: ${JSON.stringify(answers, null, 2)}
 
-Property Data:
-${JSON.stringify(answers, null, 2)}
+Fill:
+- id with: "report_${zipCode}_${templateId}_${timestamp}"
+- name with: "Safety Report for ${zipCode}"
+- description with: "Generated on ${timestamp} for ZIP ${zipCode}, hazard: ${primaryHazard}"
 
-${pdfContent && pdfContent.length > 0 ? `
-Reference Documents:
-${pdfContent.map(pdf => `
-Document: ${pdf.name}
-Content: ${pdf.content.substring(0, 3000)}...
-`).join('\n')}
-` : ''}
+For each sections entry, generate customContent using the user's answers to explain hazards, analyze risks, and give recommendations. Tailor each section's text to the ${primaryHazard} hazard and to the answers provided.
 
-Use FEMA guidelines and best practices to provide accurate recommendations. Return only the JSON object, no other text.`;
+Return only the JSON object, no other text.`;
 
   try {
     console.log('[DeepSeek] Making API call...');
@@ -143,8 +177,8 @@ Use FEMA guidelines and best practices to provide accurate recommendations. Retu
       }
 
       // Validate the structure
-      if (!auditResult.riskScore || !auditResult.primaryHazards || !auditResult.recommendations) {
-        throw new Error('Invalid response structure from DeepSeek API');
+      if (!auditResult.id || !auditResult.name || !auditResult.sections || !auditResult.styling) {
+        throw new Error('Invalid response structure from DeepSeek API - missing required fields');
       }
 
       return auditResult;
@@ -168,20 +202,20 @@ export function renderAuditHTML(audit: DeepseekAuditResult, auditData: any): str
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Home Safety Audit Report - ${zipCode}</title>
+      <title>${audit.name}</title>
       <style>
         body {
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          font-family: ${audit.styling.fonts.primary}, sans-serif;
           line-height: 1.6;
-          color: #333;
+          color: ${audit.styling.colors.text};
           max-width: 800px;
           margin: 0 auto;
-          padding: 20px;
-          background: #f9f9f9;
+          padding: ${audit.styling.layout.margins}px;
+          background: ${audit.styling.colors.background};
         }
         .header {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
+          background: linear-gradient(135deg, ${audit.styling.colors.primary} 0%, ${audit.styling.colors.secondary} 100%);
+          color: ${audit.styling.colors.white};
           padding: 2rem;
           border-radius: 10px;
           text-align: center;
@@ -189,175 +223,56 @@ export function renderAuditHTML(audit: DeepseekAuditResult, auditData: any): str
         }
         .header h1 {
           margin: 0;
-          font-size: 2.5rem;
+          font-size: ${audit.styling.fonts.size.title}px;
           font-weight: 300;
         }
         .header p {
           margin: 0.5rem 0 0 0;
           opacity: 0.9;
-          font-size: 1.1rem;
+          font-size: ${audit.styling.fonts.size.header}px;
         }
         .section {
-          background: white;
+          background: ${audit.styling.colors.white};
           margin-bottom: 2rem;
           padding: 2rem;
           border-radius: 10px;
           box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         .section h2 {
-          color: #667eea;
-          border-bottom: 2px solid #667eea;
+          color: ${audit.styling.colors.primary};
+          border-bottom: 2px solid ${audit.styling.colors.primary};
           padding-bottom: 0.5rem;
           margin-bottom: 1.5rem;
+          font-size: ${audit.styling.fonts.size.header}px;
         }
-        .risk-score {
-          font-size: 3rem;
-          font-weight: bold;
-          text-align: center;
-          color: ${audit.riskScore > 70 ? '#e74c3c' : audit.riskScore > 40 ? '#f39c12' : '#27ae60'};
-          margin: 1rem 0;
-        }
-        .hazards {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 1rem;
-          margin: 1rem 0;
-        }
-        .hazard-tag {
-          background: #667eea;
-          color: white;
-          padding: 0.5rem 1rem;
-          border-radius: 25px;
-          font-weight: 500;
-        }
-        .recommendation {
-          border-left: 4px solid #667eea;
-          padding: 1rem;
-          margin: 1rem 0;
-          background: #f8f9ff;
-          border-radius: 0 5px 5px 0;
-        }
-        .recommendation h3 {
-          margin: 0 0 0.5rem 0;
-          color: #667eea;
-        }
-        .recommendation .priority {
-          display: inline-block;
-          padding: 0.2rem 0.5rem;
-          border-radius: 3px;
-          font-size: 0.8rem;
-          font-weight: bold;
-          margin-bottom: 0.5rem;
-        }
-        .priority.High { background: #e74c3c; color: white; }
-        .priority.Medium { background: #f39c12; color: white; }
-        .priority.Low { background: #27ae60; color: white; }
-        .grant {
-          background: #e8f5e8;
-          border: 1px solid #27ae60;
-          padding: 1rem;
-          margin: 1rem 0;
-          border-radius: 5px;
-        }
-        .grant h3 {
-          color: #27ae60;
-          margin: 0 0 0.5rem 0;
-        }
-        .insurance {
-          background: #e3f2fd;
-          border: 1px solid #2196f3;
-          padding: 1rem;
-          border-radius: 5px;
-        }
-        .next-steps {
-          background: #fff3e0;
-          border: 1px solid #ff9800;
-          padding: 1rem;
-          border-radius: 5px;
-        }
-        .next-steps ul {
-          margin: 0.5rem 0 0 0;
-          padding-left: 1.5rem;
+        .content {
+          font-size: ${audit.styling.fonts.size.body}px;
+          line-height: 1.8;
+          white-space: pre-wrap;
         }
         .footer {
           text-align: center;
-          color: #666;
-          font-size: 0.9rem;
+          color: ${audit.styling.colors.lightGray};
+          font-size: ${audit.styling.fonts.size.small}px;
           margin-top: 2rem;
           padding: 1rem;
-          border-top: 1px solid #eee;
+          border-top: 1px solid ${audit.styling.colors.lightGray};
         }
       </style>
     </head>
     <body>
       <div class="header">
-        <h1>Home Safety Audit Report</h1>
+        <h1>${audit.name}</h1>
         <p>Property: ${zipCode} | Type: ${homeType} | Built: ${yearBuilt}</p>
-        <p>Generated on ${new Date().toLocaleDateString()}</p>
+        <p>${audit.description}</p>
       </div>
 
-      <div class="section">
-        <h2>Risk Assessment</h2>
-        <div class="risk-score">${audit.riskScore}/100</div>
-        <p><strong>Primary Hazards:</strong></p>
-        <div class="hazards">
-          ${audit.primaryHazards.map(hazard => `<span class="hazard-tag">${hazard}</span>`).join('')}
+      ${audit.sections.filter(section => section.enabled).sort((a, b) => a.order - b.order).map(section => `
+        <div class="section">
+          <h2>${section.title}</h2>
+          <div class="content">${section.customContent || ''}</div>
         </div>
-      </div>
-
-      <div class="section">
-        <h2>Executive Summary</h2>
-        <p>${audit.summary}</p>
-      </div>
-
-      <div class="section">
-        <h2>Recommendations</h2>
-        ${audit.recommendations.map(rec => `
-          <div class="recommendation">
-            <span class="priority ${rec.priority}">${rec.priority} Priority</span>
-            <h3>${rec.title}</h3>
-            <p>${rec.description}</p>
-            <p><strong>Estimated Cost:</strong> ${rec.estimatedCost}</p>
-            <p><strong>Timeframe:</strong> ${rec.timeframe}</p>
-            ${rec.femaCitation ? `<p><strong>FEMA Reference:</strong> ${rec.femaCitation}</p>` : ''}
-          </div>
-        `).join('')}
-      </div>
-
-      ${audit.grantOpportunities.length > 0 ? `
-      <div class="section">
-        <h2>Grant Opportunities</h2>
-        ${audit.grantOpportunities.map(grant => `
-          <div class="grant">
-            <h3>${grant.program}</h3>
-            <p>${grant.description}</p>
-            <p><strong>Eligibility:</strong> ${grant.eligibility}</p>
-            <p><strong>Maximum Amount:</strong> ${grant.maxAmount}</p>
-          </div>
-        `).join('')}
-      </div>
-      ` : ''}
-
-      <div class="section">
-        <h2>Insurance Considerations</h2>
-        <div class="insurance">
-          <p><strong>Potential Savings:</strong> ${audit.insuranceConsiderations.potentialSavings}</p>
-          <p><strong>Requirements:</strong></p>
-          <ul>
-            ${audit.insuranceConsiderations.requirements.map(req => `<li>${req}</li>`).join('')}
-          </ul>
-          <p><strong>Timeline:</strong> ${audit.insuranceConsiderations.timeline}</p>
-        </div>
-      </div>
-
-      <div class="section">
-        <h2>Next Steps</h2>
-        <div class="next-steps">
-          <ul>
-            ${audit.nextSteps.map(step => `<li>${step}</li>`).join('')}
-          </ul>
-        </div>
-      </div>
+      `).join('')}
 
       <div class="footer">
         <p>This report was generated using advanced AI analysis and FEMA guidelines.</p>
