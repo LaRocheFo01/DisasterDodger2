@@ -1,4 +1,4 @@
-import { Shield, ArrowRight, CheckCircle, Zap, Waves, Flame, Wind, ChevronDown, ChevronUp, Home, Clock, Users } from "lucide-react";
+import { Shield, ArrowRight, CheckCircle, Zap, Waves, Flame, Wind, ChevronDown, ChevronUp, Home, Clock, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useLocation } from "wouter";
@@ -64,9 +64,25 @@ export default function Landing() {
       {/* Hero Section */}
       <main className="relative overflow-hidden">
         {/* Full-screen Hero with Gradient */}
-        <section className="min-h-screen bg-gradient-to-br from-green-600 via-green-700 to-green-800 relative flex items-center justify-center animate-gradient">
+        <section className="min-h-screen bg-gradient-to-br from-emerald-500 via-green-600 to-teal-700 relative flex items-center justify-center animate-gradient">
           {/* Background Pattern */}
-          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="absolute inset-0 bg-black/5"></div>
+          
+          {/* House Silhouettes Background */}
+          <div className="absolute inset-0 overflow-hidden opacity-10">
+            <div className="absolute bottom-0 left-1/4 w-32 h-24 bg-white/20">
+              <div className="w-full h-16 bg-white/30"></div>
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-16 border-r-16 border-b-16 border-transparent border-b-white/30"></div>
+            </div>
+            <div className="absolute bottom-0 right-1/3 w-28 h-20 bg-white/15">
+              <div className="w-full h-12 bg-white/25"></div>
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-14 border-r-14 border-b-12 border-transparent border-b-white/25"></div>
+            </div>
+            <div className="absolute bottom-0 left-1/6 w-24 h-18 bg-white/10">
+              <div className="w-full h-10 bg-white/20"></div>
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-12 border-r-12 border-b-8 border-transparent border-b-white/20"></div>
+            </div>
+          </div>
           
 
           
@@ -120,9 +136,17 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* Disaster Types Section */}
-        <section className="py-20 bg-gray-50">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Visual House Protection Section */}
+        <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
+          {/* Background House Illustration */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-5">
+            <div className="relative">
+              <Home className="w-96 h-96 text-gray-600" />
+              <Shield className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 text-emerald-600" />
+            </div>
+          </div>
+          
+          <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16 animate-fade-in-up">
               <h2 className="text-4xl font-bold text-gray-900 mb-4">Disasters We Help You Prepare For</h2>
               <p className="text-xl text-gray-600 animate-fade-in-up animate-delay-200">Comprehensive protection against all major natural disasters</p>
@@ -176,32 +200,32 @@ export default function Landing() {
 
             <div className="grid lg:grid-cols-3 gap-16">
               <div className="text-center group animate-slide-in-left animate-delay-300">
-                <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-8 text-4xl font-bold shadow-2xl transform group-hover:scale-110 transition-all duration-300 animate-scale-in animate-delay-500 hover-glow">
-                  1
+                <div className="w-24 h-24 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl transform group-hover:scale-110 transition-all duration-300 animate-scale-in animate-delay-500 hover-glow">
+                  <Clock className="h-12 w-12 text-white" />
                 </div>
-                <h3 className="text-3xl font-bold mb-6 text-gray-900">Enter Location</h3>
+                <h3 className="text-3xl font-bold mb-6 text-gray-900">5-Minute Assessment</h3>
                 <p className="text-xl text-gray-600 leading-relaxed">
-                  Simply enter your ZIP code to instantly identify your area's primary disaster risks using official FEMA data
+                  Quick, comprehensive home risk evaluation using official FEMA guidelines and local data
                 </p>
               </div>
               
               <div className="text-center group animate-fade-in-up animate-delay-400">
-                <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-8 text-4xl font-bold shadow-2xl transform group-hover:scale-110 transition-all duration-300 animate-scale-in animate-delay-700 hover-glow">
-                  2
+                <div className="w-24 h-24 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl transform group-hover:scale-110 transition-all duration-300 animate-scale-in animate-delay-700 hover-glow">
+                  <DollarSign className="h-12 w-12 text-white" />
                 </div>
-                <h3 className="text-3xl font-bold mb-6 text-gray-900">Quick Assessment</h3>
+                <h3 className="text-3xl font-bold mb-6 text-gray-900">Lower Insurance Costs</h3>
                 <p className="text-xl text-gray-600 leading-relaxed">
-                  Answer targeted questions about your home's construction and current safety measures
+                  Save up to 25% on premiums with disaster-resistant improvements and risk mitigation
                 </p>
               </div>
               
               <div className="text-center group animate-slide-in-right animate-delay-500">
-                <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-8 text-4xl font-bold shadow-2xl transform group-hover:scale-110 transition-all duration-300 animate-scale-in animate-delay-1000 hover-glow">
-                  3
+                <div className="w-24 h-24 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl transform group-hover:scale-110 transition-all duration-300 animate-scale-in animate-delay-1000 hover-glow">
+                  <Shield className="h-12 w-12 text-white" />
                 </div>
-                <h3 className="text-3xl font-bold mb-6 text-gray-900">Get Results</h3>
+                <h3 className="text-3xl font-bold mb-6 text-gray-900">FEMA Aligned</h3>
                 <p className="text-xl text-gray-600 leading-relaxed">
-                  Receive a comprehensive report with actionable recommendations and potential insurance savings
+                  Official guidelines and data from federal emergency management experts
                 </p>
               </div>
             </div>
