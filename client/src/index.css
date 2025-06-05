@@ -91,63 +91,21 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground leading-relaxed;
-    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Open Sans', sans-serif;
   }
 
-  /* Typography Hierarchy */
-  h1 {
-    @apply text-4xl lg:text-5xl font-bold text-gray-900 leading-tight tracking-tight;
-    font-family: 'Inter', sans-serif;
-  }
-
-  h2 {
-    @apply text-3xl lg:text-4xl font-bold text-gray-800 leading-tight tracking-tight;
-    font-family: 'Inter', sans-serif;
-  }
-
-  h3 {
-    @apply text-2xl lg:text-3xl font-semibold text-gray-800 leading-snug;
-    font-family: 'Inter', sans-serif;
-  }
-
-  h4 {
-    @apply text-xl lg:text-2xl font-semibold text-gray-700 leading-snug;
-    font-family: 'Inter', sans-serif;
-  }
-
-  h5 {
-    @apply text-lg lg:text-xl font-medium text-gray-700 leading-normal;
-    font-family: 'Inter', sans-serif;
-  }
-
-  h6 {
-    @apply text-base lg:text-lg font-medium text-gray-600 leading-normal;
-    font-family: 'Inter', sans-serif;
-  }
-
-  p {
-    @apply text-base text-gray-600 leading-relaxed;
-  }
-
-  .text-large {
-    @apply text-lg text-gray-600 leading-relaxed;
-  }
-
-  .text-small {
-    @apply text-sm text-gray-500 leading-normal;
-  }
-
-  .text-caption {
-    @apply text-xs text-gray-400 leading-normal uppercase tracking-wide;
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
   }
 
   .font-heading {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Poppins', sans-serif;
   }
 
   .font-body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Open Sans', sans-serif;
   }
 }
 

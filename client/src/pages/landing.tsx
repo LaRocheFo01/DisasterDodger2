@@ -68,13 +68,7 @@ export default function Landing() {
           {/* Background Pattern */}
           <div className="absolute inset-0 bg-black/10"></div>
           
-          {/* Floating Background Elements */}
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute top-20 left-10 w-4 h-4 bg-white/20 rounded-full animate-float-slow"></div>
-            <div className="absolute top-40 right-20 w-6 h-6 bg-white/15 rounded-full animate-float animate-delay-300"></div>
-            <div className="absolute bottom-40 left-20 w-3 h-3 bg-white/25 rounded-full animate-float animate-delay-700"></div>
-            <div className="absolute bottom-60 right-10 w-5 h-5 bg-white/10 rounded-full animate-float-slow animate-delay-500"></div>
-          </div>
+
           
           {/* Content */}
           <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
@@ -231,7 +225,7 @@ export default function Landing() {
                     <CheckCircle className="h-8 w-8 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-3">FEMA-Certified Data</h3>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-3">FEMA-Aligned Data</h3>
                     <p className="text-lg text-gray-600">Official government hazard data ensures accuracy and reliability for your specific location</p>
                   </div>
                 </div>
