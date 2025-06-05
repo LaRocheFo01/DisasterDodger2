@@ -6,25 +6,18 @@ import { eq } from 'drizzle-orm';
 export const storage = {
   async createAudit(data: InsertAudit): Promise<Audit> {
     try {
-      console.log('Creating audit with data:', data);
-
+      console.log("Storage: Creating audit with data:", data);
       const auditData = {
         zipCode: data.zipCode,
         primaryHazard: data.primaryHazard,
         stripePaymentId: data.paymentId || null,
         completed: data.completed || false,
       };
-
       const result = await db.insert(audits).values(auditData).returning();
-
-      if (!result || result.length === 0) {
-        throw new Error('Failed to create audit - no result returned');
-      }
-
-      console.log('Created audit:', result[0]);
+      console.log("Storage: Audit created:", result[0]);
       return result[0];
     } catch (error: any) {
-      console.error('Error creating audit:', error);
+      console.error("Storage: Create audit error:", error);
       throw new Error('Failed to create audit: ' + error.message);
     }
   },

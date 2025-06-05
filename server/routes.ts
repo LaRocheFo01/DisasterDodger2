@@ -5,7 +5,7 @@ import { storage } from "./storage";
 import { generatePDFReport } from "./report";
 import { insertAuditSchema } from "@shared/schema";
 import { z } from "zod";
-import { dbManager } from "./db-manager";
+import { storage } from "./storage";
 import { generateAutomatedReport, type Hazard } from "./automated-report-generator";
 import { callDeepseek, renderAuditHTML } from "./deepseek-service";
 import { generatePDFFromHTML } from "./pdf-generator";
@@ -62,7 +62,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/audits", async (req, res) => {
     try {
       const body = insertAuditSchema.parse(req.body);
+      console.log("Creating audit with body:", body);
       const audit = await storage.createAudit(body);
+      console.log("Audit created successfully:", audit);
       return res.status(201).json(audit);
     } catch (e: any) {
       console.error("create audit err", e);
@@ -75,8 +77,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/audits/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid audit ID" });
+      }
+      
       const body = req.body;
+      console.log("Updating audit", id, "with data:", body);
+      
       const audit = await storage.updateAudit(id, body);
+      console.log("Audit updated successfully:", audit);
+      
       return res.status(200).json(audit);
     } catch (e: any) {
       console.error("update audit err", e);
