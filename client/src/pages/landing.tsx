@@ -1,4 +1,4 @@
-import { Shield, ArrowRight, CheckCircle } from "lucide-react";
+import { Shield, ArrowRight, CheckCircle, Zap, Waves, Flame, Wind, ChevronDown, ChevronUp, Home, Clock, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useLocation } from "wouter";
@@ -6,6 +6,7 @@ import { useLocation } from "wouter";
 export default function Landing() {
   const [, setLocation] = useLocation();
   const [zipCode, setZipCode] = useState("");
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const startAudit = () => {
     if (zipCode.trim()) {
@@ -20,22 +21,41 @@ export default function Landing() {
     startAudit();
   };
 
+  const toggleFaq = (index: number) => {
+    setOpenFaq(openFaq === index ? null : index);
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="absolute top-0 left-0 right-0 z-50 bg-transparent">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center h-20">
-            <nav className="flex items-center space-x-12">
-              <a href="#how-it-works" className="text-white hover:text-green-200 font-medium transition-colors">
-                How it Works
-              </a>
+          <div className="flex items-center justify-between h-20">
+            {/* Logo */}
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                <Shield className="h-6 w-6 text-white" />
+              </div>
+              <span className="text-2xl font-bold text-white">Disaster Dodger</span>
+            </div>
+            
+            {/* Navigation */}
+            <nav className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-white hover:text-green-200 font-medium transition-colors">
                 Features
               </a>
-              <a href="#contact" className="text-white hover:text-green-200 font-medium transition-colors">
-                Contact
+              <a href="#how-it-works" className="text-white hover:text-green-200 font-medium transition-colors">
+                How it Works
               </a>
+              <a href="#faq" className="text-white hover:text-green-200 font-medium transition-colors">
+                FAQ
+              </a>
+              <Button 
+                onClick={startAudit}
+                className="bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white hover:text-green-700 transition-all duration-300"
+              >
+                Start Assessment
+              </Button>
             </nav>
           </div>
         </div>
@@ -94,6 +114,50 @@ export default function Landing() {
           <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
             <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
               <div className="w-1 h-3 bg-white/50 rounded-full mt-2"></div>
+            </div>
+          </div>
+        </section>
+
+        {/* Disaster Types Section */}
+        <section className="py-20 bg-gray-50">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">Disasters We Help You Prepare For</h2>
+              <p className="text-xl text-gray-600">Comprehensive protection against all major natural disasters</p>
+            </div>
+            
+            <div className="grid md:grid-cols-4 gap-8">
+              <div className="text-center group">
+                <div className="w-20 h-20 bg-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <Zap className="h-10 w-10 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Earthquakes</h3>
+                <p className="text-gray-600">Structural assessments, foundation retrofitting, and emergency preparedness for seismic events</p>
+              </div>
+              
+              <div className="text-center group">
+                <div className="w-20 h-20 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <Waves className="h-10 w-10 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Floods</h3>
+                <p className="text-gray-600">Flood zone analysis, drainage solutions, and water damage prevention strategies</p>
+              </div>
+              
+              <div className="text-center group">
+                <div className="w-20 h-20 bg-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <Flame className="h-10 w-10 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Wildfires</h3>
+                <p className="text-gray-600">Defensible space planning, fire-resistant materials, and evacuation route planning</p>
+              </div>
+              
+              <div className="text-center group">
+                <div className="w-20 h-20 bg-gray-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <Wind className="h-10 w-10 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Hurricanes</h3>
+                <p className="text-gray-600">Wind resistance upgrades, storm shutters, and hurricane tracking systems</p>
+              </div>
             </div>
           </div>
         </section>
@@ -200,6 +264,98 @@ export default function Landing() {
                   <Button 
                     onClick={startAudit}
                     className="w-full bg-white text-green-700 hover:bg-green-50 py-4 text-lg font-bold rounded-xl"
+                  >
+                    Start Free Assessment
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section id="faq" className="py-32 bg-white">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-20">
+              <h2 className="text-5xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
+              <p className="text-2xl text-gray-600">Everything you need to know about disaster preparedness assessments</p>
+            </div>
+
+            <div className="space-y-6">
+              {[
+                {
+                  question: "How accurate are the disaster risk assessments?",
+                  answer: "Our assessments use official FEMA data, USGS hazard maps, and NOAA climate data to provide the most accurate regional risk analysis available. We combine multiple authoritative sources to ensure precision for your specific location and property type."
+                },
+                {
+                  question: "What types of disasters are covered in the assessment?",
+                  answer: "We assess all major disaster types including earthquakes, wildfires, hurricanes, floods, tornadoes, and severe storms. Our analysis is customized based on your geographic location's primary risks and historical disaster patterns."
+                },
+                {
+                  question: "How long does the complete audit take?",
+                  answer: "Most homeowners complete their comprehensive assessment in under 5 minutes. The questionnaire is designed to be quick and efficient while still gathering all essential information needed for accurate recommendations."
+                },
+                {
+                  question: "What kind of recommendations will I receive?",
+                  answer: "You'll receive specific, actionable recommendations prioritized by risk level and cost-effectiveness. This includes structural improvements, safety equipment, emergency planning, and potential insurance savings with estimated costs and timelines."
+                },
+                {
+                  question: "Is my personal information secure?",
+                  answer: "Yes, we use enterprise-grade security measures to protect your data. We only collect information necessary for the assessment and never share personal details with third parties. Your privacy and security are our top priorities."
+                },
+                {
+                  question: "Can this help reduce my insurance costs?",
+                  answer: "Many of our recommendations can lead to insurance discounts. We provide specific guidance on improvements that insurers recognize, potential premium reductions, and documentation needed to claim discounts with your insurance provider."
+                },
+                {
+                  question: "Do I need any special knowledge to complete the assessment?",
+                  answer: "No special expertise is required. Our questions are designed for homeowners of all backgrounds. We provide clear explanations and examples, and you can always skip questions you're unsure about - our AI can still provide valuable insights."
+                },
+                {
+                  question: "What if I live in a low-risk area?",
+                  answer: "Even low-risk areas benefit from preparedness planning. Our assessment identifies any potential risks and provides basic preparedness recommendations. Prevention and preparation are valuable regardless of your area's risk level."
+                }
+              ].map((faq, index) => (
+                <div key={index} className="bg-gray-50 rounded-2xl overflow-hidden shadow-sm">
+                  <button
+                    onClick={() => toggleFaq(index)}
+                    className="w-full px-8 py-6 text-left flex items-center justify-between hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset"
+                  >
+                    <span className="text-xl font-semibold text-gray-900 pr-8">{faq.question}</span>
+                    <div className="flex-shrink-0">
+                      {openFaq === index ? (
+                        <ChevronUp className="h-6 w-6 text-green-600" />
+                      ) : (
+                        <ChevronDown className="h-6 w-6 text-green-600" />
+                      )}
+                    </div>
+                  </button>
+                  {openFaq === index && (
+                    <div className="px-8 pb-6">
+                      <p className="text-lg text-gray-600 leading-relaxed">{faq.answer}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* CTA in FAQ */}
+            <div className="mt-16 text-center">
+              <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-12 text-white">
+                <h3 className="text-3xl font-bold mb-4">Still Have Questions?</h3>
+                <p className="text-xl mb-8 text-green-100">Get started with your free assessment and discover your personalized disaster preparedness plan</p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-lg mx-auto">
+                  <input 
+                    type="text" 
+                    placeholder="Enter your ZIP code"
+                    value={zipCode}
+                    onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
+                    maxLength={5}
+                    className="flex-1 rounded-xl border-0 px-6 py-4 text-lg text-gray-900 placeholder-gray-500"
+                  />
+                  <Button 
+                    onClick={startAudit}
+                    className="bg-white text-green-700 hover:bg-green-50 px-8 py-4 text-lg font-bold rounded-xl whitespace-nowrap"
                   >
                     Start Free Assessment
                   </Button>
