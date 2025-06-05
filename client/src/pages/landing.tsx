@@ -135,36 +135,36 @@ export default function Landing() {
             </div>
             
             <div className="grid md:grid-cols-4 gap-8">
-              <div className="text-center group animate-bounce-in animate-delay-300">
+              <div className="card-elevated text-center group animate-bounce-in animate-delay-300">
                 <div className="w-20 h-20 bg-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg hover-lift animate-rotate-in">
-                  <Zap className="h-10 w-10 text-white" />
+                  <Zap className="icon-large text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Earthquakes</h3>
-                <p className="text-gray-600">Structural assessments, foundation retrofitting, and emergency preparedness for seismic events</p>
+                <h3 className="text-xl font-bold mb-3">Earthquakes</h3>
+                <p className="text-large">Structural assessments, foundation retrofitting, and emergency preparedness for seismic events</p>
               </div>
               
-              <div className="text-center group animate-bounce-in animate-delay-400">
-                <div className="w-20 h-20 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg hover-lift animate-rotate-in animate-delay-100">
-                  <Waves className="h-10 w-10 text-white" />
+              <div className="card-elevated text-center group animate-bounce-in animate-delay-400">
+                <div className="w-20 h-20 bg-brand-secondary rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg hover-lift animate-rotate-in animate-delay-100">
+                  <Waves className="icon-large text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Floods</h3>
-                <p className="text-gray-600">Flood zone analysis, drainage solutions, and water damage prevention strategies</p>
+                <h3 className="text-xl font-bold mb-3">Floods</h3>
+                <p className="text-large">Flood zone analysis, drainage solutions, and water damage prevention strategies</p>
               </div>
               
-              <div className="text-center group animate-bounce-in animate-delay-500">
-                <div className="w-20 h-20 bg-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg hover-lift animate-rotate-in animate-delay-200">
-                  <Flame className="h-10 w-10 text-white" />
+              <div className="card-elevated text-center group animate-bounce-in animate-delay-500">
+                <div className="w-20 h-20 bg-brand-accent rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg hover-lift animate-rotate-in animate-delay-200">
+                  <Flame className="icon-large text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Wildfires</h3>
-                <p className="text-gray-600">Defensible space planning, fire-resistant materials, and evacuation route planning</p>
+                <h3 className="text-xl font-bold mb-3">Wildfires</h3>
+                <p className="text-large">Defensible space planning, fire-resistant materials, and evacuation route planning</p>
               </div>
               
-              <div className="text-center group animate-bounce-in animate-delay-700">
+              <div className="card-elevated text-center group animate-bounce-in animate-delay-700">
                 <div className="w-20 h-20 bg-gray-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg hover-lift animate-rotate-in animate-delay-300">
-                  <Wind className="h-10 w-10 text-white" />
+                  <Wind className="icon-large text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">Hurricanes</h3>
-                <p className="text-gray-600">Wind resistance upgrades, storm shutters, and hurricane tracking systems</p>
+                <h3 className="text-xl font-bold mb-3">Hurricanes</h3>
+                <p className="text-large">Wind resistance upgrades, storm shutters, and hurricane tracking systems</p>
               </div>
             </div>
           </div>
