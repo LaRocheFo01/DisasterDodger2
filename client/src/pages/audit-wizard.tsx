@@ -292,12 +292,24 @@ export default function AuditWizard() {
 
   const completeAudit = async () => {
     try {
-      // Update audit with final data and mark as completed
+      console.log("Completing audit with ID:", auditId);
+      
+      // First update audit with final data
       await updateAuditMutation.mutateAsync({
         auditResponses: auditData,
-        photosUploaded: uploadedPhotos.length,
-        completed: true
+        photosUploaded: uploadedPhotos.length
       });
+
+      // Then call the completion endpoint
+      const response = await fetch(`/api/audits/${auditId}/complete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to complete audit');
+      }
 
       // Navigate to success page
       setLocation(`/success/${auditId}`);

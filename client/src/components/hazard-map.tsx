@@ -74,7 +74,7 @@ export default function HazardMap({ zipCode }: HazardMapProps) {
     const fetchHazardData = async () => {
       setIsLoading(true);
       setError(null);
-      
+
       try {
         // Fetch basic hazard data
         const hazardResponse = await fetch(`/api/hazards/${zipCode}`);

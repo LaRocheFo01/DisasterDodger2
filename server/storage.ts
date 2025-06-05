@@ -26,16 +26,31 @@ export const storage = {
     try {
       console.log('Updating audit:', id, updates);
 
+      // Filter out undefined values and handle nested objects
+      const filteredUpdates: any = {};
+      for (const [key, value] of Object.entries(updates)) {
+        if (value !== undefined) {
+          filteredUpdates[key] = value;
+        }
+      }
+
+      if (Object.keys(filteredUpdates).length === 0) {
+        console.log('No valid updates provided');
+        return await this.getAudit(id);
+      }
+
       const result = await db
         .update(audits)
-        .set(updates)
+        .set(filteredUpdates)
         .where(eq(audits.id, id))
         .returning();
 
       if (!result || result.length === 0) {
+        console.log('No audit found with ID:', id);
         return null;
       }
 
+      console.log('Audit updated successfully:', result[0]);
       return result[0];
     } catch (error: any) {
       console.error('Error updating audit:', error);
