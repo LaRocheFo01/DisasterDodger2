@@ -114,44 +114,32 @@ Use FEMA guidelines and best practices to provide accurate recommendations. Retu
     console.log('[DeepSeek] API response received');
 
     if (response.data && response.data.choices && response.data.choices[0]) {
-      const content = response.data.choices[0].message.content;
-      console.log('[DeepSeek] Raw response:', content);
+      const result = response.data.choices[0].message.content;
+    console.log("Raw Deepseek response:", result);
 
-      // Clean up the response to extract just the JSON
-      let jsonString = content.trim();
-      
-      // Remove markdown code blocks if present
-      if (jsonString.startsWith('```')) {
-        jsonString = jsonString.replace(/^```[a-z]*\n?/i, '').replace(/\n?```$/i, '');
-      }
-      
-      // Find the JSON object boundaries
-      const startIndex = jsonString.indexOf('{');
-      const lastIndex = jsonString.lastIndexOf('}');
-      
-      if (startIndex !== -1 && lastIndex !== -1 && lastIndex > startIndex) {
-        jsonString = jsonString.substring(startIndex, lastIndex + 1);
-      }
-
-      let auditResult: DeepseekAuditResult;
-      try {
-        auditResult = JSON.parse(jsonString);
-      } catch (parseError) {
-        console.error('[DeepSeek] JSON parse error:', parseError);
-        console.error('[DeepSeek] Raw content:', content);
-        throw new Error(`Failed to parse JSON response: ${parseError}`);
-      }
-
-      // Validate the structure
-      if (!auditResult.riskScore || !auditResult.primaryHazards || !auditResult.recommendations) {
-        throw new Error('Invalid response structure from DeepSeek API');
-      }
-
-      return auditResult;
-    } else {
-      throw new Error('Invalid response format from DeepSeek API');
+    // Parse the JSON response
+    const jsonMatch = result.match(/```json\s*([\s\S]*?)\s*```/);
+    if (!jsonMatch) {
+      console.error("ERROR: No JSON found in Deepseek response");
+      console.error("Full response:", result);
+      throw new Error("No JSON found in Deepseek response");
     }
-  } catch (error: any) {
+
+    const jsonContent = jsonMatch[1];
+    console.log("Extracted JSON content:", jsonContent);
+
+    const auditResult = JSON.parse(jsonContent);
+    console.log("=== DEEPSEEK PARSED RESULT ===");
+    console.log("Parsed audit result:", JSON.stringify(auditResult, null, 2));
+    console.log("Result type checks:");
+    console.log("- riskScore:", typeof auditResult.riskScore, auditResult.riskScore);
+    console.log("- primaryHazards:", Array.isArray(auditResult.primaryHazards), auditResult.primaryHazards);
+    console.log("- recommendations:", Array.isArray(auditResult.recommendations), auditResult.recommendations?.length);
+    console.log("- vulnerabilities:", Array.isArray(auditResult.vulnerabilities), auditResult.vulnerabilities?.length);
+    console.log("================================");
+
+    return auditResult;
+  } catch (error) {
     console.error('Deepseek API error:', error.response?.data || error.message);
     throw new Error(`Deepseek API error: ${error.response?.data?.error?.message || error.message}`);
   }

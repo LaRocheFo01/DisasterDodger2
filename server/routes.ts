@@ -270,20 +270,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
+      console.log("=== AUDIT WORKFLOW DEBUG ===");
       console.log("Processing audit with Deepseek AI...");
+      console.log("Input answers:", JSON.stringify(answers, null, 2));
       
       // Step 1: Call Deepseek with questionnaire answers and PDF content
       const pdfContent = answers.pdfContent || [];
+      console.log("PDF content length:", pdfContent.length);
+      
       const auditResult = await callDeepseek(answers, 'deepseek/deepseek-r1-0528-qwen3-8b:free', pdfContent);
+      console.log("DeepSeek call completed successfully");
       
       // Step 2: Generate HTML from audit result
       const auditData = {
         zipCode: answers.zipCode || 'Not specified',
         ...answers
       };
+      console.log("Audit data for PDF:", JSON.stringify(auditData, null, 2));
       
       // Step 3: Generate PDF using Puppeteer
+      console.log("Starting PDF generation...");
       const pdfBuffer = await generatePDFFromHTML(auditResult, auditData);
+      console.log("PDF generation completed, buffer size:", pdfBuffer.length);
       
       // Step 4: Send PDF to browser
       const filename = `Disaster_Dodger_AI_Report_${auditData.zipCode}_${new Date().toISOString().split('T')[0]}.pdf`;
@@ -295,7 +303,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.send(pdfBuffer);
       
     } catch (error: any) {
+      console.error("=== AUDIT WORKFLOW ERROR ===");
       console.error("Deepseek audit workflow error:", error);
+      console.error("Error message:", error.message);
+      console.error("Error stack:", error.stack);
+      console.error("Request body:", JSON.stringify(req.body, null, 2));
+      console.error("===============================");
       res.status(500).json({ 
         message: "Error generating AI audit report: " + error.message 
       });
