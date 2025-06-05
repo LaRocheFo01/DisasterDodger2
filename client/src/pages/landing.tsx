@@ -143,7 +143,7 @@ export default function Landing() {
               Get your personalized disaster preparedness audit in 3 simple steps
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-16 h-16 bg-disaster-green-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
@@ -224,7 +224,7 @@ export default function Landing() {
             <h2 className="text-3xl font-semibold text-gray-900 mb-4">Get Started Today</h2>
             <p className="text-lg text-gray-600">Get your comprehensive disaster preparedness audit completely free</p>
           </div>
-          
+
           <div className="max-w-lg mx-auto">
             <div className="bg-white rounded-xl shadow-lg p-8 text-center border-2 border-disaster-green-600">
               <div className="mb-6">
@@ -232,7 +232,7 @@ export default function Landing() {
                 <div className="text-4xl font-bold text-disaster-green-600 mb-2">FREE</div>
                 <p className="text-gray-600">Comprehensive assessment at no cost</p>
               </div>
-              
+
               <ul className="space-y-3 mb-8 text-left">
                 <li className="flex items-center">
                   <CheckCircle className="h-5 w-5 text-disaster-green-600 mr-3 flex-shrink-0" />
@@ -255,14 +255,14 @@ export default function Landing() {
                   <span>Photo upload for detailed analysis</span>
                 </li>
               </ul>
-              
+
               <button 
                 onClick={startAudit}
                 className="w-full py-3 px-6 bg-disaster-green-600 text-white rounded-lg hover:bg-disaster-mint-500 transition-colors font-medium text-lg"
               >
                 Start Your Audit Now
               </button>
-              
+
               <p className="text-sm text-gray-500 mt-4">
                 <Shield className="inline h-4 w-4 mr-1" />
                 Secure • No payment required • Instant results
