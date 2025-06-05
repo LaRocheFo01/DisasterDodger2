@@ -32,27 +32,27 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+            <div className="flex items-center space-x-3 animate-fade-in-down">
+              <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center animate-float hover-glow">
                 <Shield className="h-6 w-6 text-white" />
               </div>
               <span className="text-2xl font-bold text-white">Disaster Dodger</span>
             </div>
             
             {/* Navigation */}
-            <nav className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-white hover:text-green-200 font-medium transition-colors">
+            <nav className="hidden md:flex items-center space-x-8 animate-fade-in-down animate-delay-200">
+              <a href="#features" className="text-white hover:text-green-200 font-medium transition-all duration-300 hover-scale">
                 Features
               </a>
-              <a href="#how-it-works" className="text-white hover:text-green-200 font-medium transition-colors">
+              <a href="#how-it-works" className="text-white hover:text-green-200 font-medium transition-all duration-300 hover-scale">
                 How it Works
               </a>
-              <a href="#faq" className="text-white hover:text-green-200 font-medium transition-colors">
+              <a href="#faq" className="text-white hover:text-green-200 font-medium transition-all duration-300 hover-scale">
                 FAQ
               </a>
               <Button 
                 onClick={startAudit}
-                className="bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white hover:text-green-700 transition-all duration-300"
+                className="bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white hover:text-green-700 transition-all duration-300 hover-scale animate-shimmer"
               >
                 Start Assessment
               </Button>
@@ -64,23 +64,31 @@ export default function Landing() {
       {/* Hero Section */}
       <main className="relative overflow-hidden">
         {/* Full-screen Hero with Gradient */}
-        <section className="min-h-screen bg-gradient-to-br from-green-600 via-green-700 to-green-800 relative flex items-center justify-center">
+        <section className="min-h-screen bg-gradient-to-br from-green-600 via-green-700 to-green-800 relative flex items-center justify-center animate-gradient">
           {/* Background Pattern */}
           <div className="absolute inset-0 bg-black/10"></div>
           
+          {/* Floating Background Elements */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute top-20 left-10 w-4 h-4 bg-white/20 rounded-full animate-float-slow"></div>
+            <div className="absolute top-40 right-20 w-6 h-6 bg-white/15 rounded-full animate-float animate-delay-300"></div>
+            <div className="absolute bottom-40 left-20 w-3 h-3 bg-white/25 rounded-full animate-float animate-delay-700"></div>
+            <div className="absolute bottom-60 right-10 w-5 h-5 bg-white/10 rounded-full animate-float-slow animate-delay-500"></div>
+          </div>
+          
           {/* Content */}
           <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-            <h1 className="text-6xl lg:text-7xl font-bold leading-tight mb-8">
+            <h1 className="text-6xl lg:text-7xl font-bold leading-tight mb-8 animate-fade-in-up">
               Dodge Disasters<br />
-              <span className="text-green-200">Before They Strike</span>
+              <span className="text-green-200 animate-fade-in-up animate-delay-200">Before They Strike</span>
             </h1>
             
-            <p className="text-2xl lg:text-3xl mb-12 text-green-50 font-light leading-relaxed max-w-3xl mx-auto">
+            <p className="text-2xl lg:text-3xl mb-12 text-green-50 font-light leading-relaxed max-w-3xl mx-auto animate-fade-in-up animate-delay-400">
               Five-minute, FEMA-aligned home audit that pinpoints <span className="font-semibold text-white">wildfire, flood, hurricane, and earthquake risks</span>
             </p>
 
             {/* CTA Form */}
-            <div className="max-w-lg mx-auto">
+            <div className="max-w-lg mx-auto animate-scale-in animate-delay-700">
               <form onSubmit={handleZipSubmit} className="space-y-6">
                 <div>
                   <input 
@@ -89,21 +97,21 @@ export default function Landing() {
                     value={zipCode}
                     onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
                     maxLength={5}
-                    className="w-full rounded-xl border-0 px-6 py-5 text-xl text-gray-900 placeholder-gray-500 focus:ring-4 focus:ring-white/25 shadow-2xl"
+                    className="w-full rounded-xl border-0 px-6 py-5 text-xl text-gray-900 placeholder-gray-500 focus:ring-4 focus:ring-white/25 shadow-2xl transition-all duration-300 hover-lift"
                     required
                   />
                 </div>
                 
                 <Button 
                   type="submit"
-                  className="w-full bg-white text-green-700 hover:bg-green-50 py-5 text-xl font-bold rounded-xl shadow-2xl transition-all duration-300 hover:scale-105"
+                  className="w-full bg-white text-green-700 hover:bg-green-50 py-5 text-xl font-bold rounded-xl shadow-2xl transition-all duration-300 hover:scale-105 animate-glow"
                 >
                   Get Free Risk Assessment
                   <ArrowRight className="ml-3 h-6 w-6" />
                 </Button>
               </form>
 
-              <div className="mt-8 text-green-100">
+              <div className="mt-8 text-green-100 animate-fade-in-up animate-delay-1000">
                 <CheckCircle className="inline h-5 w-5 mr-2" />
                 No signup required • Instant results • 100% free
               </div>
@@ -111,9 +119,9 @@ export default function Landing() {
           </div>
 
           {/* Scroll Indicator */}
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce animate-delay-1000">
             <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
-              <div className="w-1 h-3 bg-white/50 rounded-full mt-2"></div>
+              <div className="w-1 h-3 bg-white/50 rounded-full mt-2 animate-pulse"></div>
             </div>
           </div>
         </section>
@@ -121,38 +129,38 @@ export default function Landing() {
         {/* Disaster Types Section */}
         <section className="py-20 bg-gray-50">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
+            <div className="text-center mb-16 animate-fade-in-up">
               <h2 className="text-4xl font-bold text-gray-900 mb-4">Disasters We Help You Prepare For</h2>
-              <p className="text-xl text-gray-600">Comprehensive protection against all major natural disasters</p>
+              <p className="text-xl text-gray-600 animate-fade-in-up animate-delay-200">Comprehensive protection against all major natural disasters</p>
             </div>
             
             <div className="grid md:grid-cols-4 gap-8">
-              <div className="text-center group">
-                <div className="w-20 h-20 bg-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+              <div className="text-center group animate-bounce-in animate-delay-300">
+                <div className="w-20 h-20 bg-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg hover-lift animate-rotate-in">
                   <Zap className="h-10 w-10 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Earthquakes</h3>
                 <p className="text-gray-600">Structural assessments, foundation retrofitting, and emergency preparedness for seismic events</p>
               </div>
               
-              <div className="text-center group">
-                <div className="w-20 h-20 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+              <div className="text-center group animate-bounce-in animate-delay-400">
+                <div className="w-20 h-20 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg hover-lift animate-rotate-in animate-delay-100">
                   <Waves className="h-10 w-10 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Floods</h3>
                 <p className="text-gray-600">Flood zone analysis, drainage solutions, and water damage prevention strategies</p>
               </div>
               
-              <div className="text-center group">
-                <div className="w-20 h-20 bg-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+              <div className="text-center group animate-bounce-in animate-delay-500">
+                <div className="w-20 h-20 bg-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg hover-lift animate-rotate-in animate-delay-200">
                   <Flame className="h-10 w-10 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Wildfires</h3>
                 <p className="text-gray-600">Defensible space planning, fire-resistant materials, and evacuation route planning</p>
               </div>
               
-              <div className="text-center group">
-                <div className="w-20 h-20 bg-gray-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+              <div className="text-center group animate-bounce-in animate-delay-700">
+                <div className="w-20 h-20 bg-gray-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg hover-lift animate-rotate-in animate-delay-300">
                   <Wind className="h-10 w-10 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Hurricanes</h3>
@@ -165,16 +173,16 @@ export default function Landing() {
         {/* Features Section */}
         <section id="features" className="py-32 bg-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-20">
+            <div className="text-center mb-20 animate-fade-in-up">
               <h2 className="text-5xl font-bold text-gray-900 mb-6">Simple. Fast. Effective.</h2>
-              <p className="text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animate-delay-200">
                 Professional disaster risk assessment in minutes, not hours
               </p>
             </div>
 
             <div className="grid lg:grid-cols-3 gap-16">
-              <div className="text-center group">
-                <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-8 text-4xl font-bold shadow-2xl transform group-hover:scale-110 transition-all duration-300">
+              <div className="text-center group animate-slide-in-left animate-delay-300">
+                <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-8 text-4xl font-bold shadow-2xl transform group-hover:scale-110 transition-all duration-300 animate-scale-in animate-delay-500 hover-glow">
                   1
                 </div>
                 <h3 className="text-3xl font-bold mb-6 text-gray-900">Enter Location</h3>
@@ -183,8 +191,8 @@ export default function Landing() {
                 </p>
               </div>
               
-              <div className="text-center group">
-                <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-8 text-4xl font-bold shadow-2xl transform group-hover:scale-110 transition-all duration-300">
+              <div className="text-center group animate-fade-in-up animate-delay-400">
+                <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-8 text-4xl font-bold shadow-2xl transform group-hover:scale-110 transition-all duration-300 animate-scale-in animate-delay-700 hover-glow">
                   2
                 </div>
                 <h3 className="text-3xl font-bold mb-6 text-gray-900">Quick Assessment</h3>
@@ -193,8 +201,8 @@ export default function Landing() {
                 </p>
               </div>
               
-              <div className="text-center group">
-                <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-8 text-4xl font-bold shadow-2xl transform group-hover:scale-110 transition-all duration-300">
+              <div className="text-center group animate-slide-in-right animate-delay-500">
+                <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-8 text-4xl font-bold shadow-2xl transform group-hover:scale-110 transition-all duration-300 animate-scale-in animate-delay-1000 hover-glow">
                   3
                 </div>
                 <h3 className="text-3xl font-bold mb-6 text-gray-900">Get Results</h3>
@@ -209,17 +217,17 @@ export default function Landing() {
         {/* How It Works Section */}
         <section id="how-it-works" className="py-32 bg-gray-50">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-20">
+            <div className="text-center mb-20 animate-fade-in-up">
               <h2 className="text-5xl font-bold text-gray-900 mb-6">Why Choose Our Platform?</h2>
-              <p className="text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+              <p className="text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed animate-fade-in-up animate-delay-200">
                 Professional-grade disaster preparedness technology made accessible for every homeowner
               </p>
             </div>
 
             <div className="grid lg:grid-cols-2 gap-20 items-center">
-              <div className="space-y-12">
-                <div className="flex items-start space-x-6">
-                  <div className="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="space-y-12 animate-slide-in-left animate-delay-300">
+                <div className="flex items-start space-x-6 animate-fade-in-up animate-delay-400 hover-lift">
+                  <div className="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center flex-shrink-0 animate-scale-in animate-delay-500 hover-glow">
                     <CheckCircle className="h-8 w-8 text-white" />
                   </div>
                   <div>
@@ -228,8 +236,8 @@ export default function Landing() {
                   </div>
                 </div>
                 
-                <div className="flex items-start space-x-6">
-                  <div className="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="flex items-start space-x-6 animate-fade-in-up animate-delay-500 hover-lift">
+                  <div className="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center flex-shrink-0 animate-scale-in animate-delay-700 hover-glow">
                     <Shield className="h-8 w-8 text-white" />
                   </div>
                   <div>
@@ -238,8 +246,8 @@ export default function Landing() {
                   </div>
                 </div>
                 
-                <div className="flex items-start space-x-6">
-                  <div className="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="flex items-start space-x-6 animate-fade-in-up animate-delay-700 hover-lift">
+                  <div className="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center flex-shrink-0 animate-scale-in animate-delay-1000 hover-glow">
                     <ArrowRight className="h-8 w-8 text-white" />
                   </div>
                   <div>
@@ -249,21 +257,21 @@ export default function Landing() {
                 </div>
               </div>
               
-              <div className="bg-gradient-to-br from-green-600 to-green-800 rounded-3xl p-12 text-white">
-                <h3 className="text-3xl font-bold mb-6">Ready to Get Started?</h3>
-                <p className="text-xl mb-8 text-green-100">Join thousands of homeowners who have already secured their properties</p>
-                <div className="space-y-4">
+              <div className="bg-gradient-to-br from-green-600 to-green-800 rounded-3xl p-12 text-white animate-slide-in-right animate-delay-500 hover-lift animate-gradient">
+                <h3 className="text-3xl font-bold mb-6 animate-fade-in-up animate-delay-700">Ready to Get Started?</h3>
+                <p className="text-xl mb-8 text-green-100 animate-fade-in-up animate-delay-1000">Join thousands of homeowners who have already secured their properties</p>
+                <div className="space-y-4 animate-scale-in animate-delay-1000">
                   <input 
                     type="text" 
                     placeholder="Enter your ZIP code"
                     value={zipCode}
                     onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
                     maxLength={5}
-                    className="w-full rounded-xl border-0 px-6 py-4 text-lg text-gray-900 placeholder-gray-500"
+                    className="w-full rounded-xl border-0 px-6 py-4 text-lg text-gray-900 placeholder-gray-500 transition-all duration-300 hover-lift"
                   />
                   <Button 
                     onClick={startAudit}
-                    className="w-full bg-white text-green-700 hover:bg-green-50 py-4 text-lg font-bold rounded-xl"
+                    className="w-full bg-white text-green-700 hover:bg-green-50 py-4 text-lg font-bold rounded-xl transition-all duration-300 hover:scale-105 animate-shimmer"
                   >
                     Start Free Assessment
                   </Button>
@@ -276,9 +284,9 @@ export default function Landing() {
         {/* FAQ Section */}
         <section id="faq" className="py-32 bg-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-20">
+            <div className="text-center mb-20 animate-fade-in-up">
               <h2 className="text-5xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
-              <p className="text-2xl text-gray-600">Everything you need to know about disaster preparedness assessments</p>
+              <p className="text-2xl text-gray-600 animate-fade-in-up animate-delay-200">Everything you need to know about disaster preparedness assessments</p>
             </div>
 
             <div className="space-y-6">
@@ -316,22 +324,22 @@ export default function Landing() {
                   answer: "Even low-risk areas benefit from preparedness planning. Our assessment identifies any potential risks and provides basic preparedness recommendations. Prevention and preparation are valuable regardless of your area's risk level."
                 }
               ].map((faq, index) => (
-                <div key={index} className="bg-gray-50 rounded-2xl overflow-hidden shadow-sm">
+                <div key={index} className={`bg-gray-50 rounded-2xl overflow-hidden shadow-sm hover-lift animate-fade-in-up animate-delay-${300 + (index * 100)}`}>
                   <button
                     onClick={() => toggleFaq(index)}
-                    className="w-full px-8 py-6 text-left flex items-center justify-between hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset"
+                    className="w-full px-8 py-6 text-left flex items-center justify-between hover:bg-gray-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset hover-scale"
                   >
                     <span className="text-xl font-semibold text-gray-900 pr-8">{faq.question}</span>
-                    <div className="flex-shrink-0">
+                    <div className="flex-shrink-0 transition-transform duration-300">
                       {openFaq === index ? (
-                        <ChevronUp className="h-6 w-6 text-green-600" />
+                        <ChevronUp className="h-6 w-6 text-green-600 animate-bounce-in" />
                       ) : (
                         <ChevronDown className="h-6 w-6 text-green-600" />
                       )}
                     </div>
                   </button>
                   {openFaq === index && (
-                    <div className="px-8 pb-6">
+                    <div className="px-8 pb-6 animate-fade-in-up">
                       <p className="text-lg text-gray-600 leading-relaxed">{faq.answer}</p>
                     </div>
                   )}
@@ -340,22 +348,22 @@ export default function Landing() {
             </div>
 
             {/* CTA in FAQ */}
-            <div className="mt-16 text-center">
-              <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-12 text-white">
-                <h3 className="text-3xl font-bold mb-4">Still Have Questions?</h3>
-                <p className="text-xl mb-8 text-green-100">Get started with your free assessment and discover your personalized disaster preparedness plan</p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-lg mx-auto">
+            <div className="mt-16 text-center animate-scale-in animate-delay-1000">
+              <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-12 text-white hover-lift animate-gradient">
+                <h3 className="text-3xl font-bold mb-4 animate-fade-in-up">Still Have Questions?</h3>
+                <p className="text-xl mb-8 text-green-100 animate-fade-in-up animate-delay-200">Get started with your free assessment and discover your personalized disaster preparedness plan</p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-lg mx-auto animate-fade-in-up animate-delay-400">
                   <input 
                     type="text" 
                     placeholder="Enter your ZIP code"
                     value={zipCode}
                     onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
                     maxLength={5}
-                    className="flex-1 rounded-xl border-0 px-6 py-4 text-lg text-gray-900 placeholder-gray-500"
+                    className="flex-1 rounded-xl border-0 px-6 py-4 text-lg text-gray-900 placeholder-gray-500 transition-all duration-300 hover-lift"
                   />
                   <Button 
                     onClick={startAudit}
-                    className="bg-white text-green-700 hover:bg-green-50 px-8 py-4 text-lg font-bold rounded-xl whitespace-nowrap"
+                    className="bg-white text-green-700 hover:bg-green-50 px-8 py-4 text-lg font-bold rounded-xl whitespace-nowrap transition-all duration-300 hover:scale-105 animate-shimmer"
                   >
                     Start Free Assessment
                   </Button>
