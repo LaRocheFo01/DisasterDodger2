@@ -7,7 +7,7 @@ import { insertAuditSchema } from "@shared/schema";
 import { z } from "zod";
 import { dbManager } from "./db-manager";
 import { generateAutomatedReport, type Hazard } from "./automated-report-generator";
-import { callDeepseek } from "./deepseek-service";
+import { callDeepseek, renderAuditHTML } from "./deepseek-service";
 import { generatePDFFromHTML } from "./pdf-generator";
 import axios from 'axios';
 
@@ -152,27 +152,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log("Processing audit with Deepseek AI...");
 
-      // Step 1: Call Deepseek with questionnaire answers and PDF content
-      const pdfContent = answers.pdfContent || [];
-      const auditResult = await callDeepseek(answers, 'deepseek/deepseek-r1-0528-qwen3-8b:free', pdfContent);
+      // Step 1: Call Deepseek with new ReportTemplate structure
+      const zipCode = answers.zipCode || 'Not specified';
+      const primaryHazard = answers.primaryHazard || 'earthquake';
+      const templateId = 'comprehensive';
+      
+      const auditResult = await callDeepseek(
+        answers, 
+        'deepseek/deepseek-r1-0528-qwen3-8b:free',
+        templateId,
+        zipCode,
+        primaryHazard
+      );
 
       // Step 2: Generate HTML from audit result
       const auditData = {
-         zipCode: answers.zipCode || 'Not specified',
+        zipCode: zipCode,
+        homeType: answers.homeType || 'Unknown',
+        yearBuilt: answers.yearBuilt || 'Unknown',
         ...answers
       };
 
-      // Step 3: Generate PDF using jsPDF
-      const pdfBuffer = await generatePDFFromHTML(auditResult, auditData);
+      // Step 3: Generate HTML report
+      const htmlContent = renderAuditHTML(auditResult, auditData);
 
-      // Step 4: Send PDF to browser
-      const filename = `Disaster_Dodger_AI_Report_${auditData.zipCode}_${new Date().toISOString().split('T')[0]}.pdf`;
-
-      res.setHeader("Content-Type", "application/pdf");
-      res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
-      res.setHeader("Content-Length", pdfBuffer.length.toString());
-
-      res.send(pdfBuffer);
+      // Step 4: Return HTML for now (PDF generation can be added later)
+      res.setHeader("Content-Type", "text/html");
+      res.send(htmlContent);
 
     } catch (error: any) {
       console.error("Deepseek audit workflow error:", error);
