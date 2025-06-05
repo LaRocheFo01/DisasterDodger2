@@ -16,6 +16,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.send({ message: "Hello from the server!" });
   });
 
+  // Get hazard data for a zip code
+  app.get("/api/hazards/:zipCode", async (req, res) => {
+    try {
+      const zipCode = req.params.zipCode;
+      console.log("Fetching hazard data for zip code:", zipCode);
+      
+      // Mock hazard data - replace with actual API call if needed
+      const hazardData = {
+        zipCode: zipCode,
+        primaryHazards: ["flood", "hurricane"],
+        riskLevel: "moderate",
+        floodZone: "AE",
+        windSpeed: "120 mph",
+        earthquakeZone: "low"
+      };
+      
+      return res.status(200).json(hazardData);
+    } catch (e: any) {
+      console.error("get hazard data err", e);
+      return res
+        .status(500)
+        .send({ message: "Failed to get hazard data", error: e.message });
+    }
+  });
+
   app.post("/api/upload", async (req, res) => {
     try {
       // File upload functionality - implement as needed
@@ -96,6 +121,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // PATCH endpoint for partial updates
+  app.patch("/api/audits/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid audit ID" });
+      }
+      
+      const body = req.body;
+      console.log("Patching audit", id, "with data:", body);
+      
+      const audit = await storage.updateAudit(id, body);
+      if (!audit) {
+        return res.status(404).json({ message: "Audit not found" });
+      }
+      
+      console.log("Audit patched successfully:", audit.id);
+      return res.status(200).json(audit);
+    } catch (e: any) {
+      console.error("patch audit err", e);
+      return res
+        .status(500)
+        .send({ message: "Failed to patch audit", error: e.message });
+    }
+  });
+
   app.delete("/api/audits/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
@@ -106,6 +157,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res
         .status(500)
         .send({ message: "Failed to delete audit", error: e.message });
+    }
+  });
+
+  // Complete audit endpoint
+  app.post("/api/audits/:id/complete", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid audit ID" });
+      }
+
+      console.log("Completing audit", id);
+      
+      const audit = await storage.updateAudit(id, { completed: true });
+      if (!audit) {
+        return res.status(404).json({ message: "Audit not found" });
+      }
+
+      console.log("Audit completed successfully:", audit.id);
+      return res.status(200).json(audit);
+    } catch (e: any) {
+      console.error("complete audit err", e);
+      return res
+        .status(500)
+        .send({ message: "Failed to complete audit", error: e.message });
     }
   });
 
