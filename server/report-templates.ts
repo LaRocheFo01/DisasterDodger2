@@ -10,7 +10,7 @@ export interface ReportTemplate {
 export interface ReportSection {
   id: string;
   title: string;
-  type: 'cover' | 'summary' | 'analysis' | 'recommendations' | 'costs' | 'grants' | 'custom';
+  type: 'cover' | 'summary' | 'analysis' | 'recommendations' | 'costs' | 'grants' | 'slides' | 'custom';
   enabled: boolean;
   order: number;
   customContent?: string;
@@ -255,10 +255,69 @@ export const DETAILED_TEMPLATE: ReportTemplate = {
   }
 };
 
+export const SLIDES_TEMPLATE: ReportTemplate = {
+  id: 'slides',
+  name: 'Presentation Slides Report',
+  description: 'Report formatted as presentation slides with visual focus',
+  sections: [
+    {
+      id: 'cover',
+      title: 'Title Slide',
+      type: 'cover',
+      enabled: true,
+      order: 1
+    },
+    {
+      id: 'slides',
+      title: 'Key Findings Slides',
+      type: 'slides',
+      enabled: true,
+      order: 2
+    },
+    {
+      id: 'recommendations',
+      title: 'Action Items Slides',
+      type: 'recommendations',
+      enabled: true,
+      order: 3
+    }
+  ],
+  styling: {
+    fonts: {
+      primary: 'Helvetica',
+      secondary: 'Helvetica-Bold',
+      size: {
+        title: 48,
+        header: 32,
+        body: 18,
+        small: 14
+      }
+    },
+    colors: {
+      primary: "#16A34A",
+      secondary: "#10B981",
+      accent: "#0F4C81",
+      text: "#1F2937",
+      lightGray: "#6B7280",
+      background: "#F9FAFB",
+      white: "#FFFFFF",
+      danger: "#DC2626",
+      warning: "#F59E0B",
+      success: "#10B981"
+    },
+    layout: {
+      margins: 60,
+      pageSize: 'A4',
+      spacing: 40
+    }
+  }
+};
+
 export const AVAILABLE_TEMPLATES = [
   DEFAULT_TEMPLATE,
   EXECUTIVE_TEMPLATE,
-  DETAILED_TEMPLATE
+  DETAILED_TEMPLATE,
+  SLIDES_TEMPLATE
 ];
 
 export function getTemplate(templateId: string): ReportTemplate {

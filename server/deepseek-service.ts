@@ -77,11 +77,11 @@ Always start with:
 
 For each element of sections, produce:
 {
-  "id": one of ["cover","summary","analysis","recommendations","costs","grants"],
+  "id": one of ["cover","summary","analysis","recommendations","costs","grants","slides"],
   "title": the human-readable heading,
-  "type": one of ["cover","summary","analysis","recommendations","costs","grants"],
+  "type": one of ["cover","summary","analysis","recommendations","costs","grants","slides"],
   "enabled": true if the section is required (otherwise false),
-  "order": integer (1-6) indicating its position,
+  "order": integer (1-7) indicating its position,
   "customContent": string // the actual text for that section
 }
 
