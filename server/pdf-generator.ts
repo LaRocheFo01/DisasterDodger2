@@ -1,3 +1,4 @@
+
 import { jsPDF } from 'jspdf';
 import type { DeepseekAuditResult } from './deepseek-service';
 
@@ -7,7 +8,7 @@ export async function generatePDFFromHTML(
 ): Promise<Buffer> {
   try {
     console.log('Generating professional PDF report...');
-
+    
     const doc = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
@@ -38,13 +39,13 @@ export async function generatePDFFromHTML(
     const addTableRow = (items: string[], x: number, y: number, colWidths: number[]): number => {
       doc.setDrawColor(...borderGray);
       doc.line(x, y - 2, x + colWidths.reduce((a, b) => a + b, 0), y - 2);
-
+      
       let currentX = x;
       items.forEach((item, i) => {
         doc.text(item, currentX + 2, y);
         currentX += colWidths[i];
       });
-
+      
       return y + 8;
     };
 
@@ -61,12 +62,12 @@ export async function generatePDFFromHTML(
     // 1. COVER PAGE
     doc.setFillColor(...primaryGreen);
     doc.rect(0, 0, pageWidth, 60, 'F');
-
+    
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(28);
     doc.setFont('helvetica', 'bold');
     doc.text('Disaster Dodger™', pageWidth / 2, 35, { align: 'center' });
-
+    
     doc.setFontSize(16);
     doc.text('Home Assessment Audit Report', pageWidth / 2, 48, { align: 'center' });
 
@@ -75,11 +76,11 @@ export async function generatePDFFromHTML(
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.text('Property Details', margin, yPos);
-
+    
     yPos += 15;
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-
+    
     const propertyDetails = [
       ['Address/ZIP Code:', auditData.zipCode || 'Not specified'],
       ['Hazard Region:', audit.primaryHazards?.[0] || 'Multiple hazards'],
@@ -102,10 +103,10 @@ export async function generatePDFFromHTML(
     const riskColor = audit.riskScore >= 70 ? [220, 38, 38] : 
                      audit.riskScore >= 40 ? [245, 158, 11] : 
                      [34, 197, 94];
-
+    
     doc.setFillColor(...riskColor);
     doc.roundedRect(margin, yPos, contentWidth, 25, 3, 3, 'F');
-
+    
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');
@@ -114,56 +115,56 @@ export async function generatePDFFromHTML(
     // 2. EXECUTIVE SUMMARY (New Page)
     doc.addPage();
     yPos = 30;
-
+    
     doc.setTextColor(...primaryGreen);
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
     doc.text('Executive Summary', margin, yPos);
-
+    
     yPos += 15;
     doc.setTextColor(...textBlack);
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-
+    
     const summaryText = audit.summary || 'This comprehensive home safety assessment evaluates your property against natural disaster perils following FEMA guidelines and industry best practices.';
     yPos = addWrappedText(summaryText, margin, yPos, contentWidth, 11);
-
+    
     yPos += 10;
     doc.setFontSize(9);
     doc.setFont('helvetica', 'italic');
     doc.text('References: FEMA P-530 (Earthquake), FEMA P-804 (Wind), FEMA P-312 (Flood), FEMA P-737 (Wildfire)', margin, yPos);
-
+    
     // Risk Summary Table
     yPos += 20;
     doc.setTextColor(...primaryGreen);
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.text('Risk Summary', margin, yPos);
-
+    
     yPos += 15;
     doc.setTextColor(...textBlack);
     doc.setFontSize(10);
-
+    
     const tableHeaders = ['Hazard', 'Current Risk', 'Immediate Priority', 'Five-Year Priority', 'Residual Risk'];
     const colWidths = [35, 25, 40, 40, 30];
-
+    
     // Table header
     doc.setFillColor(...primaryGreen);
     doc.rect(margin, yPos - 2, contentWidth, 8, 'F');
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
     yPos = addTableRow(tableHeaders, margin, yPos, colWidths);
-
+    
     // Table rows
     doc.setTextColor(...textBlack);
     doc.setFont('helvetica', 'normal');
-
+    
     audit.primaryHazards?.forEach((hazard, index) => {
       if (index % 2 === 0) {
         doc.setFillColor(245, 245, 245);
         doc.rect(margin, yPos - 4, contentWidth, 8, 'F');
       }
-
+      
       const rowData = [
         hazard,
         `${Math.floor(Math.random() * 30 + 20)}%`,
@@ -171,7 +172,7 @@ export async function generatePDFFromHTML(
         audit.recommendations?.[1]?.title?.substring(0, 25) || 'Structural upgrades',
         `${Math.floor(Math.random() * 15 + 5)}%`
       ];
-
+      
       yPos = addTableRow(rowData, margin, yPos, colWidths);
     });
 
@@ -190,114 +191,114 @@ export async function generatePDFFromHTML(
     // 3. DETAILED RECOMMENDATIONS (New Page)
     doc.addPage();
     yPos = 30;
-
+    
     doc.setTextColor(...primaryGreen);
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
     doc.text('Priority Recommendations', margin, yPos);
-
+    
     yPos += 20;
-
+    
     audit.recommendations?.forEach((rec, index) => {
       checkPageBreak(40);
-
+      
       // Priority badge
       const priorityColor = rec.priority === 'High' ? [220, 38, 38] :
                            rec.priority === 'Medium' ? [245, 158, 11] :
                            [34, 197, 94];
-
+      
       doc.setFillColor(...priorityColor);
       doc.roundedRect(margin, yPos, 20, 6, 2, 2, 'F');
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(8);
       doc.setFont('helvetica', 'bold');
       doc.text(rec.priority, margin + 10, yPos + 4, { align: 'center' });
-
+      
       // Recommendation details
       doc.setTextColor(...textBlack);
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
       doc.text(rec.title, margin + 25, yPos + 4);
-
+      
       yPos += 10;
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
       yPos = addWrappedText(rec.description, margin, yPos, contentWidth, 10);
-
+      
       yPos += 5;
       doc.setFont('helvetica', 'bold');
       doc.text(`Cost: ${rec.estimatedCost} | Timeframe: ${rec.timeframe}`, margin, yPos);
-
+      
       if (rec.femaCitation) {
         yPos += 6;
         doc.setFont('helvetica', 'italic');
         doc.text(`FEMA Reference: ${rec.femaCitation}`, margin, yPos);
       }
-
+      
       yPos += 15;
     });
 
     // 4. GRANT OPPORTUNITIES & INSURANCE
     if (audit.grantOpportunities?.length > 0) {
       checkPageBreak(50);
-
+      
       doc.setTextColor(...primaryGreen);
       doc.setFontSize(16);
       doc.setFont('helvetica', 'bold');
       doc.text('Grant Opportunities', margin, yPos);
-
+      
       yPos += 15;
-
+      
       audit.grantOpportunities.forEach(grant => {
         checkPageBreak(30);
-
+        
         doc.setTextColor(...textBlack);
         doc.setFontSize(12);
         doc.setFont('helvetica', 'bold');
         doc.text(grant.program, margin, yPos);
-
+        
         yPos += 8;
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
         yPos = addWrappedText(grant.description, margin, yPos, contentWidth, 10);
-
+        
         yPos += 5;
         doc.setFont('helvetica', 'bold');
         doc.text(`Eligibility: `, margin, yPos);
         doc.setFont('helvetica', 'normal');
         yPos = addWrappedText(grant.eligibility, margin + 20, yPos, contentWidth - 20, 10);
-
+        
         yPos += 5;
         doc.setFont('helvetica', 'bold');
         doc.text(`Max Amount: ${grant.maxAmount}`, margin, yPos);
-
+        
         yPos += 15;
       });
     }
 
     // Insurance Considerations
     checkPageBreak(40);
-
+    
     doc.setTextColor(...primaryGreen);
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
     doc.text('Insurance Considerations', margin, yPos);
-
+    
     yPos += 15;
     doc.setTextColor(...textBlack);
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-
+    
     doc.setFont('helvetica', 'bold');
     doc.text('Potential Savings: ', margin, yPos);
     doc.setFont('helvetica', 'normal');
     doc.text(audit.insuranceConsiderations.potentialSavings, margin + 35, yPos);
-
+    
     yPos += 10;
     doc.setFont('helvetica', 'bold');
     doc.text('Requirements:', margin, yPos);
     yPos += 8;
-
+    
     audit.insuranceConsiderations.requirements.forEach(req => {
       doc.setFont('helvetica', 'normal');
       doc.text(`• ${req}`, margin + 5, yPos);
@@ -306,17 +307,17 @@ export async function generatePDFFromHTML(
 
     // 5. NEXT STEPS & DISCLAIMERS
     checkPageBreak(50);
-
+    
     doc.setTextColor(...primaryGreen);
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
     doc.text('Next Steps', margin, yPos);
-
+    
     yPos += 15;
     doc.setTextColor(...textBlack);
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
-
+    
     audit.nextSteps.forEach(step => {
       doc.text(`• ${step}`, margin, yPos);
       yPos += 8;
@@ -327,17 +328,17 @@ export async function generatePDFFromHTML(
     doc.setTextColor(...lightGray);
     doc.setFontSize(9);
     doc.setFont('helvetica', 'italic');
-
+    
     const disclaimerText = 'This assessment is based on self-reported information and general guidelines. It does not constitute professional engineering evaluation. Consult licensed professionals before making structural modifications.';
     yPos = addWrappedText(disclaimerText, margin, yPos, contentWidth, 9);
-
+    
     yPos += 10;
     doc.text(`Report generated: ${new Date().toLocaleDateString()} | Report ID: ${auditData.id || Math.floor(Math.random() * 10000)}`, margin, yPos);
 
     // Convert to Buffer
     const pdfOutput = doc.output('arraybuffer');
     return Buffer.from(pdfOutput);
-
+    
   } catch (error) {
     console.error('PDF generation error:', error);
     throw new Error(`Failed to generate PDF: ${error}`);
