@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
-import { generatePDFReport } from "./report-deepseek";
+import { generatePDFReport } from "./report";
 import { insertAuditSchema } from "@shared/schema";
 import { z } from "zod";
 import { generateAutomatedReport, type Hazard } from "./automated-report-generator";
@@ -291,9 +291,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).send(`Webhook Error: ${error.message}`);
     }
   });
-
-  // PDF Report generation with DeepSeek integration
-  app.post("/api/audits/:id/generate-pdf", generatePDFReport);
 
   // Insurance calculator endpoints
   app.post("/api/insurance/calculate", calculateInsuranceSavings);
