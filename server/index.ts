@@ -3,12 +3,16 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import dotenv from "dotenv";
 import { checkRequiredEnvVars } from "./env-check";
+import path from "path";
 // Load environment variables from .env file
 dotenv.config();
 checkRequiredEnvVars();
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Serve static files from public directory
+app.use(express.static(path.join(process.cwd(), 'public')));
 
 app.use((req, res, next) => {
   const start = Date.now();
