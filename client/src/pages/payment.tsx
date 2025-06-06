@@ -42,7 +42,7 @@ export default function Payment() {
       <div className="min-h-screen bg-gradient-to-br from-disaster-green-50 to-disaster-green-100 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-semibold text-gray-900 mb-4">Audit Not Found</h1>
-          <Button onClick={() => setLocation("/start-audit")} className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 rounded-xl">
+          <Button onClick={() => setLocation("/start-audit")} className="bg-disaster-green-600 hover:bg-disaster-green-700">
             Start New Audit
           </Button>
         </div>
@@ -51,7 +51,7 @@ export default function Payment() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
+    <div className="min-h-screen bg-gradient-to-br from-disaster-green-50 to-disaster-green-100">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -66,10 +66,8 @@ export default function Payment() {
                 Back
               </Button>
               <div className="flex items-center">
-                <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-green-600 rounded-lg flex items-center justify-center mr-2">
-                  <Shield className="h-5 w-5 text-white" />
-                </div>
-                <span className="text-lg font-bold text-green-700">Disaster Dodger</span>
+                <Shield className="h-6 w-6 text-disaster-green-600 mr-2" />
+                <span className="text-lg font-semibold text-gray-900">Disaster Dodger™</span>
               </div>
             </div>
           </div>

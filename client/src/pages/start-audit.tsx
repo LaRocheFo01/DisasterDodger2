@@ -268,25 +268,23 @@ export default function StartAudit() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100">
+    <div className="min-h-screen bg-gradient-to-br from-disaster-green-50 to-disaster-green-100">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-white shadow-sm border-b border-green-100">
+      <header className="sticky top-0 z-40 bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
               <Button 
                 variant="ghost" 
                 onClick={() => setLocation("/")}
-                className="mr-4 text-gray-600 hover:text-green-600 rounded-xl"
+                className="mr-4 text-gray-600 hover:text-disaster-green-600"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
               </Button>
               <div className="flex items-center">
-                <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-green-600 rounded-lg flex items-center justify-center mr-2">
-                  <Shield className="h-5 w-5 text-white" />
-                </div>
-                <span className="text-lg font-bold text-green-700">Disaster Dodger</span>
+                <Shield className="h-6 w-6 text-disaster-green-600 mr-2" />
+                <span className="text-lg font-semibold text-gray-900">Disaster Dodger™</span>
               </div>
             </div>
           </div>
@@ -295,11 +293,11 @@ export default function StartAudit() {
 
       {/* Progress Indicator */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
-          <div className="bg-gradient-to-r from-green-400 to-green-600 h-3 rounded-full shadow-sm" style={{width: '33%'}}></div>
+        <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+          <div className="bg-disaster-green-600 h-2 rounded-full" style={{width: '33%'}}></div>
         </div>
-        <p className="text-sm text-gray-600 mb-8 font-medium">Step 1 of 3: Enter Your Location 🏠</p>
-      </div>v>
+        <p className="text-sm text-gray-600 mb-8">Step 1 of 3: Enter Location</p>
+      </div>
 
       {/* Main Content */}
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
