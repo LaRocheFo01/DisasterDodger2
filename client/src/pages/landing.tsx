@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useLocation } from 'wouter';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { ChevronRight, Shield, MapPin, FileText, Clock, Users, Star, ArrowRight, Menu, X } from 'lucide-react';
 
 export default function Landing() {
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const [typedText, setTypedText] = useState('');
@@ -119,7 +119,7 @@ export default function Landing() {
               <a href="#features" className="hover:text-blue-400 transition-colors">Features</a>
               <a href="#how-it-works" className="hover:text-blue-400 transition-colors">How It Works</a>
               <a href="#testimonials" className="hover:text-blue-400 transition-colors">Reviews</a>
-              <Button onClick={() => navigate('/start-audit')} className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 transform hover:scale-105 transition-all duration-200">
+              <Button onClick={() => setLocation('/start-audit')} className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 transform hover:scale-105 transition-all duration-200">
                 Start Audit <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </div>
@@ -141,7 +141,7 @@ export default function Landing() {
               <a href="#features" className="block hover:text-blue-400 transition-colors">Features</a>
               <a href="#how-it-works" className="block hover:text-blue-400 transition-colors">How It Works</a>
               <a href="#testimonials" className="block hover:text-blue-400 transition-colors">Reviews</a>
-              <Button onClick={() => navigate('/start-audit')} className="w-full bg-gradient-to-r from-blue-600 to-cyan-600">
+              <Button onClick={() => setLocation('/start-audit')} className="w-full bg-gradient-to-r from-blue-600 to-cyan-600">
                 Start Audit
               </Button>
             </div>
@@ -178,7 +178,7 @@ export default function Landing() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Button 
-              onClick={() => navigate('/start-audit')}
+              onClick={() => setLocation('/start-audit')}
               size="lg"
               className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 py-4 text-lg font-semibold transform hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-cyan-500/25 group"
             >
@@ -354,7 +354,7 @@ export default function Landing() {
             Start your comprehensive home assessment today and protect what matters most.
           </p>
           <Button 
-            onClick={() => navigate('/start-audit')}
+            onClick={() => setLocation('/start-audit')}
             size="lg"
             className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-12 py-6 text-xl font-semibold transform hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-cyan-500/25"
           >
