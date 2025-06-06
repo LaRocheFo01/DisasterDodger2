@@ -1,4 +1,4 @@
-import { Shield, ArrowRight, CheckCircle, Zap, Waves, Flame, Wind, ChevronDown, ChevronUp, Home, Clock, DollarSign, Star, Users, MapPin, Target, Heart, Globe } from "lucide-react";
+import { Shield, ArrowRight, CheckCircle, Zap, Waves, Flame, Wind, ChevronDown, ChevronUp, Home, Clock, DollarSign, Star, Users, MapPin, Target, Heart, Globe, Download, Calculator } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
@@ -7,7 +7,7 @@ export default function Landing() {
   const [, setLocation] = useLocation();
   const [zipCode, setZipCode] = useState("");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+
 
   const startAudit = () => {
     if (zipCode.trim()) {
@@ -26,19 +26,7 @@ export default function Landing() {
     setOpenFaq(openFaq === index ? null : index);
   };
 
-  // Rotating testimonials
-  const testimonials = [
-    { name: "Sarah M.", location: "Austin, TX", savings: "$2,400", quote: "Our flood insurance dropped 40% after following the recommendations." },
-    { name: "Mike R.", location: "Phoenix, AZ", savings: "$1,800", quote: "The wildfire protection plan saved our home when neighbors lost theirs." },
-    { name: "Lisa K.", location: "Miami, FL", savings: "$3,200", quote: "Hurricane prep recommendations cut our insurance by $3,200 annually." }
-  ];
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-green-100">
@@ -54,8 +42,8 @@ export default function Landing() {
           
           <div className="hidden md:flex items-center space-x-6">
             <a href="#process" className="text-gray-600 hover:text-green-600 font-medium transition-colors">How It Works</a>
-            <a href="#stories" className="text-gray-600 hover:text-green-600 font-medium transition-colors">Success Stories</a>
-            <a href="#resources" className="text-gray-600 hover:text-green-600 font-medium transition-colors">Resources</a>
+            <a href="#stories" className="text-gray-600 hover:text-green-600 font-medium transition-colors">Resources</a>
+            <a href="#resources" className="text-gray-600 hover:text-green-600 font-medium transition-colors">Tools</a>
             <Button 
               onClick={startAudit}
               className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-full"
@@ -238,75 +226,103 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Social Proof Stories */}
+      {/* Emergency Resources & Tools */}
       <section id="stories" className="py-32 bg-gradient-to-br from-green-50 to-emerald-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
             <h2 className="text-4xl font-bold text-gray-900 mb-6">
-              Real Families, Real Protection,
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600"> Real Savings</span>
+              Essential Emergency
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600"> Resources & Tools</span>
             </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Get immediate access to critical preparedness resources and tools
+            </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Story Card 1 */}
-            <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+          <div className="grid md:grid-cols-2 gap-8 mb-16">
+            {/* Emergency Kit Download */}
+            <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300">
               <div className="flex items-center space-x-4 mb-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                  JM
+                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                  <Download className="w-8 h-8 text-white" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-gray-900">Jennifer & Mark</h4>
-                  <p className="text-gray-600">California Wildfire Zone</p>
+                  <h3 className="text-2xl font-bold text-gray-900">72-Hour Emergency Kit</h3>
+                  <p className="text-gray-600">Complete family survival checklist</p>
                 </div>
               </div>
-              <div className="bg-green-50 rounded-xl p-4 mb-6">
-                <div className="text-3xl font-bold text-green-600 mb-1">$15,000</div>
-                <div className="text-sm text-green-700">Prevented damage cost</div>
-              </div>
-              <p className="text-gray-700 leading-relaxed">
-                "When the Creek Fire hit our neighborhood, we were the only house that survived. The defensible space plan saved everything we worked for."
+              <p className="text-gray-700 leading-relaxed mb-6">
+                Download our comprehensive 72-hour family survival guide with FEMA-approved checklists for water, food, medical supplies, and emergency tools.
               </p>
+              <Button 
+                onClick={() => window.open('/_72-hour family survival guide.pdf', '_blank')}
+                className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-4 text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 h-[60px]"
+              >
+                <Download className="mr-2 h-5 w-5" />
+                Download Emergency Kit Guide
+              </Button>
             </div>
 
-            {/* Story Card 2 */}
-            <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+            {/* Insurance Calculator */}
+            <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300">
               <div className="flex items-center space-x-4 mb-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                  RK
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                  <Calculator className="w-8 h-8 text-white" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-gray-900">Rodriguez Family</h4>
-                  <p className="text-gray-600">Houston, Texas</p>
+                  <h3 className="text-2xl font-bold text-gray-900">Insurance Calculator</h3>
+                  <p className="text-gray-600">Calculate potential savings</p>
                 </div>
               </div>
-              <div className="bg-green-50 rounded-xl p-4 mb-6">
-                <div className="text-3xl font-bold text-green-600 mb-1">$3,600</div>
-                <div className="text-sm text-green-700">Annual insurance savings</div>
-              </div>
-              <p className="text-gray-700 leading-relaxed">
-                "The flood mitigation upgrades dropped our premiums by 45%. The plan paid for itself in just 8 months!"
+              <p className="text-gray-700 leading-relaxed mb-6">
+                Discover how much you could save on insurance premiums with disaster preparedness improvements. Get instant estimates based on your home's risk profile.
               </p>
+              <Button 
+                onClick={() => setLocation('/insurance-calculator')}
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 h-[60px]"
+              >
+                <Calculator className="mr-2 h-5 w-5" />
+                Calculate Insurance Savings
+              </Button>
+            </div>
+          </div>
+
+          {/* Join Community & CTA */}
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Community Button */}
+            <div className="bg-gradient-to-r from-purple-600 to-purple-700 rounded-2xl p-8 text-center shadow-xl">
+              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-4">Join Our Community</h3>
+              <p className="text-purple-100 mb-6">
+                Connect with thousands of prepared families sharing tips and experiences
+              </p>
+              <Button 
+                onClick={() => window.open('https://discord.gg/disasterdodger', '_blank')}
+                className="bg-white text-purple-600 hover:bg-purple-50 px-8 py-4 text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 h-[60px]"
+              >
+                <Users className="mr-2 h-5 w-5" />
+                Join Community
+              </Button>
             </div>
 
-            {/* Story Card 3 */}
-            <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-              <div className="flex items-center space-x-4 mb-6">
-                <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                  DL
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900">David & Lisa</h4>
-                  <p className="text-gray-600">Seattle, Washington</p>
-                </div>
+            {/* Main CTA */}
+            <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl p-8 text-center shadow-xl">
+              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="w-8 h-8 text-white" />
               </div>
-              <div className="bg-green-50 rounded-xl p-4 mb-6">
-                <div className="text-3xl font-bold text-green-600 mb-1">$8,500</div>
-                <div className="text-sm text-green-700">Grant funding secured</div>
-              </div>
-              <p className="text-gray-700 leading-relaxed">
-                "We qualified for state earthquake retrofitting grants we never knew existed. The guidance was invaluable."
+              <h3 className="text-2xl font-bold text-white mb-4">Start Your Protection Plan</h3>
+              <p className="text-green-100 mb-6">
+                Get your personalized home safety assessment in just 5 minutes
               </p>
+              <Button 
+                onClick={startAudit}
+                className="bg-white text-green-600 hover:bg-green-50 px-8 py-4 text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 h-[60px]"
+              >
+                <ArrowRight className="mr-2 h-5 w-5" />
+                Start Free Assessment
+              </Button>
             </div>
           </div>
         </div>
