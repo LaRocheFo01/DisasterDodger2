@@ -19,6 +19,50 @@ interface CreativeReportSection {
   };
 }
 
+// Helper functions
+function determineRiskLevel(hazard: string, responses: any): 'LOW' | 'MEDIUM' | 'HIGH' | 'EXTREME' {
+  if (!responses || Object.keys(responses).length === 0) {
+    return 'MEDIUM';
+  }
+  
+  let riskFactors = 0;
+  const responseValues = Object.values(responses);
+  
+  responseValues.forEach((value: any) => {
+    if (typeof value === 'string') {
+      if (value.includes('None') || value.includes('No') || value.includes('Basic')) {
+        riskFactors++;
+      }
+    }
+  });
+  
+  if (riskFactors >= 8) return 'EXTREME';
+  if (riskFactors >= 5) return 'HIGH';
+  if (riskFactors >= 2) return 'MEDIUM';
+  return 'LOW';
+}
+
+function calculateAuditScore(responses: any): number {
+  if (!responses || Object.keys(responses).length === 0) {
+    return 65;
+  }
+  
+  let score = 100;
+  const responseValues = Object.values(responses);
+  
+  responseValues.forEach((value: any) => {
+    if (typeof value === 'string') {
+      if (value.includes('None') || value.includes('No')) {
+        score -= 8;
+      } else if (value.includes('Basic') || value.includes('Single')) {
+        score -= 4;
+      }
+    }
+  });
+  
+  return Math.max(30, Math.min(95, score));
+}
+
 interface CreativeReport {
   id: string;
   title: string;
@@ -58,179 +102,133 @@ export async function generateCreativeReport(req: Request, res: Response) {
       return res.status(404).json({ error: 'Audit not found' });
     }
 
-    console.log(`[Creative Report] Generating for audit ${auditId} using OpenRouter API...`);
+    console.log(`[Creative Report] Generating for audit ${auditId}...`);
 
     const creativeConcept = generateRandomConcept();
     
-    const systemPrompt = `You are a creative disaster preparedness report designer. Generate a comprehensive, visually engaging report that tells a compelling story about home safety.
-
-Create a JSON response with this exact structure:
-{
-  "id": "creative_report_${auditId}_${Date.now()}",
-  "title": "Creative title that's engaging and memorable",
-  "subtitle": "Compelling subtitle about home protection",
-  "homeAddress": "${audit.zipCode}",
-  "generatedDate": "${new Date().toLocaleDateString()}",
-  "riskLevel": "HIGH|MEDIUM|LOW|EXTREME",
-  "primaryHazard": "${audit.primaryHazard}",
-  "sections": [
-    {
-      "id": "hero",
-      "title": "Your Home's Guardian Story",
-      "type": "hero",
-      "content": "A compelling narrative about this specific home's protection journey",
-      "visualElements": {
-        "colorTheme": "emerald-blue-gradient",
-        "animations": ["fade-in", "slide-up"]
-      }
-    },
-    {
-      "id": "current_state",
-      "title": "Protection Status Dashboard",
-      "type": "scorecard",
-      "content": "Current vulnerability analysis with specific insights",
-      "visualElements": {
-        "charts": [
-          {
-            "type": "donut",
-            "data": {"protected": 65, "vulnerable": 35},
-            "title": "Overall Protection Level"
+    // Generate report data directly instead of using API
+    const reportData: CreativeReport = {
+      id: `creative_report_${auditId}_${Date.now()}`,
+      title: `${audit.primaryHazard} Protection Plan for Your Home`,
+      subtitle: `Personalized safety strategy for ZIP ${audit.zipCode}`,
+      homeAddress: audit.zipCode,
+      generatedDate: new Date().toLocaleDateString(),
+      riskLevel: determineRiskLevel(audit.primaryHazard, audit.auditResponses),
+      primaryHazard: audit.primaryHazard,
+      sections: [
+        {
+          id: "hero",
+          title: "Your Home's Protection Journey",
+          type: "hero",
+          content: `Welcome to your personalized ${audit.primaryHazard} protection plan. This comprehensive assessment identifies your home's vulnerabilities and provides actionable solutions to keep your family safe.`,
+          visualElements: {
+            colorTheme: "emerald-blue-gradient",
+            animations: ["fade-in", "slide-up"]
           }
-        ]
-      }
-    },
-    {
-      "id": "threat_timeline",
-      "title": "Disaster Risk Timeline",
-      "type": "timeline",
-      "content": "Season-by-season risk analysis and preparation schedule",
-      "visualElements": {
-        "charts": [
-          {
-            "type": "timeline",
-            "data": {"months": ["Jan", "Feb", "Mar"], "risks": [30, 45, 60]},
-            "title": "Annual Risk Patterns"
-          }
-        ]
-      }
-    },
-    {
-      "id": "success_story",
-      "title": "Your Transformation Journey",
-      "type": "story",
-      "content": "A personalized story of how implementing recommendations transforms this home",
-      "visualElements": {
-        "icons": ["home-shield", "family-safe", "money-saved"],
-        "colorTheme": "success-green"
-      }
-    },
-    {
-      "id": "action_roadmap",
-      "title": "90-Day Action Roadmap",
-      "type": "action_plan",
-      "content": "Specific, prioritized steps with timelines and cost estimates",
-      "visualElements": {
-        "charts": [
-          {
-            "type": "bar",
-            "data": {"weeks": [1,2,3,4], "progress": [25,50,75,100]},
-            "title": "Implementation Progress"
-          }
-        ]
-      }
-    },
-    {
-      "id": "resource_arsenal",
-      "title": "Your Emergency Arsenal",
-      "type": "resources",
-      "content": "Comprehensive resource library with emergency contacts and supplies",
-      "visualElements": {
-        "icons": ["toolkit", "phone", "first-aid", "documents"]
-      }
-    }
-  ],
-  "metadata": {
-    "auditScore": 72,
-    "preparednessLevel": "Developing Guardian",
-    "totalRecommendations": 8,
-    "estimatedCost": 4500,
-    "potentialSavings": 2800
-  }
-}
-
-Base the content on these audit responses: ${JSON.stringify(audit.auditResponses || {})}
-
-Make it personal, engaging, and actionable. Use storytelling techniques and specific details about ${audit.primaryHazard} risks in ZIP code ${audit.zipCode}.`;
-
-    const userPrompt = `Generate a creative, magazine-style safety report for a ${audit.primaryHazard} assessment in ZIP ${audit.zipCode}. 
-
-Concept theme: ${creativeConcept}
-
-Make it feel like a premium, personalized consultation rather than a generic report. Include specific insights, local context, and an engaging narrative that makes the homeowner excited about improving their safety.
-
-Focus on ${audit.primaryHazard} hazards and create content that feels authentic and locally relevant.
-
-Return only the JSON object.`;
-
-    const response = await axios.post(
-      OPENROUTER_API_URL,
-      {
-        model: 'deepseek/deepseek-r1-0528-qwen3-8b:free',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ],
-        temperature: 0.7,
-        max_tokens: 4000
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://replit.com',
-          'X-Title': 'Creative Home Safety Report'
         },
-        timeout: 45000
-      }
-    );
-
-    console.log('[Creative Report] OpenRouter API response received');
-
-    if (!response.data?.choices?.[0]?.message?.content) {
-      throw new Error('Invalid response from OpenRouter API');
-    }
-
-    let reportData: CreativeReport;
-    try {
-      const content = response.data.choices[0].message.content.trim();
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        throw new Error('No JSON found in response');
-      }
-      reportData = JSON.parse(jsonMatch[0]);
-    } catch (parseError) {
-      console.error('[Creative Report] JSON parsing failed:', parseError);
-      throw new Error('Failed to parse AI response as JSON');
-    }
-
-    // Generate the creative HTML template
-    const htmlContent = generateCreativeHTML(reportData);
-    
-    // Generate PDF
-    const pdfBuffer = await generatePDFFromHTML(
-      {
-        id: reportData.id,
-        name: reportData.title,
-        description: reportData.subtitle,
-        sections: [],
-        styling: {
-          fonts: { primary: 'Poppins', secondary: 'Open Sans', size: { title: 24, header: 18, body: 14, small: 12 } },
-          colors: { primary: '#10B981', secondary: '#3B82F6', accent: '#F59E0B', text: '#1F2937', lightGray: '#6B7280', background: '#F9FAFB', white: '#FFFFFF', danger: '#DC2626', warning: '#F59E0B', success: '#10B981' },
-          layout: { margins: 40, pageSize: 'A4', spacing: 20 }
+        {
+          id: "current_state",
+          title: "Current Protection Status",
+          type: "scorecard",
+          content: `Based on your responses, we've identified key areas for improvement in your ${audit.primaryHazard} preparedness.`,
+          visualElements: {
+            charts: [{
+              type: "donut" as const,
+              data: { protected: 65, vulnerable: 35 },
+              title: "Overall Protection Level"
+            }]
+          }
+        },
+        {
+          id: "action_roadmap",
+          title: "Your 90-Day Action Plan",
+          type: "action_plan",
+          content: `Follow this prioritized roadmap to systematically improve your home's protection against ${audit.primaryHazard} disasters.`,
+          visualElements: {
+            charts: [{
+              type: "bar" as const,
+              data: { weeks: [1,2,3,4], progress: [25,50,75,100] },
+              title: "Implementation Timeline"
+            }]
+          }
+        },
+        {
+          id: "resource_arsenal",
+          title: "Emergency Resources",
+          type: "resources",
+          content: "Essential contacts, supplies, and documentation to keep your family prepared for any emergency.",
+          visualElements: {
+            icons: ["toolkit", "phone", "first-aid", "documents"]
+          }
         }
-      },
-      htmlContent
-    );
+      ],
+      metadata: {
+        auditScore: calculateAuditScore(audit.auditResponses),
+        preparednessLevel: "Developing Guardian",
+        totalRecommendations: 6,
+        estimatedCost: 3500,
+        potentialSavings: 1800
+      }
+    };
+
+    // Generate PDF directly with jsPDF for reliability
+    const { jsPDF } = require('jspdf');
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    // Add title page
+    doc.setFontSize(24);
+    doc.setTextColor(16, 185, 129); // Emerald color
+    doc.text(reportData.title, 20, 40);
+
+    doc.setFontSize(16);
+    doc.setTextColor(75, 85, 99); // Gray color
+    doc.text(reportData.subtitle, 20, 55);
+
+    // Add generation info
+    doc.setFontSize(12);
+    doc.setTextColor(107, 114, 128);
+    doc.text(`Generated: ${reportData.generatedDate}`, 20, 70);
+    doc.text(`Risk Level: ${reportData.riskLevel}`, 20, 80);
+    doc.text(`Primary Hazard: ${reportData.primaryHazard}`, 20, 90);
+
+    // Add sections
+    let yPos = 110;
+    doc.setFontSize(14);
+    doc.setTextColor(31, 41, 55);
+
+    reportData.sections.forEach((section, index) => {
+      if (yPos > 250) {
+        doc.addPage();
+        yPos = 30;
+      }
+      
+      doc.setFontSize(16);
+      doc.setTextColor(16, 185, 129);
+      doc.text(`${index + 1}. ${section.title}`, 20, yPos);
+      yPos += 10;
+      
+      doc.setFontSize(12);
+      doc.setTextColor(31, 41, 55);
+      const lines = doc.splitTextToSize(section.content, 170);
+      doc.text(lines, 20, yPos);
+      yPos += lines.length * 6 + 10;
+    });
+
+    // Add footer
+    const totalPages = doc.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.setTextColor(107, 114, 128);
+      doc.text('Generated by Disaster Dodger™ - Professional Home Safety Assessment', 20, 280);
+      doc.text(`Page ${i} of ${totalPages}`, 170, 280);
+    }
+
+    const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="creative-safety-report-${auditId}.pdf"`);
