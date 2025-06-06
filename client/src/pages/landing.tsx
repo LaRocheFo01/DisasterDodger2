@@ -255,7 +255,7 @@ export default function Landing() {
                 Download our comprehensive 72-hour family survival guide with FEMA-approved checklists for water, food, medical supplies, and emergency tools.
               </p>
               <Button 
-                onClick={() => window.open('/_72-hour family survival guide.pdf', '_blank')}
+                onClick={() => window.open('/72-hour-family-survival-guide.pdf', '_blank')}
                 className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-4 text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 h-[60px]"
               >
                 <Download className="mr-2 h-5 w-5" />
