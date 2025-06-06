@@ -130,9 +130,13 @@ export default function Landing() {
 
             {/* Right Column - Interactive Visualization */}
             <div className="relative animate-scale-in animate-delay-500">
-              {/* Central Home Icon */}
-              <div className="relative mx-auto w-80 h-80 bg-gradient-to-br from-white to-green-50 rounded-3xl shadow-2xl flex items-center justify-center">
-                <Home className="w-32 h-32 text-green-600" />
+              {/* Central Home Illustration */}
+              <div className="relative mx-auto w-80 h-80 bg-gradient-to-br from-white to-green-50 rounded-3xl shadow-2xl flex items-center justify-center overflow-hidden">
+                <img 
+                  src="/assets/disaster-dodger-illustration.png" 
+                  alt="Protected home with natural disaster elements" 
+                  className="w-72 h-72 object-contain"
+                />
                 
                 {/* Floating Protection Shields */}
                 <div className="absolute -top-4 -left-4 w-16 h-16 bg-red-100 rounded-full flex items-center justify-center animate-float">
