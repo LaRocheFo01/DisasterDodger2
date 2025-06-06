@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
-import { generatePDFReport } from "./report";
+import { generatePDFReport } from "./report-deepseek";
 import { insertAuditSchema } from "@shared/schema";
 import { z } from "zod";
 import { generateAutomatedReport, type Hazard } from "./automated-report-generator";
