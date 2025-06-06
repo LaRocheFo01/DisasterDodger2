@@ -3,55 +3,86 @@
 @tailwind utilities;
 
 :root {
-  --background: 0 0% 100%;
-  --foreground: 20 14.3% 4.1%;
-  --muted: 60 4.8% 95.9%;
-  --muted-foreground: 25 5.3% 44.7%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 20 14.3% 4.1%;
-  --card: 0 0% 100%;
-  --card-foreground: 20 14.3% 4.1%;
-  --border: 20 5.9% 90%;
-  --input: 20 5.9% 90%;
-  --primary: 207 90% 54%;
-  --primary-foreground: 211 100% 99%;
-  --secondary: 60 4.8% 95.9%;
-  --secondary-foreground: 24 9.8% 10%;
-  --accent: 60 4.8% 95.9%;
-  --accent-foreground: 24 9.8% 10%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 60 9.1% 97.8%;
-  --ring: 20 14.3% 4.1%;
-  --radius: 0.5rem;
+  /* Brand Colors - Primary: Emerald Green, Secondary: Deep Blue, Accent: Amber */
+  --brand-primary: 160 84% 39%; /* Emerald 600 - Main brand color */
+  --brand-primary-light: 158 64% 52%; /* Emerald 500 */
+  --brand-primary-dark: 158 100% 30%; /* Emerald 700 */
+  --brand-secondary: 217 91% 60%; /* Blue 500 - Trust & reliability */
+  --brand-secondary-light: 213 94% 68%; /* Blue 400 */
+  --brand-secondary-dark: 221 83% 53%; /* Blue 600 */
+  --brand-accent: 45 93% 47%; /* Amber 500 - Attention & warnings */
+  --brand-accent-light: 48 96% 53%; /* Amber 400 */
+  --brand-accent-dark: 43 96% 56%; /* Amber 600 */
   
-  /* FEMA-aligned colors */
-  --fema-blue: 223 88% 21%; /* #1E3A8A */
-  --emergency-red: 0 84% 60%; /* #DC2626 */
-  --safety-green: 158 64% 52%; /* #059669 */
-  --warning-orange: 42 97% 64%; /* #F59E0B */
+  /* Neutral Grays - Enhanced hierarchy for better readability */
+  --gray-50: 210 20% 98%; /* Background surfaces */
+  --gray-100: 220 14% 96%; /* Light backgrounds */
+  --gray-200: 220 13% 91%; /* Borders & dividers */
+  --gray-300: 216 12% 84%; /* Disabled states */
+  --gray-400: 218 11% 65%; /* Placeholder text */
+  --gray-500: 220 9% 46%; /* Secondary text */
+  --gray-600: 215 14% 34%; /* Body text */
+  --gray-700: 217 19% 27%; /* Headings */
+  --gray-800: 215 28% 17%; /* Dark headings */
+  --gray-900: 222 84% 5%; /* Maximum contrast */
+  
+  /* Semantic Colors */
+  --success: var(--brand-primary); /* Using brand green for success */
+  --warning: var(--brand-accent); /* Using brand amber for warnings */
+  --error: 0 84% 60%; /* Red for errors */
+  --info: var(--brand-secondary); /* Using brand blue for info */
+  
+  /* Design System Mappings */
+  --background: var(--gray-50);
+  --foreground: var(--gray-900);
+  --muted: var(--gray-100);
+  --muted-foreground: var(--gray-500);
+  --popover: 0 0% 100%;
+  --popover-foreground: var(--gray-900);
+  --card: 0 0% 100%;
+  --card-foreground: var(--gray-900);
+  --border: var(--gray-200);
+  --input: var(--gray-200);
+  --primary: var(--brand-primary);
+  --primary-foreground: 0 0% 100%;
+  --secondary: var(--gray-100);
+  --secondary-foreground: var(--gray-800);
+  --accent: var(--brand-accent);
+  --accent-foreground: var(--gray-900);
+  --destructive: var(--error);
+  --destructive-foreground: 0 0% 100%;
+  --ring: var(--brand-primary);
+  --radius: 0.75rem; /* Slightly more rounded for modern feel */
+  
+  /* Legacy FEMA colors for backward compatibility */
+  --fema-blue: var(--brand-secondary-dark);
+  --emergency-red: var(--error);
+  --safety-green: var(--brand-primary);
+  --warning-orange: var(--brand-accent);
 }
 
 .dark {
-  --background: 240 10% 3.9%;
-  --foreground: 0 0% 98%;
-  --muted: 240 3.7% 15.9%;
-  --muted-foreground: 240 5% 64.9%;
-  --popover: 240 10% 3.9%;
-  --popover-foreground: 0 0% 98%;
-  --card: 240 10% 3.9%;
-  --card-foreground: 0 0% 98%;
-  --border: 240 3.7% 15.9%;
-  --input: 240 3.7% 15.9%;
-  --primary: 207 90% 54%;
-  --primary-foreground: 211 100% 99%;
-  --secondary: 240 3.7% 15.9%;
-  --secondary-foreground: 0 0% 98%;
-  --accent: 240 3.7% 15.9%;
-  --accent-foreground: 0 0% 98%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 0 0% 98%;
-  --ring: 240 4.9% 83.9%;
-  --radius: 0.5rem;
+  /* Dark mode with brand colors */
+  --background: 215 28% 8%; /* Dark gray background */
+  --foreground: var(--gray-50);
+  --muted: 215 25% 12%; /* Slightly lighter dark */
+  --muted-foreground: var(--gray-400);
+  --popover: 215 28% 10%;
+  --popover-foreground: var(--gray-50);
+  --card: 215 28% 10%;
+  --card-foreground: var(--gray-50);
+  --border: 215 25% 20%;
+  --input: 215 25% 20%;
+  --primary: var(--brand-primary-light); /* Lighter green for dark mode */
+  --primary-foreground: var(--gray-900);
+  --secondary: 215 25% 15%;
+  --secondary-foreground: var(--gray-50);
+  --accent: var(--brand-accent-light); /* Lighter amber for dark mode */
+  --accent-foreground: var(--gray-900);
+  --destructive: var(--error);
+  --destructive-foreground: var(--gray-50);
+  --ring: var(--brand-primary-light);
+  --radius: 0.75rem;
 }
 
 @layer base {
@@ -78,7 +109,125 @@
   }
 }
 
-/* Custom utility classes */
+/* Design System Utilities */
+
+/* Brand Color Utilities */
+@layer utilities {
+  .text-brand-primary { color: hsl(var(--brand-primary)); }
+  .bg-brand-primary { background-color: hsl(var(--brand-primary)); }
+  .border-brand-primary { border-color: hsl(var(--brand-primary)); }
+
+  .text-brand-secondary { color: hsl(var(--brand-secondary)); }
+  .bg-brand-secondary { background-color: hsl(var(--brand-secondary)); }
+  .border-brand-secondary { border-color: hsl(var(--brand-secondary)); }
+
+  .text-brand-accent { color: hsl(var(--brand-accent)); }
+  .bg-brand-accent { background-color: hsl(var(--brand-accent)); }
+  .border-brand-accent { border-color: hsl(var(--brand-accent)); }
+}
+
+/* Card Component Styles */
+.card-elevated {
+  @apply bg-card shadow-lg rounded-xl p-6 border border-border transition-all duration-300;
+}
+
+.card-elevated:hover {
+  @apply shadow-xl transform -translate-y-1;
+}
+
+.card-standard {
+  @apply bg-card shadow-sm rounded-lg p-4 border border-border;
+}
+
+.card-flat {
+  @apply bg-card rounded-lg p-4 border border-border;
+}
+
+.card-header {
+  @apply border-l-4 border-primary bg-gray-50 dark:bg-gray-800 px-4 py-3 rounded-r-lg;
+}
+
+/* Button System */
+.btn-primary {
+  @apply bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-6 py-3 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md;
+}
+
+.btn-primary:disabled {
+  @apply opacity-50 cursor-not-allowed hover:bg-primary hover:shadow-sm hover:transform-none;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium px-6 py-3 rounded-lg transition-all duration-200 border border-gray-200;
+}
+
+.btn-secondary:disabled {
+  @apply opacity-50 cursor-not-allowed hover:bg-gray-100;
+}
+
+.btn-outline {
+  @apply border border-primary text-primary hover:bg-primary hover:text-primary-foreground font-medium px-6 py-3 rounded-lg transition-all duration-200;
+}
+
+.btn-link {
+  @apply text-primary hover:text-primary/80 hover:underline font-medium transition-colors duration-200;
+}
+
+.btn-danger {
+  @apply bg-red-500 hover:bg-red-600 text-white font-medium px-6 py-3 rounded-lg transition-all duration-200 shadow-sm hover:shadow-md;
+}
+
+.btn-small {
+  @apply px-4 py-2 text-sm;
+}
+
+.btn-large {
+  @apply px-8 py-4 text-lg;
+}
+
+/* Icon Consistency */
+.icon-standard {
+  @apply w-5 h-5 stroke-2;
+}
+
+.icon-large {
+  @apply w-6 h-6 stroke-2;
+}
+
+.icon-small {
+  @apply w-4 h-4 stroke-2;
+}
+
+/* Status Indicators */
+.status-success {
+  @apply bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium;
+}
+
+.status-warning {
+  @apply bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-sm font-medium;
+}
+
+.status-error {
+  @apply bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium;
+}
+
+.status-info {
+  @apply bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium;
+}
+
+/* Form Elements */
+.form-input {
+  @apply w-full px-4 py-3 border border-input rounded-lg bg-background text-foreground placeholder:text-gray-400 focus:ring-2 focus:ring-ring focus:border-primary transition-colors;
+}
+
+.form-label {
+  @apply text-sm font-medium text-gray-700 mb-2 block;
+}
+
+.form-error {
+  @apply text-sm text-red-600 mt-1;
+}
+
+/* Legacy FEMA colors for backward compatibility */
 .text-fema-blue {
   color: hsl(var(--fema-blue));
 }
@@ -144,6 +293,17 @@
   }
 }
 
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes slideInLeft {
   from {
     opacity: 0;
@@ -166,12 +326,32 @@
   }
 }
 
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @keyframes float {
   0%, 100% {
     transform: translateY(0px);
   }
   50% {
     transform: translateY(-10px);
+  }
+}
+
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-15px) rotate(2deg);
   }
 }
 
@@ -184,9 +364,78 @@
   }
 }
 
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes rotateIn {
+  from {
+    opacity: 0;
+    transform: rotate(-360deg) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
 /* Animation classes */
 .animate-fade-in-up {
   animation: fadeInUp 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown 0.8s ease-out forwards;
   opacity: 0;
 }
 
@@ -200,12 +449,101 @@
   opacity: 0;
 }
 
+.animate-scale-in {
+  animation: scaleIn 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-bounce-in {
+  animation: bounceIn 1s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-rotate-in {
+  animation: rotateIn 1s ease-out forwards;
+  opacity: 0;
+}
+
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
 
+.animate-float-slow {
+  animation: floatSlow 4s ease-in-out infinite;
+}
+
 .animate-glow {
   animation: glow 2s ease-in-out infinite;
+}
+
+.animate-pulse-soft {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  background-size: 200px 100%;
+  animation: shimmer 2s infinite;
+}
+
+.animate-gradient {
+  background-size: 400% 400%;
+  animation: gradientShift 3s ease infinite;
+}
+
+/* Delayed animations */
+.animate-delay-100 {
+  animation-delay: 0.1s;
+}
+
+.animate-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.animate-delay-300 {
+  animation-delay: 0.3s;
+}
+
+.animate-delay-400 {
+  animation-delay: 0.4s;
+}
+
+.animate-delay-500 {
+  animation-delay: 0.5s;
+}
+
+.animate-delay-700 {
+  animation-delay: 0.7s;
+}
+
+.animate-delay-1000 {
+  animation-delay: 1s;
+}
+
+/* Hover animations */
+.hover-scale {
+  transition: transform 0.3s ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.hover-glow {
+  transition: box-shadow 0.3s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
 }
 
 /* Smooth scrolling */
