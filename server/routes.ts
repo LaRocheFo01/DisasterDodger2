@@ -296,7 +296,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/insurance/calculate", calculateInsuranceSavings);
   app.get("/api/insurance/recommendations/:hazard", getRecommendationsByHazard);
 
-  // Creative report generator using OpenRouter API
+
 
 
   return createServer(app);
