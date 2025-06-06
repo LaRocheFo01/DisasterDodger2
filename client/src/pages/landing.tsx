@@ -49,7 +49,7 @@ export default function Landing() {
             <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
               <Shield className="h-4 w-4 text-white" />
             </div>
-            <span className="font-bold text-gray-900">SafeHaven</span>
+            <span className="font-bold text-gray-900">Disaster Dodger</span>
           </div>
           
           <div className="hidden md:flex items-center space-x-6">
@@ -97,8 +97,61 @@ export default function Landing() {
               </h1>
 
               <p className="text-xl text-gray-600 leading-relaxed mb-8 max-w-lg">
-                Transform your home into a fortress against nature's fury. Our AI-powered assessment creates a personalized shield of protection in just 5 minutes.
+                Transform your home into a fortress against nature's fury. Our comprehensive assessment creates a personalized shield of protection in just 5 minutes.
               </p>
+
+              {/* Animated Protection Level Bars */}
+              <div className="mb-8 bg-white/80 backdrop-blur-sm rounded-2xl p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Protection Level</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <Flame className="w-5 h-5 text-red-500" />
+                      <span className="text-gray-700 font-medium">Wildfire</span>
+                    </div>
+                    <div className="flex-1 mx-4 bg-gray-200 rounded-full h-3 overflow-hidden">
+                      <div className="bg-gradient-to-r from-red-400 to-red-600 h-3 rounded-full animate-fill-bar" style={{width: '65%', animationDelay: '0.5s'}}></div>
+                    </div>
+                    <span className="text-red-600 font-bold text-sm">65%</span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <Waves className="w-5 h-5 text-blue-500" />
+                      <span className="text-gray-700 font-medium">Flood</span>
+                    </div>
+                    <div className="flex-1 mx-4 bg-gray-200 rounded-full h-3 overflow-hidden">
+                      <div className="bg-gradient-to-r from-blue-400 to-blue-600 h-3 rounded-full animate-fill-bar" style={{width: '80%', animationDelay: '1s'}}></div>
+                    </div>
+                    <span className="text-blue-600 font-bold text-sm">80%</span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <Zap className="w-5 h-5 text-yellow-500" />
+                      <span className="text-gray-700 font-medium">Earthquake</span>
+                    </div>
+                    <div className="flex-1 mx-4 bg-gray-200 rounded-full h-3 overflow-hidden">
+                      <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 h-3 rounded-full animate-fill-bar" style={{width: '45%', animationDelay: '1.5s'}}></div>
+                    </div>
+                    <span className="text-yellow-600 font-bold text-sm">45%</span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <Wind className="w-5 h-5 text-gray-500" />
+                      <span className="text-gray-700 font-medium">Hurricane</span>
+                    </div>
+                    <div className="flex-1 mx-4 bg-gray-200 rounded-full h-3 overflow-hidden">
+                      <div className="bg-gradient-to-r from-gray-400 to-gray-600 h-3 rounded-full animate-fill-bar" style={{width: '75%', animationDelay: '2s'}}></div>
+                    </div>
+                    <span className="text-gray-600 font-bold text-sm">75%</span>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-500 mt-3 text-center">
+                  <span className="text-red-600 font-medium">Get your personalized assessment</span> to improve these scores
+                </p>
+              </div>
 
               {/* Interactive Stats */}
               <div className="grid grid-cols-3 gap-4 mb-8">
@@ -209,45 +262,45 @@ export default function Landing() {
               {/* Step 1 */}
               <div className="text-center group">
                 <div className="relative mx-auto w-32 h-32 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mb-8 shadow-2xl group-hover:scale-110 transition-all duration-500">
-                  <Target className="w-16 h-16 text-white" />
+                  <MapPin className="w-16 h-16 text-white" />
                   <div className="absolute -top-3 -right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center font-bold text-green-600 shadow-lg">
                     1
                   </div>
                   <div className="absolute inset-0 rounded-full bg-white/20 scale-110 animate-ping"></div>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Instant Risk Scan</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Enter Your Location</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Our AI analyzes 10,000+ data points about your location, home type, and local disaster patterns in seconds
+                  We identify your area's primary natural hazards
                 </p>
               </div>
 
               {/* Step 2 */}
               <div className="text-center group">
                 <div className="relative mx-auto w-32 h-32 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full flex items-center justify-center mb-8 shadow-2xl group-hover:scale-110 transition-all duration-500">
-                  <Heart className="w-16 h-16 text-white" />
+                  <CheckCircle className="w-16 h-16 text-white" />
                   <div className="absolute -top-3 -right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center font-bold text-green-600 shadow-lg">
                     2
                   </div>
                   <div className="absolute inset-0 rounded-full bg-white/20 scale-110 animate-ping animation-delay-1000"></div>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Personalized Shield</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Answer Simple Questions</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Get a custom protection plan designed specifically for your family's needs and your home's unique vulnerabilities
+                  Quick assessment about your home's current preparedness
                 </p>
               </div>
 
               {/* Step 3 */}
               <div className="text-center group">
                 <div className="relative mx-auto w-32 h-32 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mb-8 shadow-2xl group-hover:scale-110 transition-all duration-500">
-                  <Globe className="w-16 h-16 text-white" />
+                  <Star className="w-16 h-16 text-white" />
                   <div className="absolute -top-3 -right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center font-bold text-green-600 shadow-lg">
                     3
                   </div>
                   <div className="absolute inset-0 rounded-full bg-white/20 scale-110 animate-ping animation-delay-2000"></div>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">Lifetime Protection</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Get Your Report</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Enjoy continuous monitoring, insurance savings, and peace of mind knowing your family is protected 24/7
+                  Receive detailed recommendations with cost estimates
                 </p>
               </div>
             </div>
@@ -491,7 +544,7 @@ export default function Landing() {
               <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
                 <Shield className="h-4 w-4 text-white" />
               </div>
-              <span className="text-2xl font-bold">SafeHaven</span>
+              <span className="text-2xl font-bold">Disaster Dodger</span>
             </div>
             <p className="text-gray-400 mb-8">Protecting families, one home at a time.</p>
             <div className="flex justify-center space-x-8 text-gray-400">

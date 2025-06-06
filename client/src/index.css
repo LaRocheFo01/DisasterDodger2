@@ -560,3 +560,18 @@ html {
   border-color: hsl(var(--fema-blue));
   background-color: hsl(var(--fema-blue) / 0.02);
 }
+
+/* Protection level bar animation */
+@keyframes fill-bar {
+  0% { 
+    width: 0%; 
+  }
+  100% { 
+    width: var(--target-width, 50%); 
+  }
+}
+
+.animate-fill-bar {
+  animation: fill-bar 1.5s ease-out forwards;
+  width: 0%;
+}
