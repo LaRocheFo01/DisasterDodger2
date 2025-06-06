@@ -371,16 +371,21 @@ export default function Landing() {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 hover:shadow-lg transition-all duration-300">
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 hover:shadow-lg transition-all duration-300">
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center">
-                    <Users className="w-6 h-6 text-white" />
+                  <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
+                    <DollarSign className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-bold text-gray-900 mb-1">Community Network</h4>
-                    <p className="text-gray-600">Connect with prepared neighbors</p>
+                    <h4 className="font-bold text-gray-900 mb-1">Insurance Calculator</h4>
+                    <p className="text-gray-600">Calculate your potential savings</p>
                   </div>
-                  <Button className="btn-outline btn-small">Join</Button>
+                  <Button 
+                    onClick={() => window.open('/calculator', '_blank')}
+                    className="btn-outline btn-small"
+                  >
+                    Calculate
+                  </Button>
                 </div>
               </div>
             </div>

@@ -5,10 +5,10 @@ import { storage } from "./storage";
 import { generatePDFReport } from "./report";
 import { insertAuditSchema } from "@shared/schema";
 import { z } from "zod";
-import { storage } from "./storage";
 import { generateAutomatedReport, type Hazard } from "./automated-report-generator";
 import { callDeepseek, renderAuditHTML } from "./deepseek-service";
 import { generatePDFFromHTML } from "./pdf-generator";
+import { calculateInsuranceSavings, getRecommendationsByHazard } from "./insurance-calculator";
 import axios from 'axios';
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -290,6 +290,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(400).send(`Webhook Error: ${error.message}`);
     }
   });
+
+  // Insurance calculator endpoints
+  app.post("/api/insurance/calculate", calculateInsuranceSavings);
+  app.get("/api/insurance/recommendations/:hazard", getRecommendationsByHazard);
 
   return createServer(app);
 }
