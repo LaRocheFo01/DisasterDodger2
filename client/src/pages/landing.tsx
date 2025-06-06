@@ -1,130 +1,219 @@
-import { Shield, ArrowRight, CheckCircle, Zap, Waves, Flame, Wind, ChevronDown, ChevronUp, Home, Clock, DollarSign } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { useLocation } from "wouter";
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from '../components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Badge } from '../components/ui/badge';
+import { ChevronRight, Shield, MapPin, FileText, Clock, Users, Star, ArrowRight, Menu, X } from 'lucide-react';
 
 export default function Landing() {
-  const [, setLocation] = useLocation();
-  const [zipCode, setZipCode] = useState("");
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const [typedText, setTypedText] = useState('');
+  const [currentStat, setCurrentStat] = useState({ homes: 0, disasters: 0, savings: 0 });
 
-  const startAudit = () => {
-    if (zipCode.trim()) {
-      setLocation(`/start-audit?zip=${zipCode.trim()}`);
-    } else {
-      setLocation("/start-audit");
+  const fullText = "Protect Your Home from Natural Disasters";
+
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Typing animation
+  useEffect(() => {
+    let i = 0;
+    const timer = setInterval(() => {
+      if (i < fullText.length) {
+        setTypedText(fullText.slice(0, i + 1));
+        i++;
+      } else {
+        clearInterval(timer);
+      }
+    }, 100);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Counter animations
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentStat(prev => ({
+        homes: Math.min(prev.homes + 127, 50000),
+        disasters: Math.min(prev.disasters + 3, 1200),
+        savings: Math.min(prev.savings + 892, 350000)
+      }));
+    }, 50);
+
+    setTimeout(() => clearInterval(timer), 3000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const features = [
+    {
+      icon: <Shield className="w-8 h-8" />,
+      title: "AI-Powered Risk Assessment",
+      description: "Advanced machine learning analyzes your property's unique vulnerabilities",
+      color: "from-blue-500 to-cyan-500"
+    },
+    {
+      icon: <MapPin className="w-8 h-8" />,
+      title: "Location-Based Intelligence",
+      description: "Hyperlocal data including soil composition, flood zones, and historical events",
+      color: "from-orange-500 to-red-500"
+    },
+    {
+      icon: <FileText className="w-8 h-8" />,
+      title: "Professional Reports",
+      description: "Comprehensive documentation for insurance, contractors, and peace of mind",
+      color: "from-green-500 to-emerald-500"
+    },
+    {
+      icon: <Clock className="w-8 h-8" />,
+      title: "Real-Time Updates",
+      description: "Live monitoring of changing risk factors and new mitigation technologies",
+      color: "from-purple-500 to-pink-500"
     }
-  };
+  ];
 
-  const handleZipSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    startAudit();
-  };
-
-  const toggleFaq = (index: number) => {
-    setOpenFaq(openFaq === index ? null : index);
-  };
+  const testimonials = [
+    {
+      name: "Sarah Chen",
+      location: "San Francisco, CA",
+      text: "The earthquake assessment saved us $40,000 in retrofitting costs by prioritizing the right upgrades.",
+      rating: 5,
+      avatar: "SC"
+    },
+    {
+      name: "Mike Rodriguez",
+      location: "Houston, TX",
+      text: "Hurricane prep has never been this thorough. The flooding analysis was spot-on for Harvey aftermath.",
+      rating: 5,
+      avatar: "MR"
+    },
+    {
+      name: "Jennifer Walsh",
+      location: "Paradise, CA",
+      text: "After the Camp Fire, this tool helped us rebuild smarter. The wildfire insights are incredible.",
+      rating: 5,
+      avatar: "JW"
+    }
+  ];
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="absolute top-0 left-0 right-0 z-50 bg-transparent">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black text-white overflow-hidden">
+      {/* Navigation */}
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrollY > 50 ? 'bg-black/80 backdrop-blur-md' : 'bg-transparent'
+      }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            {/* Logo */}
-            <div className="flex items-center space-x-3 animate-fade-in-down">
-              <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center animate-float hover-glow">
-                <Shield className="h-6 w-6 text-white" />
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                <Shield className="w-5 h-5 text-white" />
               </div>
-              <span className="text-2xl font-bold text-white">Disaster Dodger</span>
+              <span className="text-xl font-bold">Disaster Dodger</span>
             </div>
-            
-            {/* Navigation */}
-            <nav className="hidden md:flex items-center space-x-8 animate-fade-in-down animate-delay-200">
-              <a href="#features" className="text-white hover:text-green-200 font-medium transition-all duration-300 hover-scale">
-                Features
-              </a>
-              <a href="#how-it-works" className="text-white hover:text-green-200 font-medium transition-all duration-300 hover-scale">
-                How it Works
-              </a>
-              <a href="#faq" className="text-white hover:text-green-200 font-medium transition-all duration-300 hover-scale">
-                FAQ
-              </a>
-              <Button 
-                onClick={startAudit}
-                className="bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white hover:text-green-700 transition-all duration-300 hover-scale animate-shimmer"
-              >
-                Start Assessment
+
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center space-x-8">
+              <a href="#features" className="hover:text-blue-400 transition-colors">Features</a>
+              <a href="#how-it-works" className="hover:text-blue-400 transition-colors">How It Works</a>
+              <a href="#testimonials" className="hover:text-blue-400 transition-colors">Reviews</a>
+              <Button onClick={() => navigate('/start-audit')} className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 transform hover:scale-105 transition-all duration-200">
+                Start Audit <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-            </nav>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              className="md:hidden"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
         </div>
-      </header>
 
-      {/* Hero Section */}
-      <main className="relative overflow-hidden">
-        {/* Full-screen Hero with Gradient */}
-        <section className="min-h-screen bg-gradient-to-br from-emerald-500 via-green-600 to-teal-700 relative flex items-center justify-center animate-gradient">
-          {/* Background Pattern */}
-          <div className="absolute inset-0 bg-black/5"></div>
-          
-          {/* House Silhouettes Background */}
-          <div className="absolute inset-0 overflow-hidden opacity-10">
-            <div className="absolute bottom-0 left-1/4 w-32 h-24 bg-white/20">
-              <div className="w-full h-16 bg-white/30"></div>
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-16 border-r-16 border-b-16 border-transparent border-b-white/30"></div>
-            </div>
-            <div className="absolute bottom-0 right-1/3 w-28 h-20 bg-white/15">
-              <div className="w-full h-12 bg-white/25"></div>
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-14 border-r-14 border-b-12 border-transparent border-b-white/25"></div>
-            </div>
-            <div className="absolute bottom-0 left-1/6 w-24 h-18 bg-white/10">
-              <div className="w-full h-10 bg-white/20"></div>
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-12 border-r-12 border-b-8 border-transparent border-b-white/20"></div>
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden bg-black/95 backdrop-blur-md">
+            <div className="px-4 py-4 space-y-4">
+              <a href="#features" className="block hover:text-blue-400 transition-colors">Features</a>
+              <a href="#how-it-works" className="block hover:text-blue-400 transition-colors">How It Works</a>
+              <a href="#testimonials" className="block hover:text-blue-400 transition-colors">Reviews</a>
+              <Button onClick={() => navigate('/start-audit')} className="w-full bg-gradient-to-r from-blue-600 to-cyan-600">
+                Start Audit
+              </Button>
             </div>
           </div>
-          
+        )}
+      </nav>
 
-          
-          {/* Content */}
-          <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-            <h1 className="text-6xl lg:text-7xl font-bold leading-tight mb-8 animate-fade-in-up">
-              Dodge Disasters<br />
-              <span className="text-green-200 animate-fade-in-up animate-delay-200">Before They Strike</span>
-            </h1>
-            
-            <p className="text-2xl lg:text-3xl mb-12 text-green-50 font-light leading-relaxed max-w-3xl mx-auto animate-fade-in-up animate-delay-400">
-              Five-minute, FEMA-aligned home audit that pinpoints <span className="font-semibold text-white">wildfire, flood, hurricane, and earthquake risks</span>
-            </p>
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-purple-900/20 to-cyan-900/20 animate-gradient-x"></div>
+          <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-purple-900/5 to-transparent animate-spin-slow"></div>
+        </div>
 
-            {/* CTA Form */}
-            <div className="max-w-lg mx-auto animate-scale-in animate-delay-700">
-              <form onSubmit={handleZipSubmit} className="space-y-6">
-                <div>
-                  <input 
-                    type="text" 
-                    placeholder="Enter your ZIP code"
-                    value={zipCode}
-                    onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
-                    maxLength={5}
-                    className="w-full rounded-xl border-0 px-6 py-5 text-xl text-gray-900 placeholder-gray-500 focus:ring-4 focus:ring-white/25 shadow-2xl transition-all duration-300 hover-lift"
-                    required
-                  />
-                </div>
-                
-                <Button 
-                  type="submit"
-                  className="w-full bg-white text-green-700 hover:bg-green-50 py-5 text-xl font-bold rounded-xl shadow-2xl transition-all duration-300 hover:scale-105 animate-glow"
-                >
-                  Get Free Risk Assessment
-                  <ArrowRight className="ml-3 h-6 w-6" />
-                </Button>
-              </form>
+        <div className="relative z-10 text-center max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-8">
+            <Badge className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-4 py-2 text-sm font-semibold animate-bounce">
+              🛡️ AI-Powered Home Protection
+            </Badge>
+          </div>
 
-              <div className="mt-8 text-green-100 animate-fade-in-up animate-delay-1000">
-                <CheckCircle className="inline h-5 w-5 mr-2" />
-                No signup required • Instant results • 100% free
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text text-transparent">
+            {typedText}
+            <span className="animate-blink">|</span>
+          </h1>
+
+          <p className="text-xl md:text-2xl mb-8 text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            Get a comprehensive disaster preparedness audit tailored to your location, property type, and risk profile. 
+            <span className="text-cyan-400 font-semibold"> Powered by FEMA guidelines and cutting-edge AI.</span>
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+            <Button 
+              onClick={() => navigate('/start-audit')}
+              size="lg"
+              className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 py-4 text-lg font-semibold transform hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-cyan-500/25 group"
+            >
+              Start Free Assessment
+              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+            </Button>
+
+            <Button 
+              variant="outline" 
+              size="lg"
+              className="border-gray-600 text-white hover:bg-white/10 px-8 py-4 text-lg backdrop-blur-sm"
+            >
+              Watch Demo
+            </Button>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-cyan-400 mb-2">
+                {currentStat.homes.toLocaleString()}+
               </div>
+              <div className="text-gray-400">Homes Protected</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-blue-400 mb-2">
+                {currentStat.disasters}+
+              </div>
+              <div className="text-gray-400">Disasters Analyzed</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-green-400 mb-2">
+                ${currentStat.savings.toLocaleString()}
+              </div>
+              <div className="text-gray-400">Avg. Savings</div>
             </div>
           </div>
 
@@ -134,306 +223,163 @@ export default function Landing() {
               <div className="w-1 h-3 bg-white/50 rounded-full mt-2 animate-pulse"></div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Visual House Protection Section */}
-        <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
-          {/* Background House Illustration */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-5">
-            <div className="relative">
-              <Home className="w-96 h-96 text-gray-600" />
-              <Shield className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 text-emerald-600" />
-            </div>
+      {/* Features Section */}
+      <section id="features" className="py-24 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-gray-900/50"></div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+              Next-Generation Risk Assessment
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              Our AI-powered platform combines satellite imagery, historical data, and predictive modeling 
+              to deliver the most comprehensive home disaster assessment available.
+            </p>
           </div>
-          
-          <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16 animate-fade-in-up">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">Disasters We Help You Prepare For</h2>
-              <p className="text-xl text-gray-600 animate-fade-in-up animate-delay-200">Comprehensive protection against all major natural disasters</p>
-            </div>
-            
-            <div className="grid md:grid-cols-4 gap-8">
-              <div className="card-elevated text-center group animate-bounce-in animate-delay-300">
-                <div className="w-20 h-20 bg-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg hover-lift animate-rotate-in">
-                  <Zap className="icon-large text-white" />
-                </div>
-                <h3 className="text-xl font-bold mb-3">Earthquakes</h3>
-                <p className="text-large">Structural assessments, foundation retrofitting, and emergency preparedness for seismic events</p>
-              </div>
-              
-              <div className="card-elevated text-center group animate-bounce-in animate-delay-400">
-                <div className="w-20 h-20 bg-brand-secondary rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg hover-lift animate-rotate-in animate-delay-100">
-                  <Waves className="icon-large text-white" />
-                </div>
-                <h3 className="text-xl font-bold mb-3">Floods</h3>
-                <p className="text-large">Flood zone analysis, drainage solutions, and water damage prevention strategies</p>
-              </div>
-              
-              <div className="card-elevated text-center group animate-bounce-in animate-delay-500">
-                <div className="w-20 h-20 bg-brand-accent rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg hover-lift animate-rotate-in animate-delay-200">
-                  <Flame className="icon-large text-white" />
-                </div>
-                <h3 className="text-xl font-bold mb-3">Wildfires</h3>
-                <p className="text-large">Defensible space planning, fire-resistant materials, and evacuation route planning</p>
-              </div>
-              
-              <div className="card-elevated text-center group animate-bounce-in animate-delay-700">
-                <div className="w-20 h-20 bg-gray-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg hover-lift animate-rotate-in animate-delay-300">
-                  <Wind className="icon-large text-white" />
-                </div>
-                <h3 className="text-xl font-bold mb-3">Hurricanes</h3>
-                <p className="text-large">Wind resistance upgrades, storm shutters, and hurricane tracking systems</p>
-              </div>
-            </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => (
+              <Card 
+                key={index} 
+                className="bg-white/5 backdrop-blur-sm border-gray-700 hover:bg-white/10 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl group overflow-hidden relative"
+              >
+                <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                <CardHeader className="relative z-10">
+                  <div className={`w-16 h-16 rounded-xl bg-gradient-to-r ${feature.color} p-3 mb-4 transform group-hover:rotate-6 transition-transform duration-300`}>
+                    {feature.icon}
+                  </div>
+                  <CardTitle className="text-xl text-white group-hover:text-white transition-colors">
+                    {feature.title}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="relative z-10">
+                  <CardDescription className="text-gray-300 group-hover:text-gray-200 transition-colors">
+                    {feature.description}
+                  </CardDescription>
+                </CardContent>
+              </Card>
+            ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Features Section */}
-        <section id="features" className="py-32 bg-white">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-20 animate-fade-in-up">
-              <h2 className="text-5xl font-bold text-gray-900 mb-6">Simple. Fast. Effective.</h2>
-              <p className="text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animate-delay-200">
-                Professional disaster risk assessment in minutes, not hours
-              </p>
-            </div>
+      {/* How It Works */}
+      <section id="how-it-works" className="py-24 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-gray-900/50 to-black/50"></div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+              How It Works
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              Three simple steps to comprehensive disaster preparedness
+            </p>
+          </div>
 
-            <div className="grid lg:grid-cols-3 gap-16">
-              <div className="text-center group animate-slide-in-left animate-delay-300">
-                <div className="w-24 h-24 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl transform group-hover:scale-110 transition-all duration-300 animate-scale-in animate-delay-500 hover-glow">
-                  <Clock className="h-12 w-12 text-white" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { step: "01", title: "Answer Questions", desc: "Complete our intelligent questionnaire about your property and location", icon: "📝" },
+              { step: "02", title: "AI Analysis", desc: "Our system analyzes your responses against thousands of data points", icon: "🤖" },
+              { step: "03", title: "Get Report", desc: "Receive a detailed action plan with prioritized recommendations", icon: "📊" }
+            ].map((item, index) => (
+              <div key={index} className="text-center group">
+                <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-full flex items-center justify-center text-3xl transform group-hover:scale-110 transition-transform duration-300">
+                  {item.icon}
                 </div>
-                <h3 className="text-3xl font-bold mb-6 text-gray-900">5-Minute Assessment</h3>
-                <p className="text-xl text-gray-600 leading-relaxed">
-                  Quick, comprehensive home risk evaluation using official FEMA guidelines and local data
+                <div className="text-6xl font-bold text-gray-800 mb-4 group-hover:text-gray-600 transition-colors">
+                  {item.step}
+                </div>
+                <h3 className="text-2xl font-bold mb-4 text-white group-hover:text-cyan-400 transition-colors">
+                  {item.title}
+                </h3>
+                <p className="text-gray-400 group-hover:text-gray-300 transition-colors">
+                  {item.desc}
                 </p>
               </div>
-              
-              <div className="text-center group animate-fade-in-up animate-delay-400">
-                <div className="w-24 h-24 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl transform group-hover:scale-110 transition-all duration-300 animate-scale-in animate-delay-700 hover-glow">
-                  <DollarSign className="h-12 w-12 text-white" />
-                </div>
-                <h3 className="text-3xl font-bold mb-6 text-gray-900">Lower Insurance Costs</h3>
-                <p className="text-xl text-gray-600 leading-relaxed">
-                  Save up to 25% on premiums with disaster-resistant improvements and risk mitigation
-                </p>
-              </div>
-              
-              <div className="text-center group animate-slide-in-right animate-delay-500">
-                <div className="w-24 h-24 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl transform group-hover:scale-110 transition-all duration-300 animate-scale-in animate-delay-1000 hover-glow">
-                  <Shield className="h-12 w-12 text-white" />
-                </div>
-                <h3 className="text-3xl font-bold mb-6 text-gray-900">FEMA Aligned</h3>
-                <p className="text-xl text-gray-600 leading-relaxed">
-                  Official guidelines and data from federal emergency management experts
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* How It Works Section */}
-        <section id="how-it-works" className="py-32 bg-gray-50">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-20 animate-fade-in-up">
-              <h2 className="text-5xl font-bold text-gray-900 mb-6">Why Choose Our Platform?</h2>
-              <p className="text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed animate-fade-in-up animate-delay-200">
-                Professional-grade disaster preparedness technology made accessible for every homeowner
-              </p>
-            </div>
-
-            <div className="grid lg:grid-cols-2 gap-20 items-center">
-              <div className="space-y-12 animate-slide-in-left animate-delay-300">
-                <div className="flex items-start space-x-6 animate-fade-in-up animate-delay-400 hover-lift">
-                  <div className="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center flex-shrink-0 animate-scale-in animate-delay-500 hover-glow">
-                    <CheckCircle className="h-8 w-8 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-3">FEMA-Aligned Data</h3>
-                    <p className="text-lg text-gray-600">Official government hazard data ensures accuracy and reliability for your specific location</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-6 animate-fade-in-up animate-delay-500 hover-lift">
-                  <div className="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center flex-shrink-0 animate-scale-in animate-delay-700 hover-glow">
-                    <Shield className="h-8 w-8 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-3">Instant Results</h3>
-                    <p className="text-lg text-gray-600">Get your comprehensive risk assessment and recommendations in under 5 minutes</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-6 animate-fade-in-up animate-delay-700 hover-lift">
-                  <div className="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center flex-shrink-0 animate-scale-in animate-delay-1000 hover-glow">
-                    <ArrowRight className="h-8 w-8 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-3">Actionable Plans</h3>
-                    <p className="text-lg text-gray-600">Receive specific, prioritized recommendations with cost estimates and insurance benefits</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-gradient-to-br from-green-600 to-green-800 rounded-3xl p-12 text-white animate-slide-in-right animate-delay-500 hover-lift animate-gradient">
-                <h3 className="text-3xl font-bold mb-6 animate-fade-in-up animate-delay-700">Ready to Get Started?</h3>
-                <p className="text-xl mb-8 text-green-100 animate-fade-in-up animate-delay-1000">Join thousands of homeowners who have already secured their properties</p>
-                <div className="space-y-4 animate-scale-in animate-delay-1000">
-                  <input 
-                    type="text" 
-                    placeholder="Enter your ZIP code"
-                    value={zipCode}
-                    onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
-                    maxLength={5}
-                    className="w-full rounded-xl border-0 px-6 py-4 text-lg text-gray-900 placeholder-gray-500 transition-all duration-300 hover-lift"
-                  />
-                  <Button 
-                    onClick={startAudit}
-                    className="w-full bg-white text-green-700 hover:bg-green-50 py-4 text-lg font-bold rounded-xl transition-all duration-300 hover:scale-105 animate-shimmer"
-                  >
-                    Start Free Assessment
-                  </Button>
-                </div>
-              </div>
-            </div>
+      {/* Testimonials */}
+      <section id="testimonials" className="py-24 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-gray-900/50"></div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+              Real Stories, Real Protection
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+              Join thousands of homeowners who've strengthened their disaster preparedness
+            </p>
           </div>
-        </section>
 
-        {/* FAQ Section */}
-        <section id="faq" className="py-32 bg-white">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-20 animate-fade-in-up">
-              <h2 className="text-5xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
-              <p className="text-2xl text-gray-600 animate-fade-in-up animate-delay-200">Everything you need to know about disaster preparedness assessments</p>
-            </div>
-
-            <div className="space-y-6">
-              {[
-                {
-                  question: "How accurate are the disaster risk assessments?",
-                  answer: "Our assessments use official FEMA data, USGS hazard maps, and NOAA climate data to provide the most accurate regional risk analysis available. We combine multiple authoritative sources to ensure precision for your specific location and property type."
-                },
-                {
-                  question: "What types of disasters are covered in the assessment?",
-                  answer: "We assess all major disaster types including earthquakes, wildfires, hurricanes, floods, tornadoes, and severe storms. Our analysis is customized based on your geographic location's primary risks and historical disaster patterns."
-                },
-                {
-                  question: "How long does the complete audit take?",
-                  answer: "Most homeowners complete their comprehensive assessment in under 5 minutes. The questionnaire is designed to be quick and efficient while still gathering all essential information needed for accurate recommendations."
-                },
-                {
-                  question: "What kind of recommendations will I receive?",
-                  answer: "You'll receive specific, actionable recommendations prioritized by risk level and cost-effectiveness. This includes structural improvements, safety equipment, emergency planning, and potential insurance savings with estimated costs and timelines."
-                },
-                {
-                  question: "Is my personal information secure?",
-                  answer: "Yes, we use enterprise-grade security measures to protect your data. We only collect information necessary for the assessment and never share personal details with third parties. Your privacy and security are our top priorities."
-                },
-                {
-                  question: "Can this help reduce my insurance costs?",
-                  answer: "Many of our recommendations can lead to insurance discounts. We provide specific guidance on improvements that insurers recognize, potential premium reductions, and documentation needed to claim discounts with your insurance provider."
-                },
-                {
-                  question: "Do I need any special knowledge to complete the assessment?",
-                  answer: "No special expertise is required. Our questions are designed for homeowners of all backgrounds. We provide clear explanations and examples, and you can always skip questions you're unsure about - our AI can still provide valuable insights."
-                },
-                {
-                  question: "What if I live in a low-risk area?",
-                  answer: "Even low-risk areas benefit from preparedness planning. Our assessment identifies any potential risks and provides basic preparedness recommendations. Prevention and preparation are valuable regardless of your area's risk level."
-                }
-              ].map((faq, index) => (
-                <div key={index} className={`bg-gray-50 rounded-2xl overflow-hidden shadow-sm hover-lift animate-fade-in-up animate-delay-${300 + (index * 100)}`}>
-                  <button
-                    onClick={() => toggleFaq(index)}
-                    className="w-full px-8 py-6 text-left flex items-center justify-between hover:bg-gray-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset hover-scale"
-                  >
-                    <span className="text-xl font-semibold text-gray-900 pr-8">{faq.question}</span>
-                    <div className="flex-shrink-0 transition-transform duration-300">
-                      {openFaq === index ? (
-                        <ChevronUp className="h-6 w-6 text-green-600 animate-bounce-in" />
-                      ) : (
-                        <ChevronDown className="h-6 w-6 text-green-600" />
-                      )}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <Card key={index} className="bg-white/5 backdrop-blur-sm border-gray-700 hover:bg-white/10 transition-all duration-300 transform hover:scale-105">
+                <CardContent className="p-6">
+                  <div className="flex items-center mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                    ))}
+                  </div>
+                  <p className="text-gray-300 mb-6 italic">"{testimonial.text}"</p>
+                  <div className="flex items-center">
+                    <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                      {testimonial.avatar}
                     </div>
-                  </button>
-                  {openFaq === index && (
-                    <div className="px-8 pb-6 animate-fade-in-up">
-                      <p className="text-lg text-gray-600 leading-relaxed">{faq.answer}</p>
+                    <div>
+                      <div className="font-semibold text-white">{testimonial.name}</div>
+                      <div className="text-gray-400 text-sm">{testimonial.location}</div>
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
 
-            {/* CTA in FAQ */}
-            <div className="mt-16 text-center animate-scale-in animate-delay-1000">
-              <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-12 text-white hover-lift animate-gradient">
-                <h3 className="text-3xl font-bold mb-4 animate-fade-in-up">Still Have Questions?</h3>
-                <p className="text-xl mb-8 text-green-100 animate-fade-in-up animate-delay-200">Get started with your free assessment and discover your personalized disaster preparedness plan</p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-lg mx-auto animate-fade-in-up animate-delay-400">
-                  <input 
-                    type="text" 
-                    placeholder="Enter your ZIP code"
-                    value={zipCode}
-                    onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
-                    maxLength={5}
-                    className="flex-1 rounded-xl border-0 px-6 py-4 text-lg text-gray-900 placeholder-gray-500 transition-all duration-300 hover-lift"
-                  />
-                  <Button 
-                    onClick={startAudit}
-                    className="bg-white text-green-700 hover:bg-green-50 px-8 py-4 text-lg font-bold rounded-xl whitespace-nowrap transition-all duration-300 hover:scale-105 animate-shimmer"
-                  >
-                    Start Free Assessment
-                  </Button>
-                </div>
+      {/* CTA Section */}
+      <section className="py-24 relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-purple-900/20 to-cyan-900/20"></div>
+        <div className="relative z-10 max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text text-transparent">
+            Don't Wait for Disaster
+          </h2>
+          <p className="text-xl md:text-2xl text-gray-300 mb-8">
+            Start your comprehensive home assessment today and protect what matters most.
+          </p>
+          <Button 
+            onClick={() => navigate('/start-audit')}
+            size="lg"
+            className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-12 py-6 text-xl font-semibold transform hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-cyan-500/25"
+          >
+            Get Started Now - It's Free
+            <ArrowRight className="w-6 h-6 ml-3" />
+          </Button>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-black/50 backdrop-blur-sm border-t border-gray-800 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="flex items-center space-x-2 mb-4 md:mb-0">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                <Shield className="w-5 h-5 text-white" />
               </div>
+              <span className="text-xl font-bold">Disaster Dodger</span>
+            </div>
+            <div className="text-gray-400 text-sm">
+              © 2024 Disaster Dodger. Protecting homes with AI-powered insights.
             </div>
           </div>
-        </section>
-
-        {/* Footer */}
-        <footer id="contact" className="bg-gray-900 text-white py-20">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h3 className="text-4xl font-bold mb-4">Questions?</h3>
-              <p className="text-xl text-gray-400">We're here to help you protect your home</p>
-            </div>
-            
-            <div className="grid md:grid-cols-3 gap-12 text-center">
-              <div>
-                <h4 className="text-xl font-semibold mb-4">Support</h4>
-                <ul className="space-y-3 text-gray-400">
-                  <li><a href="#help" className="hover:text-white transition-colors">Help Center</a></li>
-                  <li><a href="#contact" className="hover:text-white transition-colors">Contact Support</a></li>
-                  <li><a href="#faq" className="hover:text-white transition-colors">FAQ</a></li>
-                </ul>
-              </div>
-              
-              <div>
-                <h4 className="text-xl font-semibold mb-4">Resources</h4>
-                <ul className="space-y-3 text-gray-400">
-                  <li><a href="#guides" className="hover:text-white transition-colors">Safety Guides</a></li>
-                  <li><a href="#blog" className="hover:text-white transition-colors">Blog</a></li>
-                  <li><a href="#updates" className="hover:text-white transition-colors">Updates</a></li>
-                </ul>
-              </div>
-              
-              <div>
-                <h4 className="text-xl font-semibold mb-4">Legal</h4>
-                <ul className="space-y-3 text-gray-400">
-                  <li><a href="#privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                  <li><a href="#terms" className="hover:text-white transition-colors">Terms of Service</a></li>
-                  <li><a href="#security" className="hover:text-white transition-colors">Security</a></li>
-                </ul>
-              </div>
-            </div>
-            
-            <div className="border-t border-gray-800 mt-16 pt-8 text-center">
-              <p className="text-gray-400">&copy; 2025 Disaster Dodger. All rights reserved.</p>
-            </div>
-          </div>
-        </footer>
-      </main>
+        </div>
+      </footer>
     </div>
   );
 }
