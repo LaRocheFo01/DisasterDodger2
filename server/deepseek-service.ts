@@ -123,7 +123,15 @@ Return only the JSON object, no other text.`;
   try {
     console.log('[DeepSeek] Making API call...');
 
-    const response = await axios.post(
+    // Create timeout promise
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => {
+        reject(new Error('DeepSeek API timeout after 30 seconds'));
+      }, 30000);
+    });
+
+    // Create API call promise
+    const apiPromise = axios.post(
       DEEPSEEK_API_URL,
       {
         model,
@@ -132,7 +140,7 @@ Return only the JSON object, no other text.`;
           { role: 'user', content: userPrompt }
         ],
         temperature: 0.3,
-        max_tokens: 8000
+        max_tokens: 4000
       },
       {
         headers: {
@@ -144,6 +152,9 @@ Return only the JSON object, no other text.`;
         timeout: 30000
       }
     );
+
+    // Race between API call and timeout
+    const response = await Promise.race([apiPromise, timeoutPromise]);
 
     console.log('[DeepSeek] API response received');
 
