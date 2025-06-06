@@ -1,9 +1,29 @@
+
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { ChevronRight, Shield, MapPin, FileText, Clock, Users, Star, ArrowRight, Menu, X } from 'lucide-react';
+import { 
+  Shield, 
+  MapPin, 
+  FileText, 
+  Clock, 
+  Users, 
+  Star, 
+  ArrowRight, 
+  Menu, 
+  X,
+  Droplets,
+  Flame,
+  Wind,
+  Mountain,
+  CheckCircle,
+  Heart,
+  Home,
+  Target,
+  Award
+} from 'lucide-react';
 
 export default function Landing() {
   const [, setLocation] = useLocation();
@@ -11,8 +31,9 @@ export default function Landing() {
   const [scrollY, setScrollY] = useState(0);
   const [typedText, setTypedText] = useState('');
   const [currentStat, setCurrentStat] = useState({ homes: 0, disasters: 0, savings: 0 });
+  const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
 
-  const fullText = "Protect Your Home from Natural Disasters";
+  const fullText = "Dodge disasters before they strike!";
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -30,7 +51,7 @@ export default function Landing() {
       } else {
         clearInterval(timer);
       }
-    }, 100);
+    }, 80);
     return () => clearInterval(timer);
   }, []);
 
@@ -50,28 +71,60 @@ export default function Landing() {
 
   const features = [
     {
-      icon: <Shield className="w-8 h-8" />,
-      title: "AI-Powered Risk Assessment",
-      description: "Advanced machine learning analyzes your property's unique vulnerabilities",
-      color: "from-blue-500 to-cyan-500"
+      icon: <Target className="w-8 h-8" />,
+      title: "Smart Risk Assessment",
+      description: "AI-powered analysis that identifies your home's specific vulnerabilities with friendly guidance",
+      color: "from-green-400 to-green-600",
+      bgColor: "bg-green-50",
+      textColor: "text-green-700"
     },
     {
       icon: <MapPin className="w-8 h-8" />,
-      title: "Location-Based Intelligence",
-      description: "Hyperlocal data including soil composition, flood zones, and historical events",
-      color: "from-orange-500 to-red-500"
+      title: "Your Neighborhood Insights",
+      description: "Hyperlocal data about your area's unique risks and historical patterns",
+      color: "from-blue-400 to-blue-600",
+      bgColor: "bg-blue-50",
+      textColor: "text-blue-700"
     },
     {
       icon: <FileText className="w-8 h-8" />,
-      title: "Professional Reports",
-      description: "Comprehensive documentation for insurance, contractors, and peace of mind",
-      color: "from-green-500 to-emerald-500"
+      title: "Easy Action Plans",
+      description: "Step-by-step guides that make disaster prep simple and achievable",
+      color: "from-orange-400 to-orange-600",
+      bgColor: "bg-orange-50",
+      textColor: "text-orange-700"
     },
     {
-      icon: <Clock className="w-8 h-8" />,
-      title: "Real-Time Updates",
-      description: "Live monitoring of changing risk factors and new mitigation technologies",
-      color: "from-purple-500 to-pink-500"
+      icon: <Heart className="w-8 h-8" />,
+      title: "Peace of Mind",
+      description: "Sleep better knowing your family and home are prepared for anything",
+      color: "from-pink-400 to-pink-600",
+      bgColor: "bg-pink-50",
+      textColor: "text-pink-700"
+    }
+  ];
+
+  const howItWorks = [
+    {
+      step: "1",
+      title: "Quick Assessment",
+      description: "Answer friendly questions about your home and location",
+      icon: <Home className="w-8 h-8" />,
+      color: "bg-green-500"
+    },
+    {
+      step: "2",
+      title: "Smart Analysis",
+      description: "Our AI reviews your answers and local disaster data",
+      icon: <Target className="w-8 h-8" />,
+      color: "bg-blue-500"
+    },
+    {
+      step: "3",
+      title: "Personal Plan",
+      description: "Get your custom action plan with prioritized steps",
+      icon: <Award className="w-8 h-8" />,
+      color: "bg-orange-500"
     }
   ];
 
@@ -79,70 +132,102 @@ export default function Landing() {
     {
       name: "Sarah Chen",
       location: "San Francisco, CA",
-      text: "The earthquake assessment saved us $40,000 in retrofitting costs by prioritizing the right upgrades.",
+      text: "The earthquake prep guide was so helpful! My family feels confident and ready now.",
       rating: 5,
-      avatar: "SC"
+      avatar: "SC",
+      disaster: "Earthquake"
     },
     {
       name: "Mike Rodriguez",
       location: "Houston, TX",
-      text: "Hurricane prep has never been this thorough. The flooding analysis was spot-on for Harvey aftermath.",
+      text: "Hurricane season doesn't worry us anymore. The checklist made everything manageable!",
       rating: 5,
-      avatar: "MR"
+      avatar: "MR",
+      disaster: "Hurricane"
     },
     {
       name: "Jennifer Walsh",
       location: "Paradise, CA",
-      text: "After the Camp Fire, this tool helped us rebuild smarter. The wildfire insights are incredible.",
+      text: "After the fires, this helped us rebuild smarter. Such practical, easy-to-follow advice.",
       rating: 5,
-      avatar: "JW"
+      avatar: "JW",
+      disaster: "Wildfire"
     }
   ];
 
+  const disasterIcons = [
+    { icon: <Droplets className="w-6 h-6 text-blue-500" />, label: "Floods" },
+    { icon: <Flame className="w-6 h-6 text-orange-500" />, label: "Wildfires" },
+    { icon: <Wind className="w-6 h-6 text-gray-500" />, label: "Hurricanes" },
+    { icon: <Mountain className="w-6 h-6 text-yellow-600" />, label: "Earthquakes" }
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black text-white overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 text-gray-800 overflow-hidden">
+      {/* Floating disaster icons background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-20 left-10 animate-float">
+          <Droplets className="w-8 h-8 text-blue-300 opacity-20" />
+        </div>
+        <div className="absolute top-40 right-20 animate-float animation-delay-1000">
+          <Flame className="w-6 h-6 text-orange-300 opacity-20" />
+        </div>
+        <div className="absolute bottom-40 left-20 animate-float animation-delay-2000">
+          <Wind className="w-7 h-7 text-gray-300 opacity-20" />
+        </div>
+        <div className="absolute bottom-20 right-40 animate-float animation-delay-3000">
+          <Mountain className="w-5 h-5 text-yellow-400 opacity-20" />
+        </div>
+      </div>
+
       {/* Navigation */}
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrollY > 50 ? 'bg-black/80 backdrop-blur-md' : 'bg-transparent'
+        scrollY > 50 ? 'bg-white/95 backdrop-blur-sm shadow-lg' : 'bg-transparent'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                <Shield className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                <Shield className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold">Disaster Dodger</span>
+              <span className="text-2xl font-bold text-green-700">Disaster Dodger</span>
             </div>
 
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="hover:text-blue-400 transition-colors">Features</a>
-              <a href="#how-it-works" className="hover:text-blue-400 transition-colors">How It Works</a>
-              <a href="#testimonials" className="hover:text-blue-400 transition-colors">Reviews</a>
-              <Button onClick={() => setLocation('/start-audit')} className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 transform hover:scale-105 transition-all duration-200">
-                Start Audit <ArrowRight className="w-4 h-4 ml-2" />
+              <a href="#features" className="text-gray-700 hover:text-green-600 transition-colors font-medium">Features</a>
+              <a href="#how-it-works" className="text-gray-700 hover:text-green-600 transition-colors font-medium">How It Works</a>
+              <a href="#testimonials" className="text-gray-700 hover:text-green-600 transition-colors font-medium">Stories</a>
+              <Button 
+                onClick={() => setLocation('/start-audit')} 
+                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 rounded-xl px-6"
+              >
+                Start Free Audit <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </div>
 
             {/* Mobile Menu Button */}
             <button
-              className="md:hidden"
+              className="md:hidden p-2 rounded-lg hover:bg-green-50 transition-colors"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMenuOpen ? <X className="w-6 h-6 text-gray-700" /> : <Menu className="w-6 h-6 text-gray-700" />}
             </button>
           </div>
         </div>
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden bg-black/95 backdrop-blur-md">
+          <div className="md:hidden bg-white border-t border-green-100 shadow-lg">
             <div className="px-4 py-4 space-y-4">
-              <a href="#features" className="block hover:text-blue-400 transition-colors">Features</a>
-              <a href="#how-it-works" className="block hover:text-blue-400 transition-colors">How It Works</a>
-              <a href="#testimonials" className="block hover:text-blue-400 transition-colors">Reviews</a>
-              <Button onClick={() => setLocation('/start-audit')} className="w-full bg-gradient-to-r from-blue-600 to-cyan-600">
-                Start Audit
+              <a href="#features" className="block text-gray-700 hover:text-green-600 transition-colors font-medium">Features</a>
+              <a href="#how-it-works" className="block text-gray-700 hover:text-green-600 transition-colors font-medium">How It Works</a>
+              <a href="#testimonials" className="block text-gray-700 hover:text-green-600 transition-colors font-medium">Stories</a>
+              <Button 
+                onClick={() => setLocation('/start-audit')} 
+                className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl"
+              >
+                Start Free Audit
               </Button>
             </div>
           </div>
@@ -150,93 +235,93 @@ export default function Landing() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Animated Background */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-purple-900/20 to-cyan-900/20 animate-gradient-x"></div>
-          <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-purple-900/5 to-transparent animate-spin-slow"></div>
-        </div>
-
+      <section className="relative min-h-screen flex items-center justify-center pt-16">
         <div className="relative z-10 text-center max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <Badge className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-4 py-2 text-sm font-semibold animate-bounce">
-              🛡️ AI-Powered Home Protection
+            <Badge className="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 text-sm font-semibold rounded-full shadow-lg animate-bounce">
+              🛡️ Be Prepared, Not Scared
             </Badge>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text text-transparent">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 text-gray-800 leading-tight">
             {typedText}
-            <span className="animate-blink">|</span>
+            <span className="animate-blink text-green-500">|</span>
           </h1>
 
-          <p className="text-xl md:text-2xl mb-8 text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            Get a comprehensive disaster preparedness audit tailored to your location, property type, and risk profile. 
-            <span className="text-cyan-400 font-semibold"> Powered by FEMA guidelines and cutting-edge AI.</span>
+          <p className="text-xl md:text-2xl mb-8 text-gray-600 max-w-4xl mx-auto leading-relaxed">
+            Turn disaster worry into confident preparedness with our friendly, 
+            <span className="text-green-600 font-semibold"> AI-powered home assessment.</span> 
+            {" "}Get peace of mind in just 10 minutes.
           </p>
+
+          {/* Disaster icons row */}
+          <div className="flex justify-center space-x-8 mb-12">
+            {disasterIcons.map((item, index) => (
+              <div 
+                key={index} 
+                className="flex flex-col items-center group cursor-pointer"
+                style={{ animationDelay: `${index * 200}ms` }}
+              >
+                <div className="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center group-hover:shadow-xl group-hover:scale-110 transition-all duration-300 animate-float">
+                  {item.icon}
+                </div>
+                <span className="text-sm text-gray-600 mt-2 font-medium">{item.label}</span>
+              </div>
+            ))}
+          </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Button 
               onClick={() => setLocation('/start-audit')}
               size="lg"
-              className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 py-4 text-lg font-semibold transform hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-cyan-500/25 group"
+              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-10 py-6 text-xl font-semibold transform hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl rounded-2xl group"
             >
-              Start Free Assessment
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              Start Your Free Assessment
+              <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-1 transition-transform" />
             </Button>
 
             <Button 
               variant="outline" 
               size="lg"
-              className="border-gray-600 text-white hover:bg-white/10 px-8 py-4 text-lg backdrop-blur-sm"
+              className="border-2 border-green-500 text-green-600 hover:bg-green-50 px-10 py-6 text-xl rounded-2xl font-semibold"
             >
-              Watch Demo
+              See How It Works
             </Button>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-cyan-400 mb-2">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
+              <div className="text-4xl md:text-5xl font-bold text-green-600 mb-2">
                 {currentStat.homes.toLocaleString()}+
               </div>
-              <div className="text-gray-400">Homes Protected</div>
+              <div className="text-gray-600 font-medium">Families Protected</div>
             </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-blue-400 mb-2">
+            <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
+              <div className="text-4xl md:text-5xl font-bold text-blue-600 mb-2">
                 {currentStat.disasters}+
               </div>
-              <div className="text-gray-400">Disasters Analyzed</div>
+              <div className="text-gray-600 font-medium">Disaster Types Covered</div>
             </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-green-400 mb-2">
+            <div className="bg-white rounded-2xl p-6 shadow-lg text-center">
+              <div className="text-4xl md:text-5xl font-bold text-orange-600 mb-2">
                 ${currentStat.savings.toLocaleString()}
               </div>
-              <div className="text-gray-400">Avg. Savings</div>
-            </div>
-          </div>
-
-          {/* Scroll Indicator */}
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce animate-delay-1000">
-            <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
-              <div className="w-1 h-3 bg-white/50 rounded-full mt-2 animate-pulse"></div>
+              <div className="text-gray-600 font-medium">Average Protection Value</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-24 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-gray-900/50"></div>
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="features" className="py-24 bg-gradient-to-b from-white to-green-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-              Next-Generation Risk Assessment
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-800">
+              Why Families Love Our Approach
             </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Our AI-powered platform combines satellite imagery, historical data, and predictive modeling 
-              to deliver the most comprehensive home disaster assessment available.
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              We make disaster preparedness simple, friendly, and actually achievable for busy families.
             </p>
           </div>
 
@@ -244,22 +329,28 @@ export default function Landing() {
             {features.map((feature, index) => (
               <Card 
                 key={index} 
-                className="bg-white/5 backdrop-blur-sm border-gray-700 hover:bg-white/10 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl group overflow-hidden relative"
+                className={`${feature.bgColor} border-0 hover:shadow-xl transition-all duration-300 transform hover:scale-105 group overflow-hidden relative cursor-pointer rounded-2xl`}
+                onMouseEnter={() => setHoveredFeature(index)}
+                onMouseLeave={() => setHoveredFeature(null)}
               >
-                <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
-                <CardHeader className="relative z-10">
-                  <div className={`w-16 h-16 rounded-xl bg-gradient-to-r ${feature.color} p-3 mb-4 transform group-hover:rotate-6 transition-transform duration-300`}>
-                    {feature.icon}
+                <CardHeader className="relative z-10 text-center">
+                  <div className={`w-20 h-20 rounded-2xl bg-gradient-to-r ${feature.color} p-4 mb-4 mx-auto transform group-hover:rotate-6 transition-transform duration-300 shadow-lg`}>
+                    <div className="text-white">
+                      {feature.icon}
+                    </div>
                   </div>
-                  <CardTitle className="text-xl text-white group-hover:text-white transition-colors">
+                  <CardTitle className={`text-xl ${feature.textColor} group-hover:text-gray-800 transition-colors font-bold`}>
                     {feature.title}
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="relative z-10">
-                  <CardDescription className="text-gray-300 group-hover:text-gray-200 transition-colors">
+                <CardContent className="relative z-10 text-center">
+                  <CardDescription className="text-gray-600 group-hover:text-gray-700 transition-colors leading-relaxed">
                     {feature.description}
                   </CardDescription>
                 </CardContent>
+                {hoveredFeature === index && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-green-400/10 to-green-600/10 animate-pulse"></div>
+                )}
               </Card>
             ))}
           </div>
@@ -267,73 +358,81 @@ export default function Landing() {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-24 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-gray-900/50 to-black/50"></div>
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="how-it-works" className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-              How It Works
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-800">
+              Getting Prepared Is Simple
             </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Three simple steps to comprehensive disaster preparedness
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Three easy steps to go from worried to confident about your family's safety
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { step: "01", title: "Answer Questions", desc: "Complete our intelligent questionnaire about your property and location", icon: "📝" },
-              { step: "02", title: "AI Analysis", desc: "Our system analyzes your responses against thousands of data points", icon: "🤖" },
-              { step: "03", title: "Get Report", desc: "Receive a detailed action plan with prioritized recommendations", icon: "📊" }
-            ].map((item, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            {howItWorks.map((item, index) => (
               <div key={index} className="text-center group">
-                <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-full flex items-center justify-center text-3xl transform group-hover:scale-110 transition-transform duration-300">
-                  {item.icon}
+                <div className="relative mb-8">
+                  <div className={`w-24 h-24 mx-auto ${item.color} rounded-3xl flex items-center justify-center text-white shadow-xl group-hover:shadow-2xl transform group-hover:scale-110 transition-all duration-300`}>
+                    {item.icon}
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                    {item.step}
+                  </div>
                 </div>
-                <div className="text-6xl font-bold text-gray-800 mb-4 group-hover:text-gray-600 transition-colors">
-                  {item.step}
-                </div>
-                <h3 className="text-2xl font-bold mb-4 text-white group-hover:text-cyan-400 transition-colors">
+                <h3 className="text-2xl font-bold mb-4 text-gray-800 group-hover:text-green-600 transition-colors">
                   {item.title}
                 </h3>
-                <p className="text-gray-400 group-hover:text-gray-300 transition-colors">
-                  {item.desc}
+                <p className="text-gray-600 group-hover:text-gray-700 transition-colors leading-relaxed">
+                  {item.description}
                 </p>
               </div>
             ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <Button 
+              onClick={() => setLocation('/start-audit')}
+              size="lg"
+              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-4 text-lg font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+            >
+              Start Your Assessment Now
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
           </div>
         </div>
       </section>
 
       {/* Testimonials */}
-      <section id="testimonials" className="py-24 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-gray-900/50"></div>
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="testimonials" className="py-24 bg-gradient-to-b from-green-50 to-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-              Real Stories, Real Protection
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-800">
+              Real Families, Real Peace of Mind
             </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Join thousands of homeowners who've strengthened their disaster preparedness
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Join thousands of families who went from worried to confidently prepared
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <Card key={index} className="bg-white/5 backdrop-blur-sm border-gray-700 hover:bg-white/10 transition-all duration-300 transform hover:scale-105">
-                <CardContent className="p-6">
+              <Card key={index} className="bg-white border-0 hover:shadow-xl transition-all duration-300 transform hover:scale-105 rounded-2xl overflow-hidden">
+                <CardContent className="p-8">
                   <div className="flex items-center mb-4">
                     {[...Array(testimonial.rating)].map((_, i) => (
                       <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
                     ))}
                   </div>
-                  <p className="text-gray-300 mb-6 italic">"{testimonial.text}"</p>
+                  <p className="text-gray-700 mb-6 italic leading-relaxed">"{testimonial.text}"</p>
                   <div className="flex items-center">
-                    <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                    <div className="w-14 h-14 bg-gradient-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold mr-4 shadow-lg">
                       {testimonial.avatar}
                     </div>
                     <div>
-                      <div className="font-semibold text-white">{testimonial.name}</div>
-                      <div className="text-gray-400 text-sm">{testimonial.location}</div>
+                      <div className="font-semibold text-gray-800">{testimonial.name}</div>
+                      <div className="text-gray-500 text-sm">{testimonial.location}</div>
+                      <div className="text-green-600 text-sm font-medium">{testimonial.disaster} Prepared</div>
                     </div>
                   </div>
                 </CardContent>
@@ -344,38 +443,43 @@ export default function Landing() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 via-purple-900/20 to-cyan-900/20"></div>
+      <section className="py-24 bg-gradient-to-r from-green-500 via-green-600 to-green-500 relative overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full animate-float"></div>
+          <div className="absolute bottom-10 right-10 w-16 h-16 bg-white/10 rounded-full animate-float animation-delay-1000"></div>
+          <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-white/10 rounded-full animate-float animation-delay-2000"></div>
+        </div>
         <div className="relative z-10 max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-white via-blue-100 to-cyan-200 bg-clip-text text-transparent">
-            Don't Wait for Disaster
+          <h2 className="text-4xl md:text-6xl font-bold mb-6 text-white">
+            Ready to Feel Confident?
           </h2>
-          <p className="text-xl md:text-2xl text-gray-300 mb-8">
-            Start your comprehensive home assessment today and protect what matters most.
+          <p className="text-xl md:text-2xl text-green-100 mb-8 leading-relaxed">
+            Join 50,000+ families who sleep better knowing they're prepared for anything.
           </p>
           <Button 
             onClick={() => setLocation('/start-audit')}
             size="lg"
-            className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-12 py-6 text-xl font-semibold transform hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-cyan-500/25"
+            className="bg-white text-green-600 hover:bg-green-50 px-12 py-6 text-xl font-semibold transform hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl rounded-2xl"
           >
-            Get Started Now - It's Free
+            Get Started - It's Free!
             <ArrowRight className="w-6 h-6 ml-3" />
           </Button>
+          <p className="text-green-100 mt-4 text-sm">✓ Takes only 10 minutes  ✓ No credit card required  ✓ Instant results</p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-black/50 backdrop-blur-sm border-t border-gray-800 py-12">
+      <footer className="bg-gray-800 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                <Shield className="w-5 h-5 text-white" />
+            <div className="flex items-center space-x-3 mb-4 md:mb-0">
+              <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                <Shield className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold">Disaster Dodger</span>
+              <span className="text-2xl font-bold text-white">Disaster Dodger</span>
             </div>
-            <div className="text-gray-400 text-sm">
-              © 2024 Disaster Dodger. Protecting homes with AI-powered insights.
+            <div className="text-gray-400 text-sm text-center">
+              © 2024 Disaster Dodger. Helping families feel confident and prepared.
             </div>
           </div>
         </div>
