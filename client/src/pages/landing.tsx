@@ -133,7 +133,7 @@ export default function Landing() {
               {/* Central Home Illustration */}
               <div className="relative mx-auto w-96 h-96 flex items-center justify-center">
                 <img 
-                  src="/assets/disaster-dodger-illustration.png" 
+                  src="/assets/disaster-dodger-new-illustration.png" 
                   alt="Protected home with natural disaster elements" 
                   className="w-full h-full object-contain"
                 />
