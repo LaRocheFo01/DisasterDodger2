@@ -43,7 +43,6 @@ export default function Landing() {
           <div className="hidden md:flex items-center space-x-6">
             <a href="#process" className="text-gray-600 hover:text-green-600 font-medium transition-colors">How It Works</a>
             <a href="#stories" className="text-gray-600 hover:text-green-600 font-medium transition-colors">Resources</a>
-            <a href="#resources" className="text-gray-600 hover:text-green-600 font-medium transition-colors">Tools</a>
             <Button 
               onClick={startAudit}
               className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-full"
@@ -278,7 +277,7 @@ export default function Landing() {
                 Discover how much you could save on insurance premiums with disaster preparedness improvements. Get instant estimates based on your home's risk profile.
               </p>
               <Button 
-                onClick={() => setLocation('/insurance-calculator')}
+                onClick={() => setLocation('/calculator')}
                 className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 h-[60px]"
               >
                 <Calculator className="mr-2 h-5 w-5" />
@@ -328,107 +327,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Interactive Resources */}
-      <section id="resources" className="py-32 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">
-              Your Emergency
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600"> Toolkit</span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Free resources to start protecting your family today
-            </p>
-          </div>
 
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Resource Cards */}
-            <div className="space-y-6">
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 hover:shadow-lg transition-all duration-300">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
-                    <CheckCircle className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold text-gray-900 mb-1">Emergency Action Plan</h4>
-                    <p className="text-gray-600">72-hour family survival checklist</p>
-                  </div>
-                  <Button className="btn-outline btn-small">Download</Button>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-6 hover:shadow-lg transition-all duration-300">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
-                    <DollarSign className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold text-gray-900 mb-1">Insurance Calculator</h4>
-                    <p className="text-gray-600">Estimate your potential savings</p>
-                  </div>
-                  <Button className="btn-outline btn-small">Calculate</Button>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 hover:shadow-lg transition-all duration-300">
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
-                    <DollarSign className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold text-gray-900 mb-1">Insurance Calculator</h4>
-                    <p className="text-gray-600">Calculate your potential savings</p>
-                  </div>
-                  <Button 
-                    onClick={() => window.open('/calculator', '_blank')}
-                    className="btn-outline btn-small"
-                  >
-                    Calculate
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {/* Interactive Preview */}
-            <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl p-8">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-                See Your Protection Level
-              </h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-700">Wildfire Risk</span>
-                  <div className="flex-1 mx-4 bg-white rounded-full h-3">
-                    <div className="bg-gradient-to-r from-red-400 to-red-600 h-3 rounded-full" style={{width: '75%'}}></div>
-                  </div>
-                  <span className="text-red-600 font-bold">75%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-700">Flood Protection</span>
-                  <div className="flex-1 mx-4 bg-white rounded-full h-3">
-                    <div className="bg-gradient-to-r from-green-400 to-green-600 h-3 rounded-full" style={{width: '90%'}}></div>
-                  </div>
-                  <span className="text-green-600 font-bold">90%</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-700">Wind Resistance</span>
-                  <div className="flex-1 mx-4 bg-white rounded-full h-3">
-                    <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 h-3 rounded-full" style={{width: '60%'}}></div>
-                  </div>
-                  <span className="text-yellow-600 font-bold">60%</span>
-                </div>
-              </div>
-              <div className="mt-8 text-center">
-                <Button 
-                  onClick={startAudit}
-                  className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-3 rounded-xl"
-                >
-                  Get Your Real Assessment
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Final CTA Section */}
       <section className="py-32 bg-gradient-to-br from-green-600 via-emerald-600 to-green-700 relative overflow-hidden">
