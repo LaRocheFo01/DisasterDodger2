@@ -1,12 +1,13 @@
-import { Shield, ArrowRight, CheckCircle, Zap, Waves, Flame, Wind, ChevronDown, ChevronUp, Home, Clock, DollarSign } from "lucide-react";
+import { Shield, ArrowRight, CheckCircle, Zap, Waves, Flame, Wind, ChevronDown, ChevronUp, Home, Clock, DollarSign, Star, Users, MapPin, Target, Heart, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 
 export default function Landing() {
   const [, setLocation] = useLocation();
   const [zipCode, setZipCode] = useState("");
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
 
   const startAudit = () => {
     if (zipCode.trim()) {
@@ -25,675 +26,482 @@ export default function Landing() {
     setOpenFaq(openFaq === index ? null : index);
   };
 
+  // Rotating testimonials
+  const testimonials = [
+    { name: "Sarah M.", location: "Austin, TX", savings: "$2,400", quote: "Our flood insurance dropped 40% after following the recommendations." },
+    { name: "Mike R.", location: "Phoenix, AZ", savings: "$1,800", quote: "The wildfire protection plan saved our home when neighbors lost theirs." },
+    { name: "Lisa K.", location: "Miami, FL", savings: "$3,200", quote: "Hurricane prep recommendations cut our insurance by $3,200 annually." }
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="absolute top-0 left-0 right-0 z-50 bg-transparent">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            {/* Logo */}
-            <div className="flex items-center space-x-3 animate-fade-in-down">
-              <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center animate-float hover-glow">
-                <Shield className="h-6 w-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold text-white">Disaster Dodger</span>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-green-100">
+      {/* Floating Navigation */}
+      <nav className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 bg-white/90 backdrop-blur-md rounded-full px-8 py-4 shadow-lg border border-green-100">
+        <div className="flex items-center space-x-8">
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+              <Shield className="h-4 w-4 text-white" />
             </div>
-            
-            {/* Navigation */}
-            <nav className="hidden md:flex items-center space-x-8 animate-fade-in-down animate-delay-200">
-              <a href="#features" className="text-white hover:text-green-200 font-medium transition-all duration-300 hover-scale">
-                Features
-              </a>
-              <a href="#how-it-works" className="text-white hover:text-green-200 font-medium transition-all duration-300 hover-scale">
-                How it Works
-              </a>
-              <a href="#faq" className="text-white hover:text-green-200 font-medium transition-all duration-300 hover-scale">
-                FAQ
-              </a>
-              <Button 
-                onClick={startAudit}
-                className="bg-white/20 backdrop-blur-sm text-white border border-white/30 hover:bg-white hover:text-green-700 transition-all duration-300 hover-scale animate-shimmer"
-              >
-                Start Assessment
-              </Button>
-            </nav>
+            <span className="font-bold text-gray-900">SafeHaven</span>
+          </div>
+          
+          <div className="hidden md:flex items-center space-x-6">
+            <a href="#process" className="text-gray-600 hover:text-green-600 font-medium transition-colors">How It Works</a>
+            <a href="#stories" className="text-gray-600 hover:text-green-600 font-medium transition-colors">Success Stories</a>
+            <a href="#resources" className="text-gray-600 hover:text-green-600 font-medium transition-colors">Resources</a>
+            <Button 
+              onClick={startAudit}
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-full"
+            >
+              Start Now
+            </Button>
           </div>
         </div>
-      </header>
+      </nav>
 
-      {/* Hero Section */}
-      <main className="relative overflow-hidden">
-        {/* Full-screen Hero with Gradient */}
-        <section className="min-h-screen bg-gradient-to-br from-emerald-500 via-green-600 to-teal-700 relative flex items-center justify-center animate-gradient">
-          {/* Background Pattern */}
-          <div className="absolute inset-0 bg-black/5"></div>
-          
-          {/* House Silhouettes Background */}
-          <div className="absolute inset-0 overflow-hidden opacity-10">
-            <div className="absolute bottom-0 left-1/4 w-32 h-24 bg-white/20">
-              <div className="w-full h-16 bg-white/30"></div>
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-16 border-r-16 border-b-16 border-transparent border-b-white/30"></div>
-            </div>
-            <div className="absolute bottom-0 right-1/3 w-28 h-20 bg-white/15">
-              <div className="w-full h-12 bg-white/25"></div>
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-14 border-r-14 border-b-12 border-transparent border-b-white/25"></div>
-            </div>
-            <div className="absolute bottom-0 left-1/6 w-24 h-18 bg-white/10">
-              <div className="w-full h-10 bg-white/20"></div>
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-12 border-r-12 border-b-8 border-transparent border-b-white/20"></div>
-            </div>
-          </div>
-          
+      {/* Hero Section with Interactive Elements */}
+      <section className="min-h-screen flex items-center justify-center relative overflow-hidden pt-20">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-10 w-32 h-32 bg-green-200/30 rounded-full blur-xl animate-float"></div>
+          <div className="absolute top-40 right-20 w-24 h-24 bg-emerald-300/40 rounded-full blur-lg animate-float animate-delay-700"></div>
+          <div className="absolute bottom-40 left-1/4 w-40 h-40 bg-green-100/50 rounded-full blur-2xl animate-float animate-delay-300"></div>
+          <div className="absolute bottom-20 right-1/3 w-28 h-28 bg-emerald-200/30 rounded-full blur-xl animate-float animate-delay-1000"></div>
+        </div>
 
-          
-          {/* Content */}
-          <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-            {/* Trust Indicators */}
-            <div className="flex justify-center items-center space-x-8 mb-8 animate-fade-in-up">
-              <div className="flex items-center space-x-2 text-green-100">
-                <Shield className="h-5 w-5" />
-                <span className="text-sm font-medium">FEMA-Aligned</span>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left Column - Content */}
+            <div className="text-left animate-fade-in-up">
+              {/* Floating Badge */}
+              <div className="inline-flex items-center space-x-2 bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-medium mb-8 animate-bounce-in">
+                <Star className="w-4 h-4" />
+                <span>Trusted by 2,500+ families nationwide</span>
               </div>
-              <div className="flex items-center space-x-2 text-green-100">
-                <CheckCircle className="h-5 w-5" />
-                <span className="text-sm font-medium">500+ Homes Protected</span>
-              </div>
-              <div className="flex items-center space-x-2 text-green-100">
-                <Home className="h-5 w-5" />
-                <span className="text-sm font-medium">Local Experts</span>
-              </div>
-            </div>
 
-            <h1 className="text-5xl lg:text-6xl font-bold leading-tight mb-8 animate-fade-in-up animate-delay-200">
-              Protect Your Home & Family<br />
-              <span className="text-emerald-200 animate-fade-in-up animate-delay-300">Before Disaster Strikes</span>
-            </h1>
-            
-            <p className="text-xl lg:text-2xl mb-8 text-green-50 font-light leading-relaxed max-w-3xl mx-auto animate-fade-in-up animate-delay-400">
-              Your most valuable investment deserves protection. Get a comprehensive 5-minute risk assessment and <span className="font-semibold text-white">save thousands in potential damage costs.</span>
-            </p>
+              <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
+                Your Home's
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600">
+                  Guardian Angel
+                </span>
+                <span className="block text-4xl lg:text-5xl text-gray-700">
+                  Against Disasters
+                </span>
+              </h1>
 
-            {/* Local Urgency Messaging */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-8 animate-fade-in-up animate-delay-500">
-              <p className="text-emerald-100 text-lg">
-                <span className="font-semibold text-white">1 in 4 homes</span> will experience disaster damage. Most homeowners have only <span className="font-semibold text-white">72 hours</span> to prepare when disaster strikes.
+              <p className="text-xl text-gray-600 leading-relaxed mb-8 max-w-lg">
+                Transform your home into a fortress against nature's fury. Our AI-powered assessment creates a personalized shield of protection in just 5 minutes.
               </p>
-            </div>
 
-            {/* CTA Form */}
-            <div className="max-w-lg mx-auto animate-scale-in animate-delay-700">
-              <form onSubmit={handleZipSubmit} className="space-y-6">
-                <div>
-                  <input 
-                    type="text" 
-                    placeholder="Enter your ZIP code"
-                    value={zipCode}
-                    onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
-                    maxLength={5}
-                    className="w-full rounded-xl border-0 px-6 py-5 text-xl text-gray-900 placeholder-gray-500 focus:ring-4 focus:ring-white/25 shadow-2xl transition-all duration-300 hover-lift"
-                    required
-                  />
+              {/* Interactive Stats */}
+              <div className="grid grid-cols-3 gap-4 mb-8">
+                <div className="text-center bg-white/60 backdrop-blur-sm rounded-xl p-4 hover:bg-white/80 transition-all duration-300">
+                  <div className="text-2xl font-bold text-green-600">5min</div>
+                  <div className="text-sm text-gray-600">Quick Setup</div>
                 </div>
-                
-                <Button 
-                  type="submit"
-                  className="w-full bg-white text-green-700 hover:bg-green-50 py-5 text-xl font-bold rounded-xl shadow-2xl transition-all duration-300 hover:scale-105 animate-glow"
-                >
-                  Get My Free Home Assessment
-                  <ArrowRight className="ml-3 h-6 w-6" />
-                </Button>
-              </form>
-
-              <div className="mt-8 text-green-100 animate-fade-in-up animate-delay-1000">
-                <CheckCircle className="inline h-5 w-5 mr-2" />
-                No signup required • Instant personalized results • Save thousands in damage costs
-              </div>
-            </div>
-
-            {/* Seasonal Urgency */}
-            <div className="mt-12 animate-fade-in-up animate-delay-1000">
-              <p className="text-emerald-200 text-lg">
-                <span className="font-semibold">Don't wait until it's too late.</span> Hurricane season starts in 12 weeks.
-              </p>
-            </div>
-          </div>
-
-          {/* Scroll Indicator */}
-          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce animate-delay-1000">
-            <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
-              <div className="w-1 h-3 bg-white/50 rounded-full mt-2 animate-pulse"></div>
-            </div>
-          </div>
-        </section>
-
-        {/* Visual House Protection Section */}
-        <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden">
-          {/* Background House Illustration */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-5">
-            <div className="relative">
-              <Home className="w-96 h-96 text-gray-600" />
-              <Shield className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 text-emerald-600" />
-            </div>
-          </div>
-          
-          <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16 animate-fade-in-up">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">Disasters We Help You Prepare For</h2>
-              <p className="text-xl text-gray-600 animate-fade-in-up animate-delay-200">Comprehensive protection against all major natural disasters</p>
-            </div>
-            
-            <div className="grid md:grid-cols-4 gap-8">
-              <div className="card-elevated text-center group animate-bounce-in animate-delay-300">
-                <div className="w-20 h-20 bg-red-500 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg hover-lift animate-rotate-in">
-                  <Zap className="icon-large text-white" />
+                <div className="text-center bg-white/60 backdrop-blur-sm rounded-xl p-4 hover:bg-white/80 transition-all duration-300">
+                  <div className="text-2xl font-bold text-green-600">35%</div>
+                  <div className="text-sm text-gray-600">Avg Savings</div>
                 </div>
-                <h3 className="text-xl font-bold mb-3">Earthquakes</h3>
-                <p className="text-large">Structural assessments, foundation retrofitting, and emergency preparedness for seismic events</p>
-              </div>
-              
-              <div className="card-elevated text-center group animate-bounce-in animate-delay-400">
-                <div className="w-20 h-20 bg-brand-secondary rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg hover-lift animate-rotate-in animate-delay-100">
-                  <Waves className="icon-large text-white" />
-                </div>
-                <h3 className="text-xl font-bold mb-3">Floods</h3>
-                <p className="text-large">Flood zone analysis, drainage solutions, and water damage prevention strategies</p>
-              </div>
-              
-              <div className="card-elevated text-center group animate-bounce-in animate-delay-500">
-                <div className="w-20 h-20 bg-brand-accent rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg hover-lift animate-rotate-in animate-delay-200">
-                  <Flame className="icon-large text-white" />
-                </div>
-                <h3 className="text-xl font-bold mb-3">Wildfires</h3>
-                <p className="text-large">Defensible space planning, fire-resistant materials, and evacuation route planning</p>
-              </div>
-              
-              <div className="card-elevated text-center group animate-bounce-in animate-delay-700">
-                <div className="w-20 h-20 bg-gray-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg hover-lift animate-rotate-in animate-delay-300">
-                  <Wind className="icon-large text-white" />
-                </div>
-                <h3 className="text-xl font-bold mb-3">Hurricanes</h3>
-                <p className="text-large">Wind resistance upgrades, storm shutters, and hurricane tracking systems</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Clear 3-Step Process Section */}
-        <section id="features" className="py-32 bg-white">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-20 animate-fade-in-up">
-              <h2 className="text-5xl font-bold text-gray-900 mb-6">Assess → Plan → Protect</h2>
-              <p className="text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animate-delay-200">
-                Three simple steps to comprehensive home protection
-              </p>
-            </div>
-
-            <div className="grid lg:grid-cols-3 gap-16">
-              <div className="text-center group animate-slide-in-left animate-delay-300">
-                <div className="relative">
-                  <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl transform group-hover:scale-110 transition-all duration-300 animate-scale-in animate-delay-500 hover-glow">
-                    <Clock className="h-12 w-12 text-white" />
-                  </div>
-                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-lg">
-                    1
-                  </div>
-                </div>
-                <h3 className="text-3xl font-bold mb-6 text-gray-900">Assess Your Risk</h3>
-                <p className="text-xl text-gray-600 leading-relaxed mb-6">
-                  5-minute comprehensive risk evaluation using official FEMA guidelines and local disaster data
-                </p>
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <p className="text-blue-800 font-medium">Quick assessment covers all major disaster types in your area</p>
-                </div>
-              </div>
-              
-              <div className="text-center group animate-fade-in-up animate-delay-400">
-                <div className="relative">
-                  <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-green-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl transform group-hover:scale-110 transition-all duration-300 animate-scale-in animate-delay-700 hover-glow">
-                    <CheckCircle className="h-12 w-12 text-white" />
-                  </div>
-                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-lg">
-                    2
-                  </div>
-                </div>
-                <h3 className="text-3xl font-bold mb-6 text-gray-900">Create Your Plan</h3>
-                <p className="text-xl text-gray-600 leading-relaxed mb-6">
-                  Receive personalized recommendations prioritized by risk level and cost-effectiveness
-                </p>
-                <div className="bg-green-50 rounded-lg p-4">
-                  <p className="text-green-800 font-medium">Actionable steps with cost estimates and insurance savings</p>
-                </div>
-              </div>
-              
-              <div className="text-center group animate-slide-in-right animate-delay-500">
-                <div className="relative">
-                  <div className="w-24 h-24 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl transform group-hover:scale-110 transition-all duration-300 animate-scale-in animate-delay-1000 hover-glow">
-                    <Shield className="h-12 w-12 text-white" />
-                  </div>
-                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-emerald-500 text-white rounded-full flex items-center justify-center font-bold text-lg">
-                    3
-                  </div>
-                </div>
-                <h3 className="text-3xl font-bold mb-6 text-gray-900">Protect & Save</h3>
-                <p className="text-xl text-gray-600 leading-relaxed mb-6">
-                  Implement improvements and enjoy reduced insurance premiums and peace of mind
-                </p>
-                <div className="bg-emerald-50 rounded-lg p-4">
-                  <p className="text-emerald-800 font-medium">Save up to 25% on insurance while protecting your family</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Call to Action */}
-            <div className="text-center mt-16 animate-fade-in-up animate-delay-1000">
-              <Button 
-                onClick={startAudit}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white px-12 py-4 text-xl font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                Start My Assessment Now
-                <ArrowRight className="ml-3 h-6 w-6" />
-              </Button>
-              <p className="mt-4 text-gray-600">Join 500+ homeowners who've already protected their families</p>
-            </div>
-          </div>
-        </section>
-
-        {/* Customer Testimonials Section */}
-        <section className="py-32 bg-gradient-to-br from-blue-50 to-green-50">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-20 animate-fade-in-up">
-              <h2 className="text-4xl font-bold text-gray-900 mb-6">Trusted by Homeowners Nationwide</h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Real families sharing how disaster preparedness protected their homes and saved money
-              </p>
-            </div>
-
-            <div className="grid lg:grid-cols-3 gap-8 mb-16">
-              <div className="card-elevated animate-fade-in-up animate-delay-300">
-                <div className="flex items-start space-x-4 mb-4">
-                  <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
-                    SM
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900">Sarah M.</h4>
-                    <p className="text-gray-600 text-sm">Houston, TX homeowner</p>
-                  </div>
-                </div>
-                <p className="text-gray-700 leading-relaxed mb-4">
-                  "After implementing the flood protection recommendations, our insurance premiums dropped by $1,200 annually. The assessment paid for itself in just 3 months."
-                </p>
-                <div className="flex items-center text-emerald-600">
-                  <span className="text-2xl font-bold">$1,200</span>
-                  <span className="ml-2 text-sm">saved annually</span>
+                <div className="text-center bg-white/60 backdrop-blur-sm rounded-xl p-4 hover:bg-white/80 transition-all duration-300">
+                  <div className="text-2xl font-bold text-green-600">24/7</div>
+                  <div className="text-sm text-gray-600">Protection</div>
                 </div>
               </div>
 
-              <div className="card-elevated animate-fade-in-up animate-delay-400">
-                <div className="flex items-start space-x-4 mb-4">
-                  <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">
-                    JR
+              {/* CTA Form */}
+              <form onSubmit={handleZipSubmit} className="space-y-4">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="relative flex-1">
+                    <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input 
+                      type="text" 
+                      placeholder="Enter your ZIP code"
+                      value={zipCode}
+                      onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
+                      maxLength={5}
+                      className="w-full pl-12 pr-4 py-4 text-lg border-2 border-green-200 rounded-xl focus:border-green-500 focus:ring-4 focus:ring-green-100 transition-all duration-300"
+                      required
+                    />
                   </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900">James R.</h4>
-                    <p className="text-gray-600 text-sm">Wildfire-prone California</p>
-                  </div>
-                </div>
-                <p className="text-gray-700 leading-relaxed mb-4">
-                  "The defensible space plan helped us survive the 2023 wildfires when neighboring homes were lost. Our family and property stayed safe thanks to these recommendations."
-                </p>
-                <div className="flex items-center text-emerald-600">
-                  <Shield className="w-5 h-5 mr-2" />
-                  <span className="text-sm font-medium">Home protected during wildfire</span>
-                </div>
-              </div>
-
-              <div className="card-elevated animate-fade-in-up animate-delay-500">
-                <div className="flex items-start space-x-4 mb-4">
-                  <div className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold">
-                    MK
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900">Maria K.</h4>
-                    <p className="text-gray-600 text-sm">Earthquake zone resident</p>
-                  </div>
-                </div>
-                <p className="text-gray-700 leading-relaxed mb-4">
-                  "The earthquake retrofitting recommendations were clear and actionable. We qualified for a $5,000 grant and reduced our seismic risk significantly."
-                </p>
-                <div className="flex items-center text-emerald-600">
-                  <span className="text-2xl font-bold">$5,000</span>
-                  <span className="ml-2 text-sm">grant secured</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Educational Content & Trust Building */}
-        <section id="how-it-works" className="py-32 bg-white">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-20 animate-fade-in-up">
-              <h2 className="text-4xl font-bold text-gray-900 mb-6">Professional-Grade Protection Made Simple</h2>
-              <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed animate-fade-in-up animate-delay-200">
-                Backed by federal emergency management experts and trusted by insurance companies nationwide
-              </p>
-            </div>
-
-            <div className="grid lg:grid-cols-2 gap-20 items-center">
-              <div className="space-y-12 animate-slide-in-left animate-delay-300">
-                <div className="flex items-start space-x-6 animate-fade-in-up animate-delay-400 hover-lift">
-                  <div className="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center flex-shrink-0 animate-scale-in animate-delay-500 hover-glow">
-                    <CheckCircle className="h-8 w-8 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-3">FEMA-Aligned Data</h3>
-                    <p className="text-lg text-gray-600">Official government hazard data ensures accuracy and reliability for your specific location</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-6 animate-fade-in-up animate-delay-500 hover-lift">
-                  <div className="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center flex-shrink-0 animate-scale-in animate-delay-700 hover-glow">
-                    <Shield className="h-8 w-8 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-3">Instant Results</h3>
-                    <p className="text-lg text-gray-600">Get your comprehensive risk assessment and recommendations in under 5 minutes</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-6 animate-fade-in-up animate-delay-700 hover-lift">
-                  <div className="w-16 h-16 bg-green-600 rounded-xl flex items-center justify-center flex-shrink-0 animate-scale-in animate-delay-1000 hover-glow">
-                    <ArrowRight className="h-8 w-8 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-3">Actionable Plans</h3>
-                    <p className="text-lg text-gray-600">Receive specific, prioritized recommendations with cost estimates and insurance benefits</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="bg-gradient-to-br from-emerald-600 to-green-700 rounded-3xl p-12 text-white animate-slide-in-right animate-delay-500 hover-lift animate-gradient">
-                <h3 className="text-3xl font-bold mb-6 animate-fade-in-up animate-delay-700">Ready to Protect Your Family?</h3>
-                <p className="text-xl mb-8 text-green-100 animate-fade-in-up animate-delay-1000">Join 500+ families who've secured their homes and saved thousands</p>
-                
-                {/* Quick Benefits */}
-                <div className="grid grid-cols-2 gap-4 mb-8">
-                  <div className="bg-white/10 rounded-lg p-3 text-center">
-                    <div className="text-2xl font-bold">5 min</div>
-                    <div className="text-sm text-green-100">Assessment</div>
-                  </div>
-                  <div className="bg-white/10 rounded-lg p-3 text-center">
-                    <div className="text-2xl font-bold">25%</div>
-                    <div className="text-sm text-green-100">Insurance Savings</div>
-                  </div>
-                </div>
-
-                <div className="space-y-4 animate-scale-in animate-delay-1000">
-                  <input 
-                    type="text" 
-                    placeholder="Enter your ZIP code for local risk assessment"
-                    value={zipCode}
-                    onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
-                    maxLength={5}
-                    className="w-full rounded-xl border-0 px-6 py-4 text-lg text-gray-900 placeholder-gray-500 transition-all duration-300 hover-lift focus:ring-4 focus:ring-white/25"
-                  />
                   <Button 
-                    onClick={startAudit}
-                    className="w-full bg-white text-emerald-700 hover:bg-green-50 py-4 text-lg font-bold rounded-xl transition-all duration-300 hover:scale-105 animate-shimmer shadow-lg"
+                    type="submit"
+                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-4 text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                   >
-                    Get My Free Protection Plan
+                    Protect My Home
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
-                  <p className="text-center text-green-100 text-sm">
-                    💳 No credit card required • 📱 Instant mobile-friendly results
-                  </p>
                 </div>
+                <p className="text-sm text-gray-500 text-center">
+                  Free assessment • No credit card required • Instant results
+                </p>
+              </form>
+            </div>
+
+            {/* Right Column - Interactive Visualization */}
+            <div className="relative animate-scale-in animate-delay-500">
+              {/* Central Home Icon */}
+              <div className="relative mx-auto w-80 h-80 bg-gradient-to-br from-white to-green-50 rounded-3xl shadow-2xl flex items-center justify-center">
+                <Home className="w-32 h-32 text-green-600" />
+                
+                {/* Floating Protection Shields */}
+                <div className="absolute -top-4 -left-4 w-16 h-16 bg-red-100 rounded-full flex items-center justify-center animate-float">
+                  <Flame className="w-8 h-8 text-red-500" />
+                </div>
+                <div className="absolute -top-4 -right-4 w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center animate-float animate-delay-300">
+                  <Waves className="w-8 h-8 text-blue-500" />
+                </div>
+                <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center animate-float animate-delay-700">
+                  <Zap className="w-8 h-8 text-yellow-500" />
+                </div>
+                <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center animate-float animate-delay-1000">
+                  <Wind className="w-8 h-8 text-gray-500" />
+                </div>
+
+                {/* Protective Shield Overlay */}
+                <div className="absolute inset-0 border-4 border-green-300 rounded-3xl animate-pulse"></div>
+              </div>
+
+              {/* Rotating Testimonial */}
+              <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-white rounded-2xl shadow-xl p-6 max-w-sm">
+                <div className="flex items-center space-x-3 mb-3">
+                  <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">
+                    {testimonials[currentTestimonial].name.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-900">{testimonials[currentTestimonial].name}</div>
+                    <div className="text-sm text-gray-500">{testimonials[currentTestimonial].location}</div>
+                  </div>
+                  <div className="ml-auto text-green-600 font-bold">{testimonials[currentTestimonial].savings}</div>
+                </div>
+                <p className="text-gray-700 text-sm">"{testimonials[currentTestimonial].quote}"</p>
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Quick Tips & Educational Content Section */}
-        <section className="py-32 bg-gradient-to-br from-gray-50 to-blue-50">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-20 animate-fade-in-up">
-              <h2 className="text-4xl font-bold text-gray-900 mb-6">Emergency Preparedness Resources</h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                Actionable tips and downloadable resources to protect your family today
+      {/* Magical Process Section */}
+      <section id="process" className="py-32 bg-white relative">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">
+              Protection That Feels Like
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600"> Magic</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Three simple steps to transform your home into an impenetrable sanctuary
+            </p>
+          </div>
+
+          <div className="relative">
+            {/* Connecting Line */}
+            <div className="absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-green-200 via-emerald-300 to-green-200 transform -translate-y-1/2 hidden lg:block"></div>
+            
+            <div className="grid lg:grid-cols-3 gap-16 relative">
+              {/* Step 1 */}
+              <div className="text-center group">
+                <div className="relative mx-auto w-32 h-32 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mb-8 shadow-2xl group-hover:scale-110 transition-all duration-500">
+                  <Target className="w-16 h-16 text-white" />
+                  <div className="absolute -top-3 -right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center font-bold text-green-600 shadow-lg">
+                    1
+                  </div>
+                  <div className="absolute inset-0 rounded-full bg-white/20 scale-110 animate-ping"></div>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Instant Risk Scan</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Our AI analyzes 10,000+ data points about your location, home type, and local disaster patterns in seconds
+                </p>
+              </div>
+
+              {/* Step 2 */}
+              <div className="text-center group">
+                <div className="relative mx-auto w-32 h-32 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full flex items-center justify-center mb-8 shadow-2xl group-hover:scale-110 transition-all duration-500">
+                  <Heart className="w-16 h-16 text-white" />
+                  <div className="absolute -top-3 -right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center font-bold text-green-600 shadow-lg">
+                    2
+                  </div>
+                  <div className="absolute inset-0 rounded-full bg-white/20 scale-110 animate-ping animation-delay-1000"></div>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Personalized Shield</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Get a custom protection plan designed specifically for your family's needs and your home's unique vulnerabilities
+                </p>
+              </div>
+
+              {/* Step 3 */}
+              <div className="text-center group">
+                <div className="relative mx-auto w-32 h-32 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mb-8 shadow-2xl group-hover:scale-110 transition-all duration-500">
+                  <Globe className="w-16 h-16 text-white" />
+                  <div className="absolute -top-3 -right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center font-bold text-green-600 shadow-lg">
+                    3
+                  </div>
+                  <div className="absolute inset-0 rounded-full bg-white/20 scale-110 animate-ping animation-delay-2000"></div>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Lifetime Protection</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Enjoy continuous monitoring, insurance savings, and peace of mind knowing your family is protected 24/7
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Social Proof Stories */}
+      <section id="stories" className="py-32 bg-gradient-to-br from-green-50 to-emerald-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">
+              Real Families, Real Protection,
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600"> Real Savings</span>
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Story Card 1 */}
+            <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+              <div className="flex items-center space-x-4 mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                  JM
+                </div>
+                <div>
+                  <h4 className="font-bold text-gray-900">Jennifer & Mark</h4>
+                  <p className="text-gray-600">California Wildfire Zone</p>
+                </div>
+              </div>
+              <div className="bg-green-50 rounded-xl p-4 mb-6">
+                <div className="text-3xl font-bold text-green-600 mb-1">$15,000</div>
+                <div className="text-sm text-green-700">Prevented damage cost</div>
+              </div>
+              <p className="text-gray-700 leading-relaxed">
+                "When the Creek Fire hit our neighborhood, we were the only house that survived. The defensible space plan saved everything we worked for."
               </p>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-12">
-              {/* Quick Tips */}
-              <div className="animate-slide-in-left animate-delay-300">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">Essential Emergency Tips</h3>
-                <div className="space-y-4">
-                  <div className="card-standard hover-lift">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Flame className="w-4 h-4 text-red-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-2">Wildfire Protection</h4>
-                        <p className="text-gray-600">Create 30 feet of defensible space around your home by removing flammable vegetation</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="card-standard hover-lift">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Waves className="w-4 h-4 text-blue-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-2">Flood Prevention</h4>
-                        <p className="text-gray-600">Install sump pumps and ensure proper drainage away from your foundation</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="card-standard hover-lift">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Zap className="w-4 h-4 text-yellow-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-2">Earthquake Safety</h4>
-                        <p className="text-gray-600">Secure tall furniture to walls and keep emergency supplies in multiple locations</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="card-standard hover-lift">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Wind className="w-4 h-4 text-gray-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-gray-900 mb-2">Hurricane Preparation</h4>
-                        <p className="text-gray-600">Install storm shutters and trim trees near your home before hurricane season</p>
-                      </div>
-                    </div>
-                  </div>
+            {/* Story Card 2 */}
+            <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+              <div className="flex items-center space-x-4 mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                  RK
+                </div>
+                <div>
+                  <h4 className="font-bold text-gray-900">Rodriguez Family</h4>
+                  <p className="text-gray-600">Houston, Texas</p>
                 </div>
               </div>
+              <div className="bg-green-50 rounded-xl p-4 mb-6">
+                <div className="text-3xl font-bold text-green-600 mb-1">$3,600</div>
+                <div className="text-sm text-green-700">Annual insurance savings</div>
+              </div>
+              <p className="text-gray-700 leading-relaxed">
+                "The flood mitigation upgrades dropped our premiums by 45%. The plan paid for itself in just 8 months!"
+              </p>
+            </div>
 
-              {/* Downloadable Resources */}
-              <div className="animate-slide-in-right animate-delay-400">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">Free Emergency Resources</h3>
-                
-                <div className="card-elevated bg-gradient-to-br from-emerald-50 to-green-50">
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                      <CheckCircle className="w-8 h-8 text-white" />
-                    </div>
-                    <h4 className="text-xl font-bold text-gray-900 mb-4">Emergency Planning Template</h4>
-                    <p className="text-gray-600 mb-6">
-                      Complete family emergency plan including evacuation routes, emergency contacts, and supply checklists
-                    </p>
-                    <Button className="btn-primary mb-4">
-                      Download Free Template
-                      <ArrowRight className="ml-2 w-4 h-4" />
-                    </Button>
-                    <p className="text-sm text-gray-500">
-                      ✓ Customizable for your family size<br />
-                      ✓ Covers all disaster types<br />
-                      ✓ Printable and mobile-friendly
-                    </p>
-                  </div>
+            {/* Story Card 3 */}
+            <div className="bg-white rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
+              <div className="flex items-center space-x-4 mb-6">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                  DL
                 </div>
-
-                {/* Insurance Calculator */}
-                <div className="mt-8 card-standard">
-                  <div className="text-center">
-                    <DollarSign className="w-12 h-12 text-emerald-600 mx-auto mb-4" />
-                    <h4 className="text-lg font-bold text-gray-900 mb-2">Insurance Savings Calculator</h4>
-                    <p className="text-gray-600 mb-4">See how much you could save with disaster-resistant improvements</p>
-                    <Button className="btn-outline">
-                      Calculate Savings
-                    </Button>
-                  </div>
+                <div>
+                  <h4 className="font-bold text-gray-900">David & Lisa</h4>
+                  <p className="text-gray-600">Seattle, Washington</p>
                 </div>
               </div>
+              <div className="bg-green-50 rounded-xl p-4 mb-6">
+                <div className="text-3xl font-bold text-green-600 mb-1">$8,500</div>
+                <div className="text-sm text-green-700">Grant funding secured</div>
+              </div>
+              <p className="text-gray-700 leading-relaxed">
+                "We qualified for state earthquake retrofitting grants we never knew existed. The guidance was invaluable."
+              </p>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* FAQ Section */}
-        <section id="faq" className="py-32 bg-white">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-20 animate-fade-in-up">
-              <h2 className="text-5xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
-              <p className="text-2xl text-gray-600 animate-fade-in-up animate-delay-200">Everything you need to know about disaster preparedness assessments</p>
-            </div>
+      {/* Interactive Resources */}
+      <section id="resources" className="py-32 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">
+              Your Emergency
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600"> Toolkit</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Free resources to start protecting your family today
+            </p>
+          </div>
 
+          <div className="grid lg:grid-cols-2 gap-12">
+            {/* Resource Cards */}
             <div className="space-y-6">
-              {[
-                {
-                  question: "How accurate are the disaster risk assessments?",
-                  answer: "Our assessments use official FEMA data, USGS hazard maps, and NOAA climate data to provide the most accurate regional risk analysis available. We combine multiple authoritative sources to ensure precision for your specific location and property type."
-                },
-                {
-                  question: "What types of disasters are covered in the assessment?",
-                  answer: "We assess all major disaster types including earthquakes, wildfires, hurricanes, floods, tornadoes, and severe storms. Our analysis is customized based on your geographic location's primary risks and historical disaster patterns."
-                },
-                {
-                  question: "How long does the complete audit take?",
-                  answer: "Most homeowners complete their comprehensive assessment in under 5 minutes. The questionnaire is designed to be quick and efficient while still gathering all essential information needed for accurate recommendations."
-                },
-                {
-                  question: "What kind of recommendations will I receive?",
-                  answer: "You'll receive specific, actionable recommendations prioritized by risk level and cost-effectiveness. This includes structural improvements, safety equipment, emergency planning, and potential insurance savings with estimated costs and timelines."
-                },
-                {
-                  question: "Is my personal information secure?",
-                  answer: "Yes, we use enterprise-grade security measures to protect your data. We only collect information necessary for the assessment and never share personal details with third parties. Your privacy and security are our top priorities."
-                },
-                {
-                  question: "Can this help reduce my insurance costs?",
-                  answer: "Many of our recommendations can lead to insurance discounts. We provide specific guidance on improvements that insurers recognize, potential premium reductions, and documentation needed to claim discounts with your insurance provider."
-                },
-                {
-                  question: "Do I need any special knowledge to complete the assessment?",
-                  answer: "No special expertise is required. Our questions are designed for homeowners of all backgrounds. We provide clear explanations and examples, and you can always skip questions you're unsure about - our AI can still provide valuable insights."
-                },
-                {
-                  question: "What if I live in a low-risk area?",
-                  answer: "Even low-risk areas benefit from preparedness planning. Our assessment identifies any potential risks and provides basic preparedness recommendations. Prevention and preparation are valuable regardless of your area's risk level."
-                }
-              ].map((faq, index) => (
-                <div key={index} className={`bg-gray-50 rounded-2xl overflow-hidden shadow-sm hover-lift animate-fade-in-up animate-delay-${300 + (index * 100)}`}>
-                  <button
-                    onClick={() => toggleFaq(index)}
-                    className="w-full px-8 py-6 text-left flex items-center justify-between hover:bg-gray-100 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-inset hover-scale"
-                  >
-                    <span className="text-xl font-semibold text-gray-900 pr-8">{faq.question}</span>
-                    <div className="flex-shrink-0 transition-transform duration-300">
-                      {openFaq === index ? (
-                        <ChevronUp className="h-6 w-6 text-green-600 animate-bounce-in" />
-                      ) : (
-                        <ChevronDown className="h-6 w-6 text-green-600" />
-                      )}
-                    </div>
-                  </button>
-                  {openFaq === index && (
-                    <div className="px-8 pb-6 animate-fade-in-up">
-                      <p className="text-lg text-gray-600 leading-relaxed">{faq.answer}</p>
-                    </div>
-                  )}
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 hover:shadow-lg transition-all duration-300">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
+                    <CheckCircle className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-gray-900 mb-1">Emergency Action Plan</h4>
+                    <p className="text-gray-600">72-hour family survival checklist</p>
+                  </div>
+                  <Button className="btn-outline btn-small">Download</Button>
                 </div>
-              ))}
-            </div>
+              </div>
 
-            {/* CTA in FAQ */}
-            <div className="mt-16 text-center animate-scale-in animate-delay-1000">
-              <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-12 text-white hover-lift animate-gradient">
-                <h3 className="text-3xl font-bold mb-4 animate-fade-in-up">Still Have Questions?</h3>
-                <p className="text-xl mb-8 text-green-100 animate-fade-in-up animate-delay-200">Get started with your free assessment and discover your personalized disaster preparedness plan</p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-lg mx-auto animate-fade-in-up animate-delay-400">
-                  <input 
-                    type="text" 
-                    placeholder="Enter your ZIP code"
-                    value={zipCode}
-                    onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
-                    maxLength={5}
-                    className="flex-1 rounded-xl border-0 px-6 py-4 text-lg text-gray-900 placeholder-gray-500 transition-all duration-300 hover-lift"
-                  />
-                  <Button 
-                    onClick={startAudit}
-                    className="bg-white text-green-700 hover:bg-green-50 px-8 py-4 text-lg font-bold rounded-xl whitespace-nowrap transition-all duration-300 hover:scale-105 animate-shimmer"
-                  >
-                    Start Free Assessment
-                  </Button>
+              <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-6 hover:shadow-lg transition-all duration-300">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
+                    <DollarSign className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-gray-900 mb-1">Insurance Calculator</h4>
+                    <p className="text-gray-600">Estimate your potential savings</p>
+                  </div>
+                  <Button className="btn-outline btn-small">Calculate</Button>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 hover:shadow-lg transition-all duration-300">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center">
+                    <Users className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-gray-900 mb-1">Community Network</h4>
+                    <p className="text-gray-600">Connect with prepared neighbors</p>
+                  </div>
+                  <Button className="btn-outline btn-small">Join</Button>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
 
-        {/* Footer */}
-        <footer id="contact" className="bg-gray-900 text-white py-20">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h3 className="text-4xl font-bold mb-4">Questions?</h3>
-              <p className="text-xl text-gray-400">We're here to help you protect your home</p>
-            </div>
-            
-            <div className="grid md:grid-cols-3 gap-12 text-center">
-              <div>
-                <h4 className="text-xl font-semibold mb-4">Support</h4>
-                <ul className="space-y-3 text-gray-400">
-                  <li><a href="#help" className="hover:text-white transition-colors">Help Center</a></li>
-                  <li><a href="#contact" className="hover:text-white transition-colors">Contact Support</a></li>
-                  <li><a href="#faq" className="hover:text-white transition-colors">FAQ</a></li>
-                </ul>
+            {/* Interactive Preview */}
+            <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl p-8">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+                See Your Protection Level
+              </h3>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-700">Wildfire Risk</span>
+                  <div className="flex-1 mx-4 bg-white rounded-full h-3">
+                    <div className="bg-gradient-to-r from-red-400 to-red-600 h-3 rounded-full" style={{width: '75%'}}></div>
+                  </div>
+                  <span className="text-red-600 font-bold">75%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-700">Flood Protection</span>
+                  <div className="flex-1 mx-4 bg-white rounded-full h-3">
+                    <div className="bg-gradient-to-r from-green-400 to-green-600 h-3 rounded-full" style={{width: '90%'}}></div>
+                  </div>
+                  <span className="text-green-600 font-bold">90%</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-700">Wind Resistance</span>
+                  <div className="flex-1 mx-4 bg-white rounded-full h-3">
+                    <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 h-3 rounded-full" style={{width: '60%'}}></div>
+                  </div>
+                  <span className="text-yellow-600 font-bold">60%</span>
+                </div>
               </div>
-              
-              <div>
-                <h4 className="text-xl font-semibold mb-4">Resources</h4>
-                <ul className="space-y-3 text-gray-400">
-                  <li><a href="#guides" className="hover:text-white transition-colors">Safety Guides</a></li>
-                  <li><a href="#blog" className="hover:text-white transition-colors">Blog</a></li>
-                  <li><a href="#updates" className="hover:text-white transition-colors">Updates</a></li>
-                </ul>
+              <div className="mt-8 text-center">
+                <Button 
+                  onClick={startAudit}
+                  className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-3 rounded-xl"
+                >
+                  Get Your Real Assessment
+                </Button>
               </div>
-              
-              <div>
-                <h4 className="text-xl font-semibold mb-4">Legal</h4>
-                <ul className="space-y-3 text-gray-400">
-                  <li><a href="#privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                  <li><a href="#terms" className="hover:text-white transition-colors">Terms of Service</a></li>
-                  <li><a href="#security" className="hover:text-white transition-colors">Security</a></li>
-                </ul>
-              </div>
-            </div>
-            
-            <div className="border-t border-gray-800 mt-16 pt-8 text-center">
-              <p className="text-gray-400">&copy; 2025 Disaster Dodger. All rights reserved.</p>
             </div>
           </div>
-        </footer>
-      </main>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
+      <section className="py-32 bg-gradient-to-br from-green-600 via-emerald-600 to-green-700 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-20 h-20 border-2 border-white rounded-full"></div>
+          <div className="absolute top-40 right-20 w-16 h-16 border-2 border-white rounded-full"></div>
+          <div className="absolute bottom-20 left-1/4 w-24 h-24 border-2 border-white rounded-full"></div>
+          <div className="absolute bottom-40 right-10 w-12 h-12 border-2 border-white rounded-full"></div>
+        </div>
+
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <h2 className="text-5xl font-bold text-white mb-8">
+            Your Family's Safety
+            <span className="block text-emerald-200">Can't Wait</span>
+          </h2>
+          <p className="text-2xl text-green-100 mb-12 leading-relaxed">
+            Join 2,500+ families who've already secured their homes. Start your protection journey in the next 5 minutes.
+          </p>
+
+          <div className="max-w-md mx-auto">
+            <form onSubmit={handleZipSubmit} className="space-y-6">
+              <input 
+                type="text" 
+                placeholder="Enter ZIP code to begin"
+                value={zipCode}
+                onChange={(e) => setZipCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
+                maxLength={5}
+                className="w-full px-6 py-4 text-xl text-gray-900 rounded-xl border-0 focus:ring-4 focus:ring-white/25 shadow-xl"
+                required
+              />
+              <Button 
+                type="submit"
+                className="w-full bg-white text-green-700 hover:bg-green-50 py-4 text-xl font-bold rounded-xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
+              >
+                Protect My Family Now
+                <Shield className="ml-3 h-6 w-6" />
+              </Button>
+            </form>
+            
+            <div className="mt-8 flex items-center justify-center space-x-8 text-green-200">
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-5 w-5" />
+                <span>5-minute setup</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-5 w-5" />
+                <span>100% free</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-5 w-5" />
+                <span>Instant results</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="flex items-center justify-center space-x-2 mb-4">
+              <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                <Shield className="h-4 w-4 text-white" />
+              </div>
+              <span className="text-2xl font-bold">SafeHaven</span>
+            </div>
+            <p className="text-gray-400 mb-8">Protecting families, one home at a time.</p>
+            <div className="flex justify-center space-x-8 text-gray-400">
+              <a href="#" className="hover:text-green-400 transition-colors">Privacy Policy</a>
+              <a href="#" className="hover:text-green-400 transition-colors">Terms of Service</a>
+              <a href="#" className="hover:text-green-400 transition-colors">Contact Us</a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
