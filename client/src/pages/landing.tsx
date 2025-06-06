@@ -100,59 +100,6 @@ export default function Landing() {
                 Transform your home into a fortress against nature's fury. Our comprehensive assessment creates a personalized shield of protection in just 5 minutes.
               </p>
 
-              {/* Animated Protection Level Bars */}
-              <div className="mb-8 bg-white/80 backdrop-blur-sm rounded-2xl p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Protection Level</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <Flame className="w-5 h-5 text-red-500" />
-                      <span className="text-gray-700 font-medium">Wildfire</span>
-                    </div>
-                    <div className="flex-1 mx-4 bg-gray-200 rounded-full h-3 overflow-hidden">
-                      <div className="bg-gradient-to-r from-red-400 to-red-600 h-3 rounded-full animate-fill-bar" style={{width: '65%', animationDelay: '0.5s'}}></div>
-                    </div>
-                    <span className="text-red-600 font-bold text-sm">65%</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <Waves className="w-5 h-5 text-blue-500" />
-                      <span className="text-gray-700 font-medium">Flood</span>
-                    </div>
-                    <div className="flex-1 mx-4 bg-gray-200 rounded-full h-3 overflow-hidden">
-                      <div className="bg-gradient-to-r from-blue-400 to-blue-600 h-3 rounded-full animate-fill-bar" style={{width: '80%', animationDelay: '1s'}}></div>
-                    </div>
-                    <span className="text-blue-600 font-bold text-sm">80%</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <Zap className="w-5 h-5 text-yellow-500" />
-                      <span className="text-gray-700 font-medium">Earthquake</span>
-                    </div>
-                    <div className="flex-1 mx-4 bg-gray-200 rounded-full h-3 overflow-hidden">
-                      <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 h-3 rounded-full animate-fill-bar" style={{width: '45%', animationDelay: '1.5s'}}></div>
-                    </div>
-                    <span className="text-yellow-600 font-bold text-sm">45%</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <Wind className="w-5 h-5 text-gray-500" />
-                      <span className="text-gray-700 font-medium">Hurricane</span>
-                    </div>
-                    <div className="flex-1 mx-4 bg-gray-200 rounded-full h-3 overflow-hidden">
-                      <div className="bg-gradient-to-r from-gray-400 to-gray-600 h-3 rounded-full animate-fill-bar" style={{width: '75%', animationDelay: '2s'}}></div>
-                    </div>
-                    <span className="text-gray-600 font-bold text-sm">75%</span>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-500 mt-3 text-center">
-                  <span className="text-red-600 font-medium">Get your personalized assessment</span> to improve these scores
-                </p>
-              </div>
-
               {/* Interactive Stats */}
               <div className="grid grid-cols-3 gap-4 mb-8">
                 <div className="text-center bg-white/60 backdrop-blur-sm rounded-xl p-4 hover:bg-white/80 transition-all duration-300">
