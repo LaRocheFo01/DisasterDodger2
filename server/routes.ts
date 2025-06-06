@@ -9,7 +9,7 @@ import { generateAutomatedReport, type Hazard } from "./automated-report-generat
 import { callDeepseek, renderAuditHTML } from "./deepseek-service";
 import { generatePDFFromHTML } from "./pdf-generator";
 import { calculateInsuranceSavings, getRecommendationsByHazard } from "./insurance-calculator";
-import { generateCreativeReport } from "./creative-report-generator";
+import { generateCreativeReport } from "./creative-report-generator-fixed";
 import axios from 'axios';
 
 export async function registerRoutes(app: Express): Promise<Server> {
