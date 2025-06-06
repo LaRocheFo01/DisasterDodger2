@@ -132,7 +132,7 @@ Return only the JSON object, no other text.`;
           { role: 'user', content: userPrompt }
         ],
         temperature: 0.3,
-        max_tokens: 3000
+        max_tokens: 8000
       },
       {
         headers: {

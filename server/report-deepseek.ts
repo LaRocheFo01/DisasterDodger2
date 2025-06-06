@@ -27,7 +27,7 @@ export async function generatePDFReport(req: Request, res: Response) {
     console.log('[Backend] Calling DeepSeek API...');
     const deepseekResult = await callDeepseek(
       audit, 
-      'deepseek/deepseek-r1-0528-qwen3-8b:free',
+      'deepseek/deepseek-r1-0528:free',
       'comprehensive',
       audit.zipCode || '',
       audit.primaryHazard || 'earthquake'

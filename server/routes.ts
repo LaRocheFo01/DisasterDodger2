@@ -292,6 +292,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // PDF Report generation with DeepSeek integration
+  app.post("/api/audits/:id/generate-pdf", generatePDFReport);
+
   // Insurance calculator endpoints
   app.post("/api/insurance/calculate", calculateInsuranceSavings);
   app.get("/api/insurance/recommendations/:hazard", getRecommendationsByHazard);
