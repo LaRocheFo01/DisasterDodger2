@@ -88,14 +88,37 @@ export default function Landing() {
           
           {/* Content */}
           <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-            <h1 className="text-6xl lg:text-7xl font-bold leading-tight mb-8 animate-fade-in-up">
-              Dodge Disasters<br />
-              <span className="text-green-200 animate-fade-in-up animate-delay-200">Before They Strike</span>
+            {/* Trust Indicators */}
+            <div className="flex justify-center items-center space-x-8 mb-8 animate-fade-in-up">
+              <div className="flex items-center space-x-2 text-green-100">
+                <Shield className="h-5 w-5" />
+                <span className="text-sm font-medium">FEMA-Aligned</span>
+              </div>
+              <div className="flex items-center space-x-2 text-green-100">
+                <CheckCircle className="h-5 w-5" />
+                <span className="text-sm font-medium">500+ Homes Protected</span>
+              </div>
+              <div className="flex items-center space-x-2 text-green-100">
+                <Home className="h-5 w-5" />
+                <span className="text-sm font-medium">Local Experts</span>
+              </div>
+            </div>
+
+            <h1 className="text-5xl lg:text-6xl font-bold leading-tight mb-8 animate-fade-in-up animate-delay-200">
+              Protect Your Home & Family<br />
+              <span className="text-emerald-200 animate-fade-in-up animate-delay-300">Before Disaster Strikes</span>
             </h1>
             
-            <p className="text-2xl lg:text-3xl mb-12 text-green-50 font-light leading-relaxed max-w-3xl mx-auto animate-fade-in-up animate-delay-400">
-              Five-minute, FEMA-aligned home audit that pinpoints <span className="font-semibold text-white">wildfire, flood, hurricane, and earthquake risks</span>
+            <p className="text-xl lg:text-2xl mb-8 text-green-50 font-light leading-relaxed max-w-3xl mx-auto animate-fade-in-up animate-delay-400">
+              Your most valuable investment deserves protection. Get a comprehensive 5-minute risk assessment and <span className="font-semibold text-white">save thousands in potential damage costs.</span>
             </p>
+
+            {/* Local Urgency Messaging */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-8 animate-fade-in-up animate-delay-500">
+              <p className="text-emerald-100 text-lg">
+                <span className="font-semibold text-white">1 in 4 homes</span> will experience disaster damage. Most homeowners have only <span className="font-semibold text-white">72 hours</span> to prepare when disaster strikes.
+              </p>
+            </div>
 
             {/* CTA Form */}
             <div className="max-w-lg mx-auto animate-scale-in animate-delay-700">
