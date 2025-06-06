@@ -9,6 +9,7 @@ import { generateAutomatedReport, type Hazard } from "./automated-report-generat
 import { callDeepseek, renderAuditHTML } from "./deepseek-service";
 import { generatePDFFromHTML } from "./pdf-generator";
 import { calculateInsuranceSavings, getRecommendationsByHazard } from "./insurance-calculator";
+import { generateCreativeReport } from "./creative-report-generator";
 import axios from 'axios';
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -294,6 +295,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Insurance calculator endpoints
   app.post("/api/insurance/calculate", calculateInsuranceSavings);
   app.get("/api/insurance/recommendations/:hazard", getRecommendationsByHazard);
+
+  // Creative report generator using OpenRouter API
+  app.post("/api/audits/:auditId/creative-report", generateCreativeReport);
 
   return createServer(app);
 }

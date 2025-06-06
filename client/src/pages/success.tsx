@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { DownloadReportButton } from "@/components/download-report-button";
+import { CreativeReportButton } from "@/components/creative-report-button";
 
 export default function Success() {
   const [, params] = useRoute("/success/:auditId");
@@ -171,21 +172,37 @@ export default function Success() {
         </div>
 
         {/* Action Cards */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow">
             <div className="flex items-center mb-4">
               <div className="w-12 h-12 bg-disaster-green-600 rounded-full flex items-center justify-center mr-4">
                 <Download className="text-white h-6 w-6" />
               </div>
               <div>
-                <h3 className="text-lg font-medium text-gray-900">Download Report</h3>
-                <p className="text-sm text-gray-600">Get your personalized PDF recommendations</p>
+                <h3 className="text-lg font-medium text-gray-900">Standard Report</h3>
+                <p className="text-sm text-gray-600">Comprehensive PDF recommendations</p>
               </div>
             </div>
             <DownloadReportButton 
               auditId={auditId}
               zipCode={audit?.zipCode}
               className="w-full active:scale-95 transition-all"
+            />
+          </div>
+
+          <div className="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow">
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center mr-4">
+                <FileText className="text-white h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-gray-900">Creative Report</h3>
+                <p className="text-sm text-gray-600">Magazine-style visual report</p>
+              </div>
+            </div>
+            <CreativeReportButton 
+              auditId={auditId}
+              variant="creative"
             />
           </div>
 
