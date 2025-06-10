@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import Stripe from "stripe";
 import { storage } from "./storage";
 import { generatePDFReport } from "./report";
-import { insertAuditSchema } from "@shared/schema";
+import { insertAuditSchema, insertEmailSignupSchema } from "@shared/schema";
 import { z } from "zod";
 import { generateAutomatedReport, type Hazard } from "./automated-report-generator";
 import { callDeepseek, renderAuditHTML } from "./deepseek-service";

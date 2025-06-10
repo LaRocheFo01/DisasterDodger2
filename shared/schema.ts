@@ -103,6 +103,21 @@ export const audits = pgTable("audits", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const emailSignups = pgTable("email_signups", {
+  id: serial("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  downloadedKit: boolean("downloaded_kit").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertEmailSignupSchema = createInsertSchema(emailSignups).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertEmailSignup = z.infer<typeof insertEmailSignupSchema>;
+export type EmailSignup = typeof emailSignups.$inferSelect;
+
 export const insertAuditSchema = z.object({
   zipCode: z.string().min(5).max(5),
   primaryHazard: z.string(),
