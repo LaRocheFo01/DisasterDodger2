@@ -55,24 +55,24 @@ export default function Landing() {
 
       {/* Hero Section with Interactive Elements */}
       <section className="min-h-screen flex items-center justify-center relative overflow-hidden pt-20">
-        {/* Animated Background Elements */}
+        {/* Static Background Elements */}
         <div className="absolute inset-0">
-          <div className="absolute top-20 left-10 w-32 h-32 bg-green-200/30 rounded-full blur-xl animate-float"></div>
-          <div className="absolute top-40 right-20 w-24 h-24 bg-emerald-300/40 rounded-full blur-lg animate-float animate-delay-700"></div>
-          <div className="absolute bottom-40 left-1/4 w-40 h-40 bg-green-100/50 rounded-full blur-2xl animate-float animate-delay-300"></div>
-          <div className="absolute bottom-20 right-1/3 w-28 h-28 bg-emerald-200/30 rounded-full blur-xl animate-float animate-delay-1000"></div>
+          <div className="absolute top-20 left-10 w-32 h-32 bg-green-200/20 rounded-full blur-xl"></div>
+          <div className="absolute top-40 right-20 w-24 h-24 bg-emerald-300/30 rounded-full blur-lg"></div>
+          <div className="absolute bottom-40 left-1/4 w-40 h-40 bg-green-100/40 rounded-full blur-2xl"></div>
+          <div className="absolute bottom-20 right-1/3 w-28 h-28 bg-emerald-200/20 rounded-full blur-xl"></div>
         </div>
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left Column - Content */}
-            <div className="text-left animate-fade-in-up">
+            <div className="text-left">
 
 
               <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
                 Your Home's
                 <span className="block text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600">
-                  Protector
+                  Guardian Angel
                 </span>
                 <span className="block text-4xl lg:text-5xl text-gray-700">
                   Against Disasters
@@ -80,7 +80,8 @@ export default function Landing() {
               </h1>
 
               <p className="text-xl text-gray-600 leading-relaxed mb-8 max-w-lg">
-              Get a clear, report to make your home safer, no jargon, no hassle, right in five minutes.              </p>
+                Transform your home into a fortress against nature's fury. Our comprehensive assessment creates a personalized shield of protection in just 5 minutes.
+              </p>
 
               {/* Interactive Stats */}
               <div className="grid grid-cols-3 gap-4 mb-8">
@@ -89,7 +90,7 @@ export default function Landing() {
                   <div className="text-sm text-gray-600">Quick Setup</div>
                 </div>
                 <div className="text-center bg-white/60 backdrop-blur-sm rounded-xl p-4 hover:bg-white/80 transition-all duration-300">
-                  <div className="text-2xl font-bold text-green-600">20%</div>
+                  <div className="text-2xl font-bold text-green-600">35%</div>
                   <div className="text-sm text-gray-600">Avg Savings</div>
                 </div>
                 <div className="text-center bg-white/60 backdrop-blur-sm rounded-xl p-4 hover:bg-white/80 transition-all duration-300">
@@ -127,32 +128,16 @@ export default function Landing() {
               </form>
             </div>
 
-            {/* Right Column - Interactive Visualization */}
-            <div className="relative animate-scale-in animate-delay-500">
-              {/* Central Home Illustration */}
-              <div className="relative mx-auto w-96 h-96 flex items-center justify-center">
+            {/* Right Column - Clean Visualization */}
+            <div className="relative">
+              {/* Central Home Illustration - Bigger Size */}
+              <div className="relative mx-auto w-[500px] h-[500px] flex items-center justify-center">
                 <img 
-                  src="/assets/disaster-dodger-illustration.png" 
-                  alt="Protected home with natural disaster elements" 
-                  className="w-full h-full object-contain"
+                  src="@assets/Illustration DisasterDodger seamless.jpg" 
+                  alt="Disaster Dodger seamless illustration" 
+                  className="w-full h-full object-contain rounded-2xl"
                 />
-                
-                {/* Floating Protection Shields */}
-                <div className="absolute -top-4 -left-4 w-16 h-16 bg-red-100 rounded-full flex items-center justify-center animate-float">
-                  <Flame className="w-8 h-8 text-red-500" />
-                </div>
-                <div className="absolute -top-4 -right-4 w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center animate-float animate-delay-300">
-                  <Waves className="w-8 h-8 text-blue-500" />
-                </div>
-                <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center animate-float animate-delay-700">
-                  <Zap className="w-8 h-8 text-yellow-500" />
-                </div>
-                <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center animate-float animate-delay-1000">
-                  <Wind className="w-8 h-8 text-gray-500" />
-                </div>
               </div>
-
-
             </div>
           </div>
         </div>
@@ -163,12 +148,11 @@ export default function Landing() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
             <h2 className="text-4xl font-bold text-gray-900 mb-6">
-              Three Steps to 
-
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600"> a Safer Home</span>
+              Protection That Feels Like
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600"> Magic</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Follow these quick steps to see exactly where your risks are, and how to fix them:
+              Three simple steps to transform your home into an impenetrable sanctuary
             </p>
           </div>
 
@@ -178,13 +162,12 @@ export default function Landing() {
             
             <div className="grid lg:grid-cols-3 gap-16 relative">
               {/* Step 1 */}
-              <div className="text-center group">
-                <div className="relative mx-auto w-32 h-32 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mb-8 shadow-2xl group-hover:scale-110 transition-all duration-500">
+              <div className="text-center">
+                <div className="relative mx-auto w-32 h-32 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center mb-8 shadow-2xl">
                   <MapPin className="w-16 h-16 text-white" />
                   <div className="absolute -top-3 -right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center font-bold text-green-600 shadow-lg">
                     1
                   </div>
-                  <div className="absolute inset-0 rounded-full bg-white/20 scale-110 animate-ping"></div>
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">Enter Your Location</h3>
                 <p className="text-gray-600 leading-relaxed">
@@ -193,13 +176,12 @@ export default function Landing() {
               </div>
 
               {/* Step 2 */}
-              <div className="text-center group">
-                <div className="relative mx-auto w-32 h-32 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full flex items-center justify-center mb-8 shadow-2xl group-hover:scale-110 transition-all duration-500">
+              <div className="text-center">
+                <div className="relative mx-auto w-32 h-32 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full flex items-center justify-center mb-8 shadow-2xl">
                   <CheckCircle className="w-16 h-16 text-white" />
                   <div className="absolute -top-3 -right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center font-bold text-green-600 shadow-lg">
                     2
                   </div>
-                  <div className="absolute inset-0 rounded-full bg-white/20 scale-110 animate-ping animation-delay-1000"></div>
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">Answer Simple Questions</h3>
                 <p className="text-gray-600 leading-relaxed">
@@ -208,13 +190,12 @@ export default function Landing() {
               </div>
 
               {/* Step 3 */}
-              <div className="text-center group">
-                <div className="relative mx-auto w-32 h-32 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mb-8 shadow-2xl group-hover:scale-110 transition-all duration-500">
+              <div className="text-center">
+                <div className="relative mx-auto w-32 h-32 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mb-8 shadow-2xl">
                   <Star className="w-16 h-16 text-white" />
                   <div className="absolute -top-3 -right-3 w-8 h-8 bg-white rounded-full flex items-center justify-center font-bold text-green-600 shadow-lg">
                     3
                   </div>
-                  <div className="absolute inset-0 rounded-full bg-white/20 scale-110 animate-ping animation-delay-2000"></div>
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">Get Your Report</h3>
                 <p className="text-gray-600 leading-relaxed">
