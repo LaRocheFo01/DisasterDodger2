@@ -72,7 +72,7 @@ export default function Landing() {
               <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
                 Your Home's
                 <span className="block text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600">
-                  Guardian Angel
+                  Protector
                 </span>
                 <span className="block text-4xl lg:text-5xl text-gray-700">
                   Against Disasters
@@ -80,8 +80,7 @@ export default function Landing() {
               </h1>
 
               <p className="text-xl text-gray-600 leading-relaxed mb-8 max-w-lg">
-                Transform your home into a fortress against nature's fury. Our comprehensive assessment creates a personalized shield of protection in just 5 minutes.
-              </p>
+              Get a clear, report to make your home safer, no jargon, no hassle, right in five minutes.              </p>
 
               {/* Interactive Stats */}
               <div className="grid grid-cols-3 gap-4 mb-8">
@@ -90,7 +89,7 @@ export default function Landing() {
                   <div className="text-sm text-gray-600">Quick Setup</div>
                 </div>
                 <div className="text-center bg-white/60 backdrop-blur-sm rounded-xl p-4 hover:bg-white/80 transition-all duration-300">
-                  <div className="text-2xl font-bold text-green-600">35%</div>
+                  <div className="text-2xl font-bold text-green-600">20%</div>
                   <div className="text-sm text-gray-600">Avg Savings</div>
                 </div>
                 <div className="text-center bg-white/60 backdrop-blur-sm rounded-xl p-4 hover:bg-white/80 transition-all duration-300">
@@ -164,11 +163,12 @@ export default function Landing() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
             <h2 className="text-4xl font-bold text-gray-900 mb-6">
-              Protection That Feels Like
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600"> Magic</span>
+              Three Steps to 
+
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-600"> a Safer Home</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Three simple steps to transform your home into an impenetrable sanctuary
+              Follow these quick steps to see exactly where your risks are, and how to fix them:
             </p>
           </div>
 

@@ -1,6 +1,6 @@
 import { db } from './database';
-import type { Audit, InsertAudit } from '@shared/schema';
-import { audits } from '@shared/schema';
+import type { Audit, InsertAudit, EmailSignup, InsertEmailSignup } from '@shared/schema';
+import { audits, emailSignups } from '@shared/schema';
 import { eq } from 'drizzle-orm';
 
 export const storage = {
@@ -100,6 +100,48 @@ export const storage = {
     } catch (error: any) {
       console.error('Error getting completed audits:', error);
       throw new Error('Failed to get completed audits: ' + error.message);
+    }
+  },
+
+  async createEmailSignup(data: InsertEmailSignup): Promise<EmailSignup> {
+    try {
+      console.log("Storage: Creating email signup with data:", data);
+      const result = await db.insert(emailSignups).values(data).returning();
+      console.log("Storage: Email signup created:", result[0]);
+      return result[0];
+    } catch (error: any) {
+      console.error("Storage: Create email signup error:", error);
+      throw new Error('Failed to create email signup: ' + error.message);
+    }
+  },
+
+  async getEmailSignup(email: string): Promise<EmailSignup | null> {
+    try {
+      const result = await db
+        .select()
+        .from(emailSignups)
+        .where(eq(emailSignups.email, email))
+        .limit(1);
+      
+      return result[0] || null;
+    } catch (error: any) {
+      console.error('Error getting email signup:', error);
+      throw new Error('Failed to get email signup: ' + error.message);
+    }
+  },
+
+  async updateEmailSignup(email: string, updates: Partial<EmailSignup>): Promise<EmailSignup | null> {
+    try {
+      const result = await db
+        .update(emailSignups)
+        .set(updates)
+        .where(eq(emailSignups.email, email))
+        .returning();
+      
+      return result[0] || null;
+    } catch (error: any) {
+      console.error('Error updating email signup:', error);
+      throw new Error('Failed to update email signup: ' + error.message);
     }
   }
 };
