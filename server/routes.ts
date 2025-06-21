@@ -17,6 +17,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.send({ message: "Hello from the server!" });
   });
 
+  // Email signup for teaser page
+  app.post("/api/email-signup", async (req, res) => {
+    try {
+      const validatedData = insertEmailSignupSchema.parse(req.body);
+      
+      // Check if email already exists
+      const existingSignup = await storage.getEmailSignup(validatedData.email);
+      if (existingSignup) {
+        // Update download status if user downloads again
+        await storage.updateEmailSignup(validatedData.email, { downloadedKit: true });
+        return res.status(200).json({ 
+          message: "Welcome back! Your emergency kit is ready for download.",
+          existing: true 
+        });
+      }
+
+      // Create new email signup
+      const emailSignup = await storage.createEmailSignup({
+        ...validatedData,
+        downloadedKit: true
+      });
+
+      return res.status(201).json({ 
+        message: "Thank you for signing up! Your emergency kit is downloading.",
+        signup: emailSignup 
+      });
+    } catch (e: any) {
+      console.error("Email signup error:", e);
+      return res.status(400).json({ 
+        message: e.message || "Failed to process signup" 
+      });
+    }
+  });
+
   // Get hazard data for a zip code
   app.get("/api/hazards/:zipCode", async (req, res) => {
     try {
