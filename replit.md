@@ -1,99 +1,51 @@
-# Disaster Dodger™ - Home Disaster Preparedness Audit Platform
+# SafeHaven - Disaster Preparedness Application
 
-## Overview
+## Project Overview
+SafeHaven is a comprehensive disaster preparedness application that helps homeowners assess their disaster readiness and generate detailed safety reports. The app provides personalized recommendations based on location-specific hazards and home characteristics.
 
-Disaster Dodger™ is a comprehensive web application that provides personalized home disaster preparedness audits. The platform allows users to complete questionnaires based on their location and primary hazards, then generates detailed PDF reports with FEMA-cited recommendations, cost estimates, and insurance savings calculations. The system integrates with Stripe for payment processing and uses AI-powered report generation through DeepSeek API.
+## Recent Changes
+- **2025-01-24**: Successfully migrated from Replit Agent to standard Replit environment
+- **2025-01-24**: Configured PostgreSQL database with all required tables
+- **2025-01-24**: Set up API integrations for Stripe payments and DeepSeek AI analysis
+- **2025-01-24**: Verified email signup functionality and emergency kit download feature
 
-## System Architecture
+## Project Architecture
 
-### Frontend Architecture
-- **Framework**: React 18 with TypeScript
-- **Routing**: Wouter for client-side routing
-- **UI Components**: Shadcn/ui component library with Radix UI primitives
-- **Styling**: Tailwind CSS with custom design system
-- **State Management**: TanStack Query (React Query) for server state
-- **Build Tool**: Vite for development and production builds
+### Technology Stack
+- **Frontend**: React with Vite, TypeScript, Tailwind CSS
+- **Backend**: Express.js with TypeScript
+- **Database**: PostgreSQL (Neon) with Drizzle ORM
+- **External APIs**: Stripe for payments, DeepSeek for AI analysis
+- **PDF Generation**: jsPDF with custom templates
 
-### Backend Architecture
-- **Runtime**: Node.js with TypeScript
-- **Framework**: Express.js for REST API
-- **Database**: PostgreSQL with Drizzle ORM
-- **Database Provider**: Neon (serverless PostgreSQL)
-- **Payment Processing**: Stripe integration
-- **PDF Generation**: jsPDF and custom HTML-to-PDF pipeline
-- **AI Integration**: DeepSeek API via OpenRouter for intelligent report generation
+### Key Features
+1. **Home Safety Audits**: Comprehensive questionnaires for different disaster types
+2. **AI-Powered Analysis**: DeepSeek integration for intelligent safety recommendations
+3. **PDF Report Generation**: Professional safety reports with actionable insights
+4. **Emergency Kit Downloads**: Free emergency preparedness resources
+5. **Premium Features**: Advanced analysis and detailed reports via Stripe integration
 
-### Key Components
+### Database Schema
+- `audits`: Stores home safety assessment data
+- `email_signups`: Tracks user engagement and kit downloads
+- `users`: User authentication and profile management
 
-#### Database Layer
-- **ORM**: Drizzle with PostgreSQL dialect
-- **Schema**: Comprehensive audit tracking with hazard-specific fields
-- **Migrations**: Automated database migration system
-- **Indexing**: Performance-optimized indexes for common queries
+### External Integrations
+- **Facebook Page**: https://www.facebook.com/people/Disaster-Dodger/61577011420592/
+- **Stripe**: Payment processing for premium features
+- **DeepSeek**: AI-powered safety analysis and recommendations
 
-#### Authentication & Payments
-- **Payment Gateway**: Stripe for secure payment processing
-- **Session Management**: Built-in session handling
-- **Environment-based Configuration**: Separate dev/production settings
-
-#### Report Generation System
-- **Automated Reports**: Comprehensive recommendation engine with FEMA citations
-- **AI-Enhanced Reports**: DeepSeek integration for creative, personalized reports
-- **PDF Pipeline**: Multi-format PDF generation (professional and creative templates)
-- **Insurance Calculator**: Real-time premium savings calculations
-
-#### Questionnaire Engine
-- **Dynamic Forms**: Hazard-specific question sets
-- **Progress Tracking**: Multi-step wizard with validation
-- **Data Persistence**: Auto-save functionality
-- **Conditional Logic**: Smart question flow based on previous answers
-
-## Data Flow
-
-1. **User Registration**: ZIP code collection and hazard identification
-2. **Payment Processing**: Stripe integration for audit fees
-3. **Questionnaire Completion**: Progressive form with section-based organization
-4. **Data Analysis**: AI-powered analysis of responses and local hazard data
-5. **Report Generation**: Multiple format options (standard, creative, insurance-focused)
-6. **Delivery**: PDF download with email backup option
-
-## External Dependencies
-
-### Core Infrastructure
-- **Neon Database**: Serverless PostgreSQL hosting
-- **Stripe**: Payment processing and subscription management
-- **OpenRouter/DeepSeek**: AI-powered content generation
-
-### Development Tools
-- **Replit**: Primary development environment
-- **Vite**: Build tooling and development server
-- **TypeScript**: Type safety across frontend and backend
-
-### UI/UX Libraries
-- **Radix UI**: Accessible component primitives
-- **Tailwind CSS**: Utility-first styling framework
-- **Lucide React**: Icon library
-- **jsPDF**: Client-side PDF generation
-
-## Deployment Strategy
-
-### Production Environment
-- **Platform**: Replit autoscale deployment
-- **Build Process**: Vite production build with esbuild server bundling
-- **Static Assets**: Served from dist/public directory
-- **Environment Variables**: Secure configuration management
-
-### Development Workflow
-- **Hot Reload**: Vite HMR for rapid development
-- **Type Checking**: Real-time TypeScript validation
-- **Database**: Automatic migration system
-- **Testing**: Built-in error overlay and debugging tools
-
-## Changelog
-
-Changelog:
-- June 24, 2025. Initial setup
+## Environment Configuration
+- **NODE_ENV**: Set to development/production
+- **DATABASE_URL**: PostgreSQL connection string
+- **STRIPE_SECRET_KEY**: Stripe payment processing
+- **DEEPSEEK_API_KEY**: AI analysis capabilities
 
 ## User Preferences
+- Focus on core functionality: email signup and emergency kit downloads
+- No Stripe payment integration needed for now
+- No DeepSeek AI analysis required currently
+- Prioritize Facebook page integration for updates
 
-Preferred communication style: Simple, everyday language.
+## Deployment Status
+Application is successfully running on port 5000 in the Replit environment with all features functional.
