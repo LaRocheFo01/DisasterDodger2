@@ -149,7 +149,7 @@ export default function Teaser() {
                   <div className="text-center">
                     <p className="text-gray-600 mb-4">Follow our journey and get updates:</p>
                     <Button
-                      onClick={() => window.open('https://facebook.com/DisasterDodger', '_blank')}
+                      onClick={() => window.open('https://www.facebook.com/people/Disaster-Dodger/61577011420592/', '_blank')}
                       className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold"
                     >
                       <Facebook className="mr-2 h-5 w-5" />
@@ -169,7 +169,7 @@ export default function Teaser() {
                     Your emergency kit should be downloading now. We'll email you when Disaster Dodger launches!
                   </p>
                   <Button
-                    onClick={() => window.open('https://facebook.com/DisasterDodger', '_blank')}
+                    onClick={() => window.open('https://www.facebook.com/people/Disaster-Dodger/61577011420592/', '_blank')}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold"
                   >
                     <Facebook className="mr-2 h-5 w-5" />
